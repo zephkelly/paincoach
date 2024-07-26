@@ -10,6 +10,12 @@
     --text-light: #000000;
     --text-dark: #FFFFFF;
     --text-color: var(--text-light);
+
+    --pain-none: #838383;
+    --pain-0: #83A45D;
+    --pain-1: #E8CB9F;
+    --pain-2: #EF8D56;
+    --pain-3: #D24646;
 }
 
 @media (prefers-color-scheme: dark) {
