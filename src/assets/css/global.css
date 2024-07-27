@@ -1,0 +1,59 @@
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/inter-400.ttf') format('truetype');
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/inter-300.ttf') format('truetype');
+    font-weight: 300;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/inter-200.ttf') format('truetype');
+    font-weight: 200;
+    font-display: swap;
+}
+
+/* Colors */
+:root {
+    --background-light: #FFFFFF;
+    --background-dark: #121212;
+    --background-color: var(--background-light);
+
+    --panel-light: #EFEFEF;
+    --panel-dark: #1C1C1E;
+    --panel: var(--panel-light);
+
+    --text-light: #000000;
+    --text-dark: #FFFFFF;
+    --text-color: var(--text-light);
+
+    --pain-none: #838383;
+    --pain-0: #83A45D;
+    --pain-1: #E8CB9F;
+    --pain-2: #EF8D56;
+    --pain-3: #D24646;
+
+    --lifestyle-1: #39abc4;
+    --lifestyle-2: #2ca7c2;
+    --lifestyle-3: #3da4bc;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: var(--background-dark);
+        --panel: var(--panel-dark);
+        --text-color: var(--text-dark);
+    }
+}
+
+
+:root {
+    --font-size-14: clamp(12px, 3.9vw, 16px);
+    --font-size-18: clamp(16px, 5vw, 20px);
+}

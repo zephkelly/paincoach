@@ -1,12 +1,17 @@
 <template>
-    <section class="calendar overview" :class="currentTimeline" ref="parentContainer">
-        <div class="title wrapper">
-            <h2>This Week</h2>
+    <section class="calendar overview panel" :class="currentTimeline" ref="parentContainer">
+        <div class="headers wrapper">
+            <h2>This <span>{{ currentTimeline }}</span></h2>
             <h3>Aug 11</h3>
         </div>
         <div class="wrapper days">
-            <div ref="daysContainer" :style="daysContainerWidthStyle">
-                <DayIndicator v-for="(day, index) in numberOfDays" labelType="day" :dayIndex="index" :labelContent="dayLabels[index % 7]" :painLevel="generatedPainLevels[index]" />
+            <div ref="daysContainer" class="days-grid">
+                <DayIndicator v-for="(day, index) in numberOfDays" 
+                    labelType="day" 
+                    :dayIndex="index" 
+                    :labelContent="dayLabels[index % 7]" 
+                    :painLevel="generatedPainLevels[index]" 
+                />
             </div>
         </div>
     </section>
@@ -16,63 +21,18 @@
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import DayIndicator from '@/components/overview/dayIndicator.vue';
 import { useTimeline } from '@/composables/overview/currentTimeline';
-import { DayIndicatorLabel, DayLabel } from '@/types/dayIndicator';
+import { DayLabel } from '@/types/dayIndicator';
 import { PainLevel } from '@/types/painLevel';
 
 const { currentTimeline, setTimeline } = useTimeline();
-setTimeline('month');
-
-// Dynamically set day container width
-const parentContainer = ref<HTMLDivElement | null>(null);
-const daysContainer = ref<HTMLDivElement | null>(null);
+setTimeline('week');
 
 const numberOfDays = ref(7);
-const daysContainerWidth = ref(0);
 const isMounted = ref(false);
-
-const parentContainerMargin = 32;
-const dayIndicatorWidth = 34;
-const dayIndicatorGap = 8;
-
-function calculateDaysContainerWidth() {
-    if (!parentContainer.value || !daysContainer.value) return;
-
-    nextTick(() => {
-        const parentWidth = parentContainer.value.clientWidth;
-        const availableSpace = parentWidth - parentContainerMargin;
-
-        let dayCount = Math.floor((availableSpace + dayIndicatorGap) / (dayIndicatorWidth + dayIndicatorGap));
-
-        if (dayCount > numberOfDays.value) {
-            dayCount = numberOfDays.value;
-        }
-
-        const totalWidth = dayCount * (dayIndicatorWidth + dayIndicatorGap) - dayIndicatorGap;
-        daysContainerWidth.value = totalWidth;
-    });
-}
-
-const daysContainerWidthStyle = computed(() => ({
-    width: `${daysContainerWidth.value}px`
-}));
 
 onMounted(() => {
     isMounted.value = true;
     generatedPainLevels.value = generatePainLevels(numberOfDays.value);
-
-    const resizeObserver = new ResizeObserver(() => {
-        if (isMounted.value) {
-            calculateDaysContainerWidth();
-        }
-    });
-    
-    if (parentContainer.value) {
-        resizeObserver.observe(parentContainer.value);
-    }
-
-    onUnmounted(() => {
-        resizeObserver.disconnect();
-    });
 });
 
 // define our day labels
@@ -89,9 +49,6 @@ function generatePainLevels(count: number) {
     return painLevels[randomIndex];
   });
 }
-
-// Setting  number of days based on current timeline
-
 
 switch (currentTimeline.value) {
     case 'week':
@@ -111,63 +68,45 @@ switch (currentTimeline.value) {
         console.log('Week');
         break;
 }
-
-watch(currentTimeline, () => {
-    nextTick(() => {
-        calculateDaysContainerWidth();
-    });
-});
-
-watch(numberOfDays, (newCount) => {
-    generatedPainLevels.value = generatePainLevels(newCount);
-});
 </script>
 
 <style lang="css" scoped>
-section {
-    width: 100%;
-    padding: 24px 16px;
-    background-color: var(--panel);
-    border-radius: 16px;
-    transition: width 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+.calendar {
+    max-width: 452px;
+    min-width: 268px;
 }
 
-section.week {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.title {
+.headers.wrapper {
     display: flex;
     justify-content: flex-start;
-    gap: 12px;
 }
 
-.days {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 32px;
-
+.headers.wrapper > h2 {
+    margin-right: 4%;
 }
 
-.days > div {
-    display: inline-flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 8px;
+.headers.wrapper > h2 > span {
+    text-transform: capitalize;
 }
 
-h2, h3 {
-    font-family: 'Inter', sans-serif;
-    color: var(--text-color);
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0;
+.headers.wrapper > h3 {
+    opacity: 0.3;
 }
 
-h3 {
-    opacity: 0.2;
+@media (prefers-color-scheme: light) {
+    .headers.wrapper > h3 {
+        opacity: 0.5;
+    }
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-auto-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr;
+    justify-content: space-around;
+    gap: 0.5rem 0.5rem;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 </style>

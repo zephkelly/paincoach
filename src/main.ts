@@ -31,9 +31,9 @@ import '@ionic/vue/css/display.css';
 /* @import '@ionic/vue/css/palettes/dark.class.css'; */
 // import '@ionic/vue/css/palettes/dark.system.css';
 
-import './assets/global.css';
-import './assets/main.css';
-import './assets/reset.css';
+import './assets/css/global.css';
+import './assets/css/main.css';
+import './assets/css/reset.css';
 
 const app = createApp(App)
   .use(IonicVue)

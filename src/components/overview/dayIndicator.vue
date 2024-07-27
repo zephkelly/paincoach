@@ -1,7 +1,8 @@
 <template>
     <div>
         <p class="day-label" v-if="dayIndex <= 6">{{ labelContent }}</p>
-        <span class="visual" :class="[`pain-level-${painLevel}`]"></span>
+        <span class="visual first-row" :class="[`pain-level-${painLevel}`]" v-if="dayIndex <= 6"></span>
+        <span class="visual" :class="[`pain-level-${painLevel}`]" v-else></span>
     </div>
 </template>
 
@@ -9,32 +10,76 @@
 import { DayIndicatorLabel, DayLabel } from '@/types/dayIndicator';
 import { PainLevel } from '@/types/painLevel';
 
-interface Props{
+interface Props {
     labelType: DayIndicatorLabel,
     labelContent: DayLabel | Number,
-    painLevel: DayIndicatorPainLevel,
-    dayIndex: Number
+    painLevel: PainLevel,
+    dayIndex: number
 }
 
 const props = defineProps<Props>();
-
-console.log(props.labelContent);
 </script>
 
+<style lang="css">
+:root {
+    --day-indicator-size: 34px;
+}
+
+@media (max-width: 349px) {
+    :root {
+        --day-indicator-size: 28px;
+    }
+}
+</style>
+
 <style lang="css" scoped>
+
+
+div {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    max-width: 60px;
+    aspect-ratio: 1/1;
+}
+
 p {
+    font-family: 'Inter', sans-serif;
     text-align: center;
     font-size: 10px;
     color: var(--text-color);
     margin-bottom: 8px;
+    font-size: clamp(10px, 3vw, 14px);
+    opacity: 0.3;
+}
+
+@media (prefers-color-scheme: light) {
+    p {
+        opacity: 0.5;
+    }
 }
 
 span {
     display: flex;
-    height: 34px;
-    width: 34px;
+    width: 100%;
+    height: 100%;
+    max-height: 60px;
+    max-width: 60px;
     background-color: var(--pain-none);
     border-radius: 50%;
+    will-change: width, height;
+    transition: width 0.28s ease, height 0.28s ease;
+}
+
+span.first-row {
+    margin-top: 0px;
+}
+
+@media (max-width: 349px) {
+    span {
+        transition: width 0.08s ease, height 0.08s ease;
+    }
 }
 
 .pain-level-0 {

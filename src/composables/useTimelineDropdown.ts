@@ -11,7 +11,7 @@ export function useTimelineDropdown() {
     isEnabled.value = false
   }
 
-  function toggle() {
+  function toggleEnabled() {
     isEnabled.value = !isEnabled.value
   }
 
@@ -19,6 +19,6 @@ export function useTimelineDropdown() {
     isEnabled,
     enable,
     disable,
-    toggle
+    toggleEnabled
   }
 }

@@ -22,6 +22,7 @@ import TimelineDropdown from './timelineDropdown.vue';
 <style lang="css" scoped>
 section {
     height: 44px;
+    width: 100%;
     box-sizing: border-box;
     margin-bottom: 2rem;
 }
@@ -46,7 +47,9 @@ section {
 h1 {
     font-family: 'Inter', sans-serif;
     color: var(--text-color);
+    font-weight: 300;
     font-size: 14px;
+    letter-spacing: 0.1px;;
 }
 
 .btn.search {

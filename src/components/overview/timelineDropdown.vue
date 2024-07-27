@@ -1,7 +1,7 @@
 <template>
     <nav>
         <div class="wrapper">
-            <button @click.prevent="toggleTimeline" :class="currentTimeline">
+            <button @click.prevent="toggleEnabled" :class="currentTimeline">
                 <p>{{ displayTimeline }}</p>
                 <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"><path d="M480-397.85 311.85-566h336.3L480-397.85Z"/></svg>
             </button>
@@ -15,7 +15,7 @@ import { ref, computed } from 'vue';
 import { useTimelineDropdown } from '@/composables/useTimelineDropdown';
 import { useTimeline } from '@/composables/overview/currentTimeline';
 
-const { toggleTimeline } = useTimelineDropdown();
+const { toggleEnabled } = useTimelineDropdown();
 
 const { currentTimeline, setTimeline, isCurrentTimeline } = useTimeline()
 
