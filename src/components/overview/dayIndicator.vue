@@ -7,8 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import { DayIndicatorLabel, DayLabel } from '@/types/dayIndicator';
-import { PainLevel } from '@/types/painLevel';
+import type { DayIndicatorLabel, DayLabel } from '~/paincoach/src/types/dayIndicator';
+import type { PainLevel } from '~/paincoach/src/types/painLevel';
 
 interface Props {
     labelType: DayIndicatorLabel,

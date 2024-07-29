@@ -1,7 +1,7 @@
 <template>
     <section class="header overview">
         <header class="overview-header">
-            <TimelineDropdown />
+            <OverviewTimelineDropdown />
             <div class="wrapper">
                 <h1>Overview</h1>
             </div>
@@ -15,7 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import TimelineDropdown from './timelineDropdown.vue';
 
 </script>
 
@@ -32,7 +31,6 @@ section {
     grid-template-columns: 82px 1fr 82px;
     height: 100%;
 }
-
 
 .wrapper {
     display: flex;

@@ -6,7 +6,7 @@
         </div>
         <div class="wrapper days">
             <div ref="daysContainer" class="days-grid">
-                <DayIndicator v-for="(day, index) in numberOfDays" 
+                <OverviewDayIndicator v-for="(day, index) in numberOfDays" 
                     labelType="day" 
                     :dayIndex="index" 
                     :labelContent="dayLabels[index % 7]" 
@@ -18,13 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
-import DayIndicator from '@/components/overview/dayIndicator.vue';
-import { useTimeline } from '@/composables/overview/currentTimeline';
-import { DayLabel } from '@/types/dayIndicator';
-import { PainLevel } from '@/types/painLevel';
+const { currentTimeline, setTimeline } = useOverviewTimeline();
 
-const { currentTimeline, setTimeline } = useTimeline();
 setTimeline('week');
 
 const numberOfDays = ref(7);

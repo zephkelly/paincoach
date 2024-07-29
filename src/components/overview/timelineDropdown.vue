@@ -11,13 +11,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useTimelineDropdown } from '@/composables/useTimelineDropdown';
-import { useTimeline } from '@/composables/overview/currentTimeline';
-
 const { toggleEnabled } = useTimelineDropdown();
-
-const { currentTimeline, setTimeline, isCurrentTimeline } = useTimeline()
+const { currentTimeline } = useOverviewTimeline();
 
 const displayTimeline = computed(() => {
   return currentTimeline.value === 'week' ? '7 Days' : currentTimeline.value;
@@ -42,7 +37,6 @@ nav {
 button {
     position: relative;
     width: 100%;
-    background-color: transparent;
     padding: 8px 12px;
 }
 

@@ -1,0 +1,16 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "composite": true,
+        "outDir": "./dist",
+        "rootDir": "../",
+        "paths": {
+            "~/*": ["./"],
+            "@composables/*": ["./composables/*"],
+            "@components/*": ["./components/*"],
+            "@types/*": ["./types/*"],
+        }, 
+    },
+    "include": ["./**/*.ts", "./**/*.js", "./**/*.vue"],
+    "exclude": ["node_modules"]
+}

@@ -10,16 +10,29 @@
             </div>
             <h3>{{ factorName }}</h3>
         </div>
-        <span class="status indicator"></span>
+        <span class="status indicator" :class="getFactorColor()"></span>
     </button>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
+// import type { PainFactor } from './../../types/painFactor';
+import type { PainFactor } from '@types/painFactor';
 
 interface Props {
-    factorName: string,
+    factorName: PainFactor,
     factorValue: number
+}
+
+function getFactorColor(): string {
+    if (props.factorValue >= 0 && props.factorValue <= 2) {
+        return 'pain-0';
+    } else if (props.factorValue > 2 && props.factorValue <= 4) {
+        return 'pain-1';
+    } else if (props.factorValue > 4 && props.factorValue <= 6) {
+        return 'pain-2';
+    } else {
+        return 'pain-3';
+    }
 }
 
 const props = defineProps<Props>();
@@ -72,8 +85,26 @@ h3 {
 .status {
     height: 100%;
     width: 1rem;
-    background-color: var(--pain-1);
+    background-color: var(--pain-none);
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
 }
+
+.status.pain-0 {
+    background-color: var(--pain-0);
+}
+
+.status.pain-1 {
+    background-color: var(--pain-1);
+}
+
+.status.pain-2 {
+    background-color: var(--pain-2);
+}
+
+.status.pain-3 {
+    background-color: var(--pain-3);
+}
+
+
 </style>

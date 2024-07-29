@@ -5,21 +5,24 @@
         </div>
     </section>
     <div class="wrapper factors">
-        <Factor v-for="factor in props.painFactors" :factorName="factor.factorType" :factorValue="factor.factorValue"/>
+        <OverviewFactor v-for="factor in props.painFactors" :factorName="factor.factorType" :factorValue="factor.factorValue"/>
     </div>
 </template>
 
 <script setup lang="ts">
-import Factor from './factor.vue';
-import { ref, onMounted, nextTick } from 'vue';
+// import { defineProps, ref, onMounted, nextTick } from 'vue';
 
-import { PainFactorProps } from '@/types/painFactor';
+import type { PainFactorProps } from '@types/painFactor';
+// import type { PainFactorProps } from '~/paincoach/src/types/painFactor';
 
 interface Props {
     painFactors: PainFactorProps[]
 }
 
 const props = defineProps<Props>();
+
+//determine the order of the factors based on the pain level. Higher renders first
+const orderedFactors = props.painFactors.sort((a, b) => b.factorValue - a.factorValue);
 
 const isMounted = ref(false);
 

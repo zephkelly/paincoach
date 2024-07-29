@@ -13,8 +13,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
-
 interface Props {
     lifestyleScore: number
 }

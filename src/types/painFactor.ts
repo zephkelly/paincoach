@@ -1,6 +1,6 @@
 export type PainFactor = 'psychological distress' | 'sleep' | 'exercise' | 'nutrition' | 'social connection';
 
-export type PainFactorProps = {
+export interface PainFactorProps {
     factorType: PainFactor;
     factorValue: number;
 }
