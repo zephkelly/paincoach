@@ -1,16 +1,10 @@
 <template>
-    <!-- <ion-page>
-        <ion-content class="ion-padding"> -->
-            <main>
-                <OverviewHeader />
-                <div class="page">
-                    <OverviewCalendar />
-                    <OverviewLifestyleScore :lifestyleScore="82"/>
-                    <OverviewPainFactors :painFactors="factors" />
-                </div>
-            </main>
-        <!-- </ion-content>
-    </ion-page> -->
+    <OverviewHeader />
+    <div class="page">
+        <OverviewCalendar />
+        <OverviewLifestyleScore :lifestyleScore="82"/>
+        <OverviewPainFactors :painFactors="factors" />
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -50,29 +44,24 @@ const factors: PainFactorProps[] = [factor5, factor1, factor2, factor3, factor4]
 </script>
 
 <style lang="css" scoped>
-ion-app {
-    background-color: var(--background-color);
-}
-
-ion-content {
-    --background: var(--background-color);
-}
-
-main {
-    height: 100%;
-    width: 100%;
-    background-color: var(--background-color);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
 .page {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     gap: 16px;
+    height: 740px;
     width: 100%;
     margin-bottom: 8rem;
+}
+</style>
+
+<style lang="css">
+.platform-web button {
+    cursor: pointer;
+    transition: background-color 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.platform-web button:hover {
+    background-color: var(--panel-hover);
 }
 </style>

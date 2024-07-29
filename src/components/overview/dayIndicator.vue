@@ -2,17 +2,19 @@
     <div>
         <p class="day-label" v-if="dayIndex <= 6">{{ labelContent }}</p>
         <span class="visual first-row" :class="[`pain-level-${painLevel}`]" v-if="dayIndex <= 6"></span>
-        <span class="visual" :class="[`pain-level-${painLevel}`]" v-else></span>
+        <span class="visual" :class="[`pain-level-${painLevel}`]" v-if="dayIndex > 6"></span>
     </div>
 </template>
 
 <script setup lang="ts">
-import type { DayIndicatorLabel, DayLabel } from '~/paincoach/src/types/dayIndicator';
-import type { PainLevel } from '~/paincoach/src/types/painLevel';
+//@ts-ignore
+import type { DayIndicatorLabel, DayLabel } from '@types/dayIndicator';
+//@ts-ignore
+import type { PainLevel } from '@types/painLevel';
 
 interface Props {
     labelType: DayIndicatorLabel,
-    labelContent: DayLabel | Number,
+    labelContent: DayLabel | number,
     painLevel: PainLevel,
     dayIndex: number
 }
@@ -33,8 +35,6 @@ const props = defineProps<Props>();
 </style>
 
 <style lang="css" scoped>
-
-
 div {
     display: flex;
     flex-direction: column;
@@ -69,7 +69,7 @@ span {
     background-color: var(--pain-none);
     border-radius: 50%;
     will-change: width, height;
-    transition: width 0.28s ease, height 0.28s ease;
+    transition: width 0.28s ease, height 0.28s ease, background-color 0.28s ease;
 }
 
 span.first-row {

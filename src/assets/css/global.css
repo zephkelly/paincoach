@@ -26,8 +26,11 @@
     --background-color: var(--background-light);
 
     --panel-light: #EFEFEF;
+    --panel-light-hover: #c4c4c4;
     --panel-dark: #1C1C1E;
+    --panel-dark-hover: #2C2C2E;
     --panel: var(--panel-light);
+    --panel-hover: var(--panel-light-hover);
 
     --text-light: #000000;
     --text-dark: #FFFFFF;
@@ -48,6 +51,7 @@
     :root {
         --background-color: var(--background-dark);
         --panel: var(--panel-dark);
+        --panel-hover: var(--panel-dark-hover);
         --text-color: var(--text-dark);
     }
 }

@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-// import type { PainFactor } from './../../types/painFactor';
+//@ts-ignore
 import type { PainFactor } from '@types/painFactor';
 
 interface Props {
@@ -86,8 +86,8 @@ h3 {
     height: 100%;
     width: 1rem;
     background-color: var(--pain-none);
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 
 .status.pain-0 {
@@ -105,6 +105,4 @@ h3 {
 .status.pain-3 {
     background-color: var(--pain-3);
 }
-
-
 </style>

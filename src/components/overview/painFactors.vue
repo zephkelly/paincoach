@@ -4,16 +4,25 @@
             <h2>Your Pain Factors</h2>
         </div>
     </section>
-    <div class="wrapper factors">
-        <OverviewFactor v-for="factor in props.painFactors" :factorName="factor.factorType" :factorValue="factor.factorValue"/>
+    <div class="wrapper factors-container">
+        <!-- <Transition name="fade"> -->
+            <div class="loaded factors" v-if="isMounted === true">
+                <OverviewFactor v-for="factor in props.painFactors" :factorName="factor.factorType" :factorValue="factor.factorValue"/> 
+            </div>
+        <!-- </Transition> -->
+        <Transition name="fade">
+            <div class="loading factors" v-if="isMounted === false">
+                <button class="factor" v-for="i in 5">
+                    <span class="indicator"></span>
+                </button>
+            </div>
+        </Transition> 
     </div>
 </template>
 
 <script setup lang="ts">
-// import { defineProps, ref, onMounted, nextTick } from 'vue';
-
+//@ts-ignore
 import type { PainFactorProps } from '@types/painFactor';
-// import type { PainFactorProps } from '~/paincoach/src/types/painFactor';
 
 interface Props {
     painFactors: PainFactorProps[]
@@ -22,7 +31,7 @@ interface Props {
 const props = defineProps<Props>();
 
 //determine the order of the factors based on the pain level. Higher renders first
-const orderedFactors = props.painFactors.sort((a, b) => b.factorValue - a.factorValue);
+const orderedFactors = props.painFactors.sort((a: PainFactorProps, b: PainFactorProps) => b.factorValue - a.factorValue);
 
 const isMounted = ref(false);
 
@@ -45,10 +54,46 @@ onMounted(() => {
     margin-bottom: 1rem;
 }
 
-.factors.wrapper {
+.factors-container.wrapper {
+    position: relative;
+}
+
+.loaded.factors, .loading.factors {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     width: 100%;
+}
+
+.loading.factors {
+    top: 0;
+    position: absolute;
+}
+
+.loading.factors  > .factor {
+    height: 4rem;
+    width: 100%;
+    border-radius: 12px;
+    background-color: var(--panel);
+}
+
+/* .factor > .indicator {
+    background-color: var(--pain-none);
+    height: 100%;
+    width: 1rem;
+} */
+</style>
+
+<style lang="css" scoped>
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 2s;
+}
+
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to, .fade-leave {
+    opacity: 1;
 }
 </style>

@@ -10,9 +10,9 @@
         "baseUrl": ".",
         "paths": {
             "~/*": ["./src/*"],
-            "@composables/*": ["src/composables/*"],
-            "@components/*": ["src/components/*"],
-            "@types/*": ["src/types/*"],
+            "@composables/*": ["./src/composables/*"],
+            "@components/*": ["./src/components/*"],
+            "@types/*": ["./src/types/*"],
         }
     },
     "extends": "./web/.nuxt/tsconfig.json",

@@ -45,35 +45,43 @@ function generatePainLevels(count: number) {
   });
 }
 
-switch (currentTimeline.value) {
-    case 'week':
-        numberOfDays.value = 7;
-        console.log('Week');
-        break;
-    case 'fortnight':
-        numberOfDays.value = 14;
-        console.log('Fortnight');
-        break;
-    case 'month':
-        numberOfDays.value = 30;
-        console.log('Month');
-        break;
-    default:
-        numberOfDays.value = 7;
-        console.log('Week');
-        break;
-}
+watch(currentTimeline, () => {
+    switch (currentTimeline.value) {
+        case 'week':
+            numberOfDays.value = 7;
+            console.log('Week');
+            break;
+        case 'fortnight':
+            numberOfDays.value = 14;
+            console.log('Fortnight');
+            break;
+        case 'month':
+            numberOfDays.value = 30;
+            console.log('Month');
+            break;
+        default:
+            numberOfDays.value = 7;
+            console.log('Week');
+            break;
+    }
+});
 </script>
 
 <style lang="css" scoped>
 .calendar {
     max-width: 452px;
     min-width: 268px;
+    /* overflow: hidden; */
+    transition: height 0.5s ease;
 }
 
 .headers.wrapper {
     display: flex;
     justify-content: flex-start;
+}
+
+h2 h3 {
+    transition: position 0.5s ease;
 }
 
 .headers.wrapper > h2 {
@@ -103,5 +111,6 @@ switch (currentTimeline.value) {
     gap: 0.5rem 0.5rem;
     margin: 0 auto;
     box-sizing: border-box;
+    transition: height 0.5s ease;
 }
 </style>

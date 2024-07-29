@@ -38,6 +38,7 @@ button {
     position: relative;
     width: 100%;
     padding: 8px 12px;
+    border-radius: 10px;
 }
 
 button p {

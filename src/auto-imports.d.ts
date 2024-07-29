@@ -5,6 +5,7 @@ declare global {
   const ref: <T>(value: T) => Ref<T>
   const onMounted: (hook: () => void) => void
   const nextTick: (callback: () => void) => void
+  const watch: typeof import('vue').watch
   // Add other Vue composables you frequently use
   const useState: typeof import('#app')['useState']
   const useRouter: typeof import('#app')['useRouter']
