@@ -7,12 +7,12 @@ section.panel, button.panel {
     border-radius: 16px;
 }
 
-section.panel > .headers > h2, 
-section.panel > .headers > h3 {
-    font-family: 'Inter', sans-serif;
+section.panel > .headers > h2, section > .headers > h2,
+section.panel > .headers > h3, section > .headers > h3 {
+    font-family: 'Poppins', sans-serif;
     color: var(--text-color);
     font-size: var(--font-size-18);
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .panel > .headers {
@@ -22,3 +22,23 @@ section.panel > .headers > h3 {
 body {
     background-color: var(--background-color);
 }
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 7rem;
+}
+
+/* PAGE TRANSITIONS */
+/* .page-enter-active,
+.page-leave-active {
+    transition: all 0.5s ease;
+}
+.page-enter-from,
+.page-leave-to {
+    opacity: 0;
+    filter: blur(1rem);
+} */

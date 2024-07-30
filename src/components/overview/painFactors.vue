@@ -1,23 +1,14 @@
 <template>
-    <section class="pain-factors overview panel">
+    <section class="pain-factors overview">
         <div class="headers wrapper">
             <h2>Your Pain Factors</h2>
         </div>
+        <div class="wrapper factors-container">
+            <div class="loaded factors">
+                <OverviewFactor v-for="factor in props.painFactors" :factorName="factor.factorType" :factorValue="factor.factorValue" :isMounted="isMounted"/> 
+            </div>
+        </div>
     </section>
-    <div class="wrapper factors-container">
-        <!-- <Transition name="fade"> -->
-            <div class="loaded factors" v-if="isMounted === true">
-                <OverviewFactor v-for="factor in props.painFactors" :factorName="factor.factorType" :factorValue="factor.factorValue"/> 
-            </div>
-        <!-- </Transition> -->
-        <Transition name="fade">
-            <div class="loading factors" v-if="isMounted === false">
-                <button class="factor" v-for="i in 5">
-                    <span class="indicator"></span>
-                </button>
-            </div>
-        </Transition> 
-    </div>
 </template>
 
 <script setup lang="ts">
@@ -43,6 +34,16 @@ onMounted(() => {
 </script>
 
 <style lang="css" scoped>
+/* section {
+    padding: 0px;
+    display: flex;
+    flex: 1;
+} */
+
+h2 {
+    padding-left: 1rem;
+}
+
 .pain-factors.overview {
     background-color: transparent;
     margin-top: 48px;
@@ -55,6 +56,8 @@ onMounted(() => {
 }
 
 .factors-container.wrapper {
+    display: flex;
+    flex: 1;
     position: relative;
 }
 
@@ -65,7 +68,7 @@ onMounted(() => {
     width: 100%;
 }
 
-.loading.factors {
+/* .loading.factors {
     top: 0;
     position: absolute;
 }
@@ -75,9 +78,11 @@ onMounted(() => {
     width: 100%;
     border-radius: 12px;
     background-color: var(--panel);
+    display: flex;
+    flex-direction: row;
 }
 
-/* .factor > .indicator {
+.factor > .indicator {
     background-color: var(--pain-none);
     height: 100%;
     width: 1rem;
@@ -85,15 +90,5 @@ onMounted(() => {
 </style>
 
 <style lang="css" scoped>
-.fade-enter-active, .fade-leave-active {
-    transition: opacity 2s;
-}
 
-.fade-enter, .fade-leave-to {
-    opacity: 0;
-}
-
-.fade-enter-to, .fade-leave {
-    opacity: 1;
-}
 </style>

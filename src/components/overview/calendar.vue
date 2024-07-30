@@ -18,6 +18,9 @@
 </template>
 
 <script setup lang="ts">
+//@ts-ignore
+import type { DayLabel, PainLevel } from '@types';
+
 const { currentTimeline, setTimeline } = useOverviewTimeline();
 
 setTimeline('week');
@@ -71,7 +74,6 @@ watch(currentTimeline, () => {
 .calendar {
     max-width: 452px;
     min-width: 268px;
-    /* overflow: hidden; */
     transition: height 0.5s ease;
 }
 

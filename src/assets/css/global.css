@@ -1,3 +1,4 @@
+/* Inter */
 @font-face {
     font-family: 'Inter';
     src: url('../fonts/inter-400.ttf') format('truetype');
@@ -19,6 +20,28 @@
     font-display: swap;
 }
 
+/* Poppins */
+@font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/poppins-500.ttf') format('truetype');
+    font-weight: 500;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/poppins-400.ttf') format('truetype');
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/poppins-300.ttf') format('truetype');
+    font-weight: 300;
+    font-display: swap;
+}
+
 /* Colors */
 :root {
     --background-light: #FFFFFF;
@@ -33,8 +56,11 @@
     --panel-hover: var(--panel-light-hover);
 
     --text-light: #000000;
+    --text-light-inactive: #838383;
     --text-dark: #FFFFFF;
+    --text-dark-inactive: #838383;
     --text-color: var(--text-light);
+    --text-color-inactive: var(--text-light-inactive);
 
     --pain-none: #838383;
     --pain-0: #83A45D;
@@ -53,6 +79,7 @@
         --panel: var(--panel-dark);
         --panel-hover: var(--panel-dark-hover);
         --text-color: var(--text-dark);
+        --text-color-inactive: var(--text-dark-inactive);
     }
 }
 

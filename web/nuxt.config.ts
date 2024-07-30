@@ -36,5 +36,8 @@ export default defineNuxtConfig({
                 "../src/**/*.vue"
             ]
         }
-      }
+    },
+    app: {
+        pageTransition: { name: 'page', mode: 'out-in' }
+    }
 });

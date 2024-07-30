@@ -1,7 +1,5 @@
 <template>
-    <main class="platform-web">
-       <slot/>
-    </main>
+    <slot/>
 </template>
 
 <style lang="css">
@@ -14,7 +12,18 @@ main {
     min-height: calc(100vh - 2rem);
 }
 
-body {
-    background-color: var(--background-color);
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 5px;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
 }
 </style>
