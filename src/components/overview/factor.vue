@@ -1,5 +1,5 @@
 <template>
-    <button class="factor panel">
+    <button class="factor panel" :id="factorName" @click.prevent="handleClick">
         <Transition name="fade">
             <div class="content loaded" v-if="isMounted">
                 <div class="wrapper labels">
@@ -15,6 +15,14 @@
                 <span class="status indicator" :class="getFactorColor()"></span>
             </div>
         </Transition>
+        <div class="more" v-show="factorsExpanded && factorsExpanded[props.factorName]">
+            <p>
+                Psychological Distress is responsible for 45% of the change in your pain levels.
+            </p>
+            <p>
+                There is a strong positive correlation, indicating that higher psychological distress is associated with higher pain levels.
+            </p>
+        </div>
         <Transition name="fade">
             <div class="content unloaded" v-if="!isMounted">
                 <div class="wrapper labels">
@@ -34,6 +42,8 @@
 <script setup lang="ts">
 //@ts-ignore
 import type { PainFactor } from '@types/painFactor';
+
+const { factorsExpanded, toggleFactor, isFactorExpanded, disableAllFactors } = useFactorsExpanded();
 
 interface Props {
     factorName: PainFactor,
@@ -59,13 +69,30 @@ function getFactorColor(): string {
 }
 
 const props = defineProps<Props>();
-
 const isMounted = ref(false);
+const isExpanded = ref(false);
+
+const emit = defineEmits(['factorClicked']);
+
+function debounce(func: any, timeout: any) {
+  let timeoutId: any;
+  return (...args: any) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, timeout);
+  };
+}
+
+const handleClick = debounce(() => {
+    disableAllFactors();
+    toggleFactor(props.factorName);
+
+    emit('factorClicked', props.factorName);
+}, 100);
 
 onMounted(() => {
     isMounted.value = true;
-    nextTick(() => {
-    });
 });
 </script>
 
@@ -128,38 +155,19 @@ onMounted(() => {
 
     flex: 1;
 }
-
-/* .loading.factors {
-    top: 0;
-    position: absolute;
-}
-
-.loading.factors  > .factor {
-    height: 4rem;
-    width: 100%;
-    border-radius: 12px;
-    background-color: var(--panel);
-    display: flex;
-    flex-direction: row;
-}
-
-.factor > .indicator {
-    background-color: var(--pain-none);
-    height: 100%;
-    width: 1rem;
-}  */
 </style>
 
 <style lang="css" scoped>
 
 .factor {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     position: relative;
+    cursor: pointer;
+    transition: all 0.5s ease;
 }
 
 button.factor.panel {
-    height: 4rem;
     padding: 0px;
     background-color: var(--panel);
     overflow: hidden;
@@ -179,12 +187,20 @@ h3.factor-title {
     flex-direction: row;
     flex: 1;
     justify-content: space-between;
+    height: 4rem;
 }
 
 .wrapper {
     padding: 24px 16px;
     display: flex;
     flex-direction: row;
+    align-items: center;
+}
+
+.icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .icons > svg, .icons > div {
@@ -195,6 +211,8 @@ h3.factor-title {
 }
 
 .status {
+    position: absolute;
+    right: 0px;
     height: 100%;
     width: 1rem;
     background-color: var(--pain-none);
@@ -216,5 +234,24 @@ h3.factor-title {
 
 .status.pain-3 {
     background-color: var(--pain-3);
+}
+
+.more {
+    padding: 24px 16px;
+    padding-top: 0px;
+    padding-right: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all 0.5s ease;
+}
+
+.more p {
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    font-size: var(--font-size-14);
+    font-weight: 300;
+    text-align: left;
+    opacity: 0.7;
 }
 </style>

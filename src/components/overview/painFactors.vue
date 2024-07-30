@@ -5,7 +5,7 @@
         </div>
         <div class="wrapper factors-container">
             <div class="loaded factors">
-                <OverviewFactor v-for="factor in props.painFactors" :factorName="factor.factorType" :factorValue="factor.factorValue" :isMounted="isMounted"/> 
+                <OverviewFactor v-for="factor in orderedFactors" :factorName="factor.factorType" :factorValue="factor.factorValue" :isMounted="isMounted" @factorClicked="handleFactorClick"/> 
             </div>
         </div>
     </section>
@@ -20,11 +20,31 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { smoothScroll } = useScroll();
+const { disableAllFactors, toggleFactor, isFactorExpanded, factorsExpanded } = useFactorsExpanded();
 
-//determine the order of the factors based on the pain level. Higher renders first
 const orderedFactors = props.painFactors.sort((a: PainFactorProps, b: PainFactorProps) => b.factorValue - a.factorValue);
 
 const isMounted = ref(false);
+const showOverlay = ref(false);
+
+function handleFactorClick(factorName: string) {
+    if (factorName === 'psychological distress') {
+        factorName = 'psychological';
+    }
+
+    const factorIdSelector = "#" + factorName;
+    smoothScroll(factorIdSelector);
+    
+    // document.body.style.overflow = 'hidden';
+    
+    showOverlay.value = true;
+}
+
+function closeOverlay() {
+    document.body.style.overflow = 'auto';
+    showOverlay.value = false;
+}
 
 onMounted(() => {
     isMounted.value = true;
@@ -68,25 +88,6 @@ h2 {
     width: 100%;
 }
 
-/* .loading.factors {
-    top: 0;
-    position: absolute;
-}
-
-.loading.factors  > .factor {
-    height: 4rem;
-    width: 100%;
-    border-radius: 12px;
-    background-color: var(--panel);
-    display: flex;
-    flex-direction: row;
-}
-
-.factor > .indicator {
-    background-color: var(--pain-none);
-    height: 100%;
-    width: 1rem;
-} */
 </style>
 
 <style lang="css" scoped>

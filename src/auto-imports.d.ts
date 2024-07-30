@@ -13,6 +13,8 @@ declare global {
   // Add your custom composables here
   const useTimelineDropdown: typeof import('@/composables/timelineDropdown')['useTimelineDropdown']
   const useOverviewTimeline: typeof import('@/composables/overviewTimeline')['useOverviewTimeline']
+  const useScroll: typeof import('@/composables/useScroll')['useScroll']
+  const useFactorsExpanded: typeof import('@/composables/useFactorsExpanded')['useFactorsExpanded']
 //   const useMyComposable: typeof import('@/composables/myComposable')['useMyComposable']
 }
 

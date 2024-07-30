@@ -10,10 +10,10 @@ export default defineNuxtConfig({
     },],
     imports: {
         dirs: [
-            '../src/composables',
-            '../src/types',
-            '../src/assets',
-            '../src/components',
+            './../src/composables',
+            './../src/types',
+            './../src/assets',
+            './../src/components',
         ],
     },
     alias: {
@@ -39,5 +39,5 @@ export default defineNuxtConfig({
     },
     app: {
         pageTransition: { name: 'page', mode: 'out-in' }
-    }
+    },
 });

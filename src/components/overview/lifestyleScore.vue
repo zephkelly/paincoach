@@ -11,8 +11,7 @@
             @touchmove="onDrag"
             @mouseup="endDrag"
             @mouseleave="endDrag"
-            @touchend="endDrag"
-        >
+            @touchend="endDrag">
             <Transition name="grow">
                 <div v-if="isMounted" class="lifestyle-bar-inner" :style="{ width: `${stretchedScore}%` }"></div>
             </Transition>
@@ -26,41 +25,42 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
 const isMounted = ref(false);
+
 const isDragging = ref(false);
 const stretchAmount = ref(0);
-const maxStretch = 2; // Maximum stretch amount in either direction
-const displayScore = computed(() => Math.round(props.lifestyleScore + stretchAmount.value));
+const maxStretch = 2;
+const initialDragX = ref(0);
+
 const stretchedScore = computed(() => Math.max(0, Math.min(props.lifestyleScore + stretchAmount.value, 100)));
 
 const startDrag = (event: MouseEvent | TouchEvent) => {
     isDragging.value = true;
+    initialDragX.value = 'touches' in event ? event.touches[0].clientX : event.clientX;
     event.preventDefault();
 };
 
 const onDrag = (event: MouseEvent | TouchEvent) => {
     if (!isDragging.value) return;
-    
+   
     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
     const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
-    const rawPercentage = ((clientX - rect.left) / rect.width) * 100;
-
-    // Calculate the raw stretch amount (positive for stretching, negative for shrinking)
-    const rawStretch = rawPercentage - props.lifestyleScore;
-
-    // Apply a non-linear function to slow down the stretch/shrink as it approaches the limit
+    const currentPercentage = ((clientX - rect.left) / rect.width) * 100;
+    const initialPercentage = ((initialDragX.value - rect.left) / rect.width) * 100;
+    
+    const rawStretch = currentPercentage - initialPercentage;
+    
     const normalizedStretch = rawStretch / maxStretch;
     const slowedStretch = maxStretch * Math.tanh(normalizedStretch);
-
+    
     stretchAmount.value = Math.max(-maxStretch, Math.min(slowedStretch, maxStretch));
 };
 
 const endDrag = () => {
     isDragging.value = false;
     stretchAmount.value = 0;
+    initialDragX.value = 0;
 };
-
 onMounted(() => {
     isMounted.value = true;
 });
@@ -87,9 +87,6 @@ h3 > span.score {
     -webkit-text-fill-color: transparent;
     margin-right: 2px;
     font-weight: 500;
-    /* position: relative;
-    bottom: 0px; */
-    
 }
 
 h3 > span.divider {

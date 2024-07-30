@@ -1,3 +1,4 @@
+//@ts-ignore
 import { ref, Ref } from 'vue'
 
 import type { TimelineOverview } from '../types/timeline';
