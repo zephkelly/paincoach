@@ -1,16 +1,12 @@
 <template>
-    <ion-page>
-        <ion-content class="ion-padding">
-            <main>
-                <OverviewHeader />
-                <div class="page">
-                    <OverviewCalendar />
-                    <OverviewLifestyleScore :lifestyleScore="82"/>
-                    <OverviewPainFactors :painFactors="factors" />
-                </div>
-            </main>
-        </ion-content>
-    </ion-page>
+    <main>
+        <OverviewHeader />
+        <div class="page">
+            <OverviewCalendar />
+            <OverviewLifestyleScore :lifestyleScore="82"/>
+            <OverviewPainFactors :painFactors="factors" />
+        </div>
+    </main>
 </template>
 
 <script lang="ts" setup>
@@ -57,6 +53,8 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
+    box-sizing: border-box;
+    padding: 1rem;
 }
 
 .page {
