@@ -45,8 +45,11 @@
 /* Colors */
 :root {
     --background-light: #FFFFFF;
+    --background-light-overlay: #ffffffa0;
     --background-dark: #121212;
+    --background-dark-overlay: #12121285;
     --background-color: var(--background-light);
+    --background-color-overlay: var(--background-light-overlay);
 
     --panel-light: #EFEFEF;
     --panel-light-hover: #c4c4c4;
@@ -76,6 +79,7 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --background-color: var(--background-dark);
+        --background-color-overlay: var(--background-dark-overlay);
         --panel: var(--panel-dark);
         --panel-hover: var(--panel-dark-hover);
         --text-color: var(--text-dark);

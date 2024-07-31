@@ -181,6 +181,7 @@ onMounted(() => {
     position: relative;
     cursor: pointer;
     transition: top 0.5s ease;
+    min-height: 66.75px;
 }
 
 .factor.expanded {
