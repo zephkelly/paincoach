@@ -1,5 +1,5 @@
 <template>
-    <button class="factor panel" :id="factorName" @click.prevent="handleClick">
+    <button class="factor panel" :class="{ expanded: isExpanded }" @click.prevent="handleClick">
         <Transition name="fade">
             <div class="content loaded" v-if="isMounted">
                 <div class="wrapper labels">
@@ -15,14 +15,16 @@
                 <span class="status indicator" :class="getFactorColor()"></span>
             </div>
         </Transition>
-        <div class="more" v-show="factorsExpanded && factorsExpanded[props.factorName]">
-            <p>
-                Psychological Distress is responsible for 45% of the change in your pain levels.
-            </p>
-            <p>
-                There is a strong positive correlation, indicating that higher psychological distress is associated with higher pain levels.
-            </p>
-        </div>
+        <Transition name="expand">
+            <div class="more" :class="{ active: isExpanded}" v-show="isExpanded">
+                <p>
+                    Psychological Distress is responsible for 45% of the change in your pain levels.
+                </p>
+                <p>
+                    There is a strong positive correlation, indicating that higher psychological distress is associated with higher pain levels.
+                </p>
+            </div>
+        </Transition>
         <Transition name="fade">
             <div class="content unloaded" v-if="!isMounted">
                 <div class="wrapper labels">
@@ -42,16 +44,21 @@
 <script setup lang="ts">
 //@ts-ignore
 import type { PainFactor } from '@types/painFactor';
+import type { PainFactorID } from 'src/types/painFactor';
 
-const { factorsExpanded, toggleFactor, isFactorExpanded, disableAllFactors } = useFactorsExpanded();
+const { factorsExpanded, isFactorExpanded } = useFactorsExpanded();
+const isExpanded = computed(() => isFactorExpanded(props.factorID));
 
 interface Props {
+    factorID: PainFactorID,
     factorName: PainFactor,
     factorValue: number,
     isMounted: boolean
 }
 
-//generate a random width between 5rem and 10rem
+const props = defineProps<Props>();
+const emit = defineEmits(['factorClicked']);
+
 function getRandomWidth(): string {
     return `${Math.floor(Math.random() * 42) + 24}%`;
 }
@@ -68,27 +75,21 @@ function getFactorColor(): string {
     }
 }
 
-const props = defineProps<Props>();
 const isMounted = ref(false);
-const isExpanded = ref(false);
 
-const emit = defineEmits(['factorClicked']);
 
 function debounce(func: any, timeout: any) {
-  let timeoutId: any;
-  return (...args: any) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      func(...args);
-    }, timeout);
-  };
+    let timeoutId: any;
+    return (...args: any) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func(...args);
+        }, timeout);
+    };
 }
 
 const handleClick = debounce(() => {
-    disableAllFactors();
-    toggleFactor(props.factorName);
-
-    emit('factorClicked', props.factorName);
+    emit('factorClicked', props.factorID);
 }, 100);
 
 onMounted(() => {
@@ -103,6 +104,21 @@ onMounted(() => {
 
 .fade-enter, .fade-leave-to {
     opacity: 0;
+}
+
+.expand-enter-active,
+.expand-leave-active {
+  max-height: 1000px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  overflow: hidden;
 }
 </style>
 
@@ -164,7 +180,11 @@ onMounted(() => {
     flex-direction: column;
     position: relative;
     cursor: pointer;
-    transition: all 0.5s ease;
+    transition: top 0.5s ease;
+}
+
+.factor.expanded {
+    z-index: 90;
 }
 
 button.factor.panel {
@@ -243,7 +263,10 @@ h3.factor-title {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    transition: all 0.5s ease;
+}
+
+.more.active {
+    transition: opacity 0.5s cubic-bezier(0.075, 0.82, 0.165, 1), max-height 0.6s ease, transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 .more p {

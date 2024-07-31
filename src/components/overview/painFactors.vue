@@ -5,7 +5,18 @@
         </div>
         <div class="wrapper factors-container">
             <div class="loaded factors">
-                <OverviewFactor v-for="factor in orderedFactors" :factorName="factor.factorType" :factorValue="factor.factorValue" :isMounted="isMounted" @factorClicked="handleFactorClick"/> 
+                <Transition name="fade">
+                    <div class="overlay" v-if="showOverlay && anyFactorExpanded" @click="closeOverlay"></div>
+                </Transition>
+                <OverviewFactor 
+                v-for="factor in orderedFactors"
+                :id="factor.factorID"
+                :key="factor.factorType"
+                :factorName="factor.factorType" 
+                :factorValue="factor.factorValue" 
+                :factorID="factor.factorID"
+                :isMounted="isMounted"
+                @factorClicked="handleFactorClick"/> 
             </div>
         </div>
     </section>
@@ -14,51 +25,69 @@
 <script setup lang="ts">
 //@ts-ignore
 import type { PainFactorProps } from '@types/painFactor';
+const { smoothScroll } = useScroll();
+const { isAnyFactorExpanded, isFactorExpanded, disableAllFactors, disableAllButThenToggle, factorsExpanded } = useFactorsExpanded();
 
 interface Props {
     painFactors: PainFactorProps[]
 }
 
 const props = defineProps<Props>();
-const { smoothScroll } = useScroll();
-const { disableAllFactors, toggleFactor, isFactorExpanded, factorsExpanded } = useFactorsExpanded();
-
+const isMounted = ref(false);
 const orderedFactors = props.painFactors.sort((a: PainFactorProps, b: PainFactorProps) => b.factorValue - a.factorValue);
 
-const isMounted = ref(false);
+const anyFactorExpanded = computed(() => isAnyFactorExpanded());
+
 const showOverlay = ref(false);
+const timeoutScrollID = ref<number | null>(null);
+const timeoutOverflowID = ref<number | null>(null);
 
-function handleFactorClick(factorName: string) {
-    if (factorName === 'psychological distress') {
-        factorName = 'psychological';
+function handleFactorClick(factorID: string) {
+    const expandedSate = disableAllButThenToggle(factorID);
+
+    if (expandedSate) {
+        openOverlay(factorID);
+    } else {
+        closeOverlay();
     }
+}
 
-    const factorIdSelector = "#" + factorName;
-    smoothScroll(factorIdSelector);
-    
-    // document.body.style.overflow = 'hidden';
-    
+function openOverlay(factorID: string) {
+    const factorIdSelector = "#" + factorID;
     showOverlay.value = true;
+    
+    timeoutScrollID.value = setTimeout(() => {
+        smoothScroll(factorIdSelector);
+            // document.body.style.overflow = 'hidden';
+    }, 100);
+
+    timeoutOverflowID.value = setTimeout(() => {
+        document.body.style.overflow = 'hidden';
+    }, 800);
 }
 
 function closeOverlay() {
-    document.body.style.overflow = 'auto';
+    disableAllFactors();
+    document.body.style.overflow = '';
     showOverlay.value = false;
+    cancelOverlayTimeout();
+}
+
+function cancelOverlayTimeout() {
+    if (timeoutScrollID.value !== null) {
+        clearTimeout(timeoutScrollID.value);
+        clearTimeout(timeoutOverflowID.value);
+        timeoutScrollID.value = null;
+    }
 }
 
 onMounted(() => {
     isMounted.value = true;
-    nextTick(() => {
-    });
 });
 </script>
 
 <style lang="css" scoped>
-/* section {
-    padding: 0px;
-    display: flex;
-    flex: 1;
-} */
+
 
 h2 {
     padding-left: 1rem;
@@ -86,10 +115,31 @@ h2 {
     flex-direction: column;
     gap: 1rem;
     width: 100%;
+    /* position: relative; */
 }
 
 </style>
 
 <style lang="css" scoped>
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.5s;
+}
 
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to, .fade-leave {
+    opacity: 1;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 80;
+}
 </style>

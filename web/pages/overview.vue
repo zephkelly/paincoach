@@ -18,26 +18,31 @@ definePageMeta({
 
 
 const factor1: PainFactorProps = {
+    factorID: 'psychological',
     factorType: 'psychological distress',
     factorValue: 8
 };
 
 const factor2: PainFactorProps = {
+    factorID: 'exercise',
     factorType: 'exercise',
     factorValue: 6
 };
 
 const factor3: PainFactorProps = {
+    factorID: 'sleep',
     factorType: 'sleep',
     factorValue: 4
 };
 
 const factor4: PainFactorProps = {
+    factorID: 'nutrition',
     factorType: 'nutrition',
     factorValue: 2
 };
 
 const factor5: PainFactorProps = {
+    factorID: 'social',
     factorType: 'social connection',
     factorValue: 1
 };

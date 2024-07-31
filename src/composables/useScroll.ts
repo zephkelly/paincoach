@@ -3,20 +3,18 @@ export const useScroll = () => {
         let element: HTMLElement | null;
         
         if (typeof target === 'string') {
-        element = document.querySelector(target);
+            element = document.querySelector(target);
         } else {
-        element = target;
+            element = target;
         }
 
         if (element) {
-        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
 
-        console.log(elementPosition);
-
-        window.scrollTo({
-            top: elementPosition - offset,
-            behavior: 'smooth'
-        });
+            window.scrollTo({
+                top: elementPosition - offset,
+                behavior: 'smooth'
+            });
         }
     }
 
