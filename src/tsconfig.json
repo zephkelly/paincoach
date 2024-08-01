@@ -9,6 +9,7 @@
             "@composables/*": ["./composables/*"],
             "@components/*": ["./components/*"],
             "@types/*": ["./types/*"],
+            "@utils/*": ["./utils/*"],
         }, 
     },
     "include": ["./**/*.ts", "./**/*.js", "./**/*.vue"],

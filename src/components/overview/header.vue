@@ -29,7 +29,7 @@ section {
 
 .overview-header {
     display: grid;
-    grid-template-columns: 82px 1fr 82px;
+    grid-template-columns: 96px 1fr 96px;
     grid-template-rows: 44px;
     height: 100%;
 }

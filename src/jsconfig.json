@@ -5,7 +5,8 @@
             "~/*": ["./*"],
             "@composables/*": ["./composables/*"],
             "@components/*": ["./components/*"],
-            "@types/*": ["./types/*"]
+            "@types/*": ["./types/*"],
+            "@utils/*": ["./utils/*"]
         }
     }
 }

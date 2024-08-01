@@ -42,9 +42,10 @@
 </template>
 
 <script setup lang="ts">
-//@ts-ignore
-import type { PainFactor } from '@types/painFactor';
+import type { PainFactor } from 'src/types/painFactor';
 import type { PainFactorID } from 'src/types/painFactor';
+
+import debounce from './../../utils/debounce';
 
 const { factorsExpanded, isFactorExpanded } = useFactorsExpanded();
 const isExpanded = computed(() => isFactorExpanded(props.factorID));
@@ -76,17 +77,6 @@ function getFactorColor(): string {
 }
 
 const isMounted = ref(false);
-
-
-function debounce(func: any, timeout: any) {
-    let timeoutId: any;
-    return (...args: any) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            func(...args);
-        }, timeout);
-    };
-}
 
 const handleClick = debounce(() => {
     emit('factorClicked', props.factorID);

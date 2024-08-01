@@ -1,24 +1,27 @@
 <template>
     <div class="timeline" :class="{ open: isEnabled }">
-        <button @click.prevent="toggleEnabled" class="main" :class="currentTimeline">
+        <button @click.prevent="debouncedToggleEnabled" class="main" :class="currentTimeline">
             <p>{{ currentTimelineLength.label }}</p>
             <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"><path d="M480-397.85 311.85-566h336.3L480-397.85Z"/></svg>
         </button>
-        <nav v-show="isEnabled" class="menu">
-            <ul>
-                <li v-for="option in dropdownOptions" :key="option.value">
-                    <button @click.prevent="selectTimeline(option.value)" :class="option.value">
-                        <p>{{ option.label }}</p>
-                    </button>
-                </li>
-            </ul>
-        </nav>
+        <Transition name="fade">
+            <nav v-show="isEnabled" class="menu">
+                <ul>
+                    <li v-for="option in dropdownOptions" :key="option.value">
+                        <button @click.prevent="debouncedSelectTimeline(option.value)" :class="option.value">
+                            <p>{{ option.label }}</p>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </Transition>
     </div>
 </template>
 
 <script setup lang="ts">
 //@ts-ignore
 import type { TimelineOverview } from '@types/timeline';
+import debounce from './../../utils/debounce';
 const { toggleEnabled, isEnabled  } = useTimelineDropdown();
 const { currentTimeline, setTimeline } = useOverviewTimeline();
 
@@ -41,10 +44,11 @@ const currentTimelineLength = computed(() => {
     return timelineLengths.find((timeline) => timeline.value === currentTimeline.value);
 });
 
-const selectTimeline = (value: TimelineOverview) => {
+const debouncedToggleEnabled = debounce(toggleEnabled, 100);
+const debouncedSelectTimeline = debounce((value: TimelineOverview) => {
     setTimeline(value);
     toggleEnabled();
-};
+}, 100);
 </script>
 
 <style lang="css" scoped>
@@ -53,16 +57,16 @@ const selectTimeline = (value: TimelineOverview) => {
     flex-direction: column;
     justify-content: flex-start;
     width: 100%;
+    height: 100%;
     border-radius: 10px;
-    margin-top: 6px;
     background-color: var(--panel);
-    transition: background-color 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+    transition: background-color 0.2s cubic-bezier(0.075, 0.82, 0.165, 1), box-shadow 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+    box-shadow: 0px 0px 80px 0px rgba(0, 0, 0, 0.9);
 }
 
 .timeline.open {
     position: relative;
     height: auto;
-    background-color: var(--panel-hover);
 }
 
 .timeline.open button:hover {
@@ -72,6 +76,10 @@ const selectTimeline = (value: TimelineOverview) => {
 .timeline.open .main {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+}
+
+.timeline.open .main p {
+    opacity: 0.3;
 }
 
 nav.menu {
@@ -86,8 +94,12 @@ nav.menu ul, nav.menu li {
 }
 
 nav.menu li {
-    background-color: transparent;
+    background-color: var(--panel-hover);
     transition: background-color 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+    overflow: hidden;
+}
+nav.menu li button {
+    border-radius: 0px;
 }
 
 nav.menu li:hover {
@@ -100,27 +112,30 @@ nav.menu li:last-child {
 }
 
 
-
 button {
     display: flex;
     align-items: center;
     position: relative;
     width: 100%;
-    padding: 8px 12px;
+    padding: 12px 12px;
     border-radius: 10px;
     cursor: pointer;
+    height: 100%;
+    min-height: 44px;
+}
+
+button.main p {
+    transition: opacity 0.4s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 button p {
     margin: 0;
-    margin-bottom: 1px;
     font-family: 'Inter', sans-serif;
     color: var(--text-color);
     font-size: 12px;
     font-weight: 500;
     display: inline-bock;
     text-align: left;
-
 }
 
 button svg {
@@ -129,5 +144,17 @@ button svg {
     top: 50%;
     transform: translateY(-50%);
     fill: var(--text-color);
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to, .fade-leave {
+    opacity: 1;
 }
 </style>

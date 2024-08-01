@@ -13,6 +13,7 @@
             "@composables/*": ["./src/composables/*"],
             "@components/*": ["./src/components/*"],
             "@types/*": ["./src/types/*"],
+            "@utils/*": ["./src/utils/*"]
         }
     },
     "extends": "./web/.nuxt/tsconfig.json",
