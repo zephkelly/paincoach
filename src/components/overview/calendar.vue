@@ -5,14 +5,17 @@
             <h3>Aug 11</h3>
         </div>
         <div class="wrapper days">
-            <div ref="daysContainer" class="days-grid">
-                <OverviewDayIndicator v-for="(day, index) in numberOfDays" 
-                    labelType="day" 
-                    :dayIndex="index" 
-                    :labelContent="dayLabels[index % 7]" 
-                    :painLevel="generatedPainLevels[index]" 
-                />
-            </div>
+            <!-- <div ref="daysContainer" class="days-grid"> -->
+                <TransitionGroup name="list" tag="div" class="days-grid">
+                    <OverviewDayIndicator v-for="(day, index) in numberOfDays" 
+                        labelType="day"
+                        :key="index"
+                        :dayIndex="index" 
+                        :labelContent="dayLabels[index % 7]" 
+                        :painLevel="generatedPainLevels[index]" 
+                    />
+                </TransitionGroup>
+            <!-- </div> -->
         </div>
     </section>
 </template>
@@ -23,15 +26,7 @@ import type { DayLabel, PainLevel } from '@types';
 
 const { currentTimeline, setTimeline } = useOverviewTimeline();
 
-setTimeline('week');
-
-const numberOfDays = ref(7);
 const isMounted = ref(false);
-
-onMounted(() => {
-    isMounted.value = true;
-    generatedPainLevels.value = generatePainLevels(numberOfDays.value);
-});
 
 // define our day labels
 const dayLabels: DayLabel[] = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -49,24 +44,35 @@ function generatePainLevels(count: number) {
 }
 
 watch(currentTimeline, () => {
+    setNumberOfDays();
+});
+
+
+const numberOfDays = ref(7);
+function setNumberOfDays() {
     switch (currentTimeline.value) {
         case 'week':
             numberOfDays.value = 7;
-            console.log('Week');
             break;
         case 'fortnight':
             numberOfDays.value = 14;
-            console.log('Fortnight');
             break;
         case 'month':
             numberOfDays.value = 30;
-            console.log('Month');
             break;
         default:
             numberOfDays.value = 7;
-            console.log('Week');
             break;
     }
+
+    generatedPainLevels.value = generatePainLevels(numberOfDays.value);
+}
+
+onMounted(() => {
+    isMounted.value = true;
+    generatedPainLevels.value = generatePainLevels(numberOfDays.value);
+
+    setNumberOfDays();
 });
 </script>
 
@@ -114,5 +120,18 @@ h2 h3 {
     margin: 0 auto;
     box-sizing: border-box;
     transition: height 0.5s ease;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.list-move {
+  transition: transform 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 </style>

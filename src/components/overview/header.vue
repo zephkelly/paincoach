@@ -1,7 +1,9 @@
 <template>
     <section class="header overview">
         <header class="overview-header">
-            <OverviewTimelineDropdown />
+            <div class="wrapper timeline">
+                <OverviewTimelineDropdown />
+            </div>
             <div class="wrapper">
                 <h1>Overview</h1>
             </div>
@@ -15,7 +17,6 @@
 </template>
 
 <script setup lang="ts">
-
 </script>
 
 <style lang="css" scoped>
@@ -29,6 +30,7 @@ section {
 .overview-header {
     display: grid;
     grid-template-columns: 82px 1fr 82px;
+    grid-template-rows: 44px;
     height: 100%;
 }
 
@@ -36,6 +38,10 @@ section {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.wrapper.timeline {
+    align-items: flex-start;
 }
 
 .wrapper.search {

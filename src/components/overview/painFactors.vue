@@ -95,7 +95,7 @@ h2 {
 
 .pain-factors.overview {
     background-color: transparent;
-    margin-top: 48px;
+    margin-top: 42px;
     padding-top: 0px;
     padding-bottom: 0px;
 }

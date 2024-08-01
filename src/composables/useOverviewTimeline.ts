@@ -4,7 +4,7 @@ import { ref, Ref } from 'vue'
 import type { TimelineOverview } from '../types/timeline';
 
 export const useOverviewTimeline = () => {
-    const currentTimeline: Ref<TimelineOverview> = ref('week')
+    const currentTimeline: Ref<TimelineOverview> = useState<TimelineOverview>('currentTimeline', () => 'week')
 
     function setTimeline(timeline: TimelineOverview) {
         currentTimeline.value = timeline
