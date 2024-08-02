@@ -96,14 +96,12 @@ onMounted(() => {
 
 .expand-enter-active,
 .expand-leave-active {
-  max-height: 1000px;
   opacity: 1;
   transform: translateY(0);
 }
 
 .expand-enter-from,
 .expand-leave-to {
-  max-height: 0;
   opacity: 0;
   transform: translateY(-10px);
   overflow: hidden;
@@ -171,7 +169,7 @@ onMounted(() => {
     cursor: pointer;
     /* transition: top 0.5s ease; */
     min-height: 66.75px;
-    will-change: height;
+    will-change: height, position, ;
 }
 
 .factor.expanded {

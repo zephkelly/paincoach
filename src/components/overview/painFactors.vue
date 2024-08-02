@@ -114,6 +114,7 @@ h2 {
     flex-direction: column;
     gap: 1rem;
     width: 100%;
+    will-change: height;
     /* position: relative; */
 }
 
