@@ -209,10 +209,11 @@ h2 h3 {
     margin: 0 auto;
     box-sizing: border-box;
     transition: height 0.5s ease;
+    will-change: height;
 }
-/* 
+
 .list-enter-active {
-  transition: transform 0.2s ease;
+  transition: transform 0.4s ease;
 }
 
 .list-enter-from {
@@ -229,5 +230,5 @@ h2 h3 {
 
 .list-leave-to {
     opacity: 0;
-} */
+}
 </style>

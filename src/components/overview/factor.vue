@@ -169,8 +169,9 @@ onMounted(() => {
     flex-direction: column;
     position: relative;
     cursor: pointer;
-    transition: top 0.5s ease;
+    /* transition: top 0.5s ease; */
     min-height: 66.75px;
+    will-change: height;
 }
 
 .factor.expanded {
@@ -260,6 +261,7 @@ h3.factor-title {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    will-change: transform, max-height, opacity;
 }
 
 .more.active {

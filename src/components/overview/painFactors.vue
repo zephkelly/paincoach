@@ -140,5 +140,6 @@ h2 {
     height: 100%;
     background-color: var(--background-color-overlay);
     z-index: 80;
+    will-change: opacity;
 }
 </style>
