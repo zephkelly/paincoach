@@ -54,31 +54,108 @@ const currentMonth = ref<CalendarMonth>({
 const dayLabelType = ref<DayIndicatorLabelType>('day');
 
 const emptyDaysAtStart = computed(() => {
-    return getEmptyDaysAtStartOfMonth(currentMonth.value.startingDayOfWeek);
+    const today = new Date();
+    let startDate: Date;
+
+    switch(currentTimeline.value) {
+        case 'week':
+            startDate = getStartOfWeek(today);
+            break;
+        case 'fortnight':
+            startDate = getStartOfFortnight(today);
+            break;
+        case 'month':
+        default:
+            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            break;
+    }
+
+    return startDate.getDay();
 });
 
 const calendarDays = computed(() => {
-    return generateCalendarMonthDays(currentMonth.value.date);
+    const today = new Date();
+    let startDate: Date;
+    let endDate: Date;
+
+    switch(currentTimeline.value) {
+        case 'week':
+            startDate = getStartOfWeek(today);
+            endDate = getEndOfWeek(today);
+            break;
+        case 'fortnight':
+            startDate = getStartOfFortnight(today);
+            endDate = getEndOfFortnight(today);
+            break;
+        case 'month':
+        default:
+            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            break;
+    }
+
+    return generateCalendarDays(startDate, endDate);
 });
 
-function generateCalendarMonthDays(date: Date): CalendarDay[] {
+function getStartOfWeek(date: Date): Date {
+    const d = new Date(date);
+    const day = d.getDay();
+    d.setDate(d.getDate() - day);
+    return d;
+}
+
+function getEndOfWeek(date: Date): Date {
+    const d = new Date(date);
+    const day = d.getDay();
+    d.setDate(d.getDate() + (6 - day));
+    return d;
+}
+
+function getStartOfFortnight(date: Date): Date {
+    const d = new Date(date);
+    const dayOfMonth = d.getDate();
+    
+    if (dayOfMonth <= 14) {
+        d.setDate(1);
+    } else {
+        d.setDate(15);
+    }
+    
+    return d;
+}
+
+function getEndOfFortnight(date: Date): Date {
+    const d = new Date(date);
+    const dayOfMonth = d.getDate();
+    
+    if (dayOfMonth <= 14) {
+        d.setDate(14);
+    } else {
+        d.setDate(getMonthDays(d));
+    }
+    
+    return d;
+}
+
+function generateCalendarDays(startDate: Date, endDate: Date): CalendarDay[] {
     const days: CalendarDay[] = [];
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const lastDayOfMonth = new Date(year, month + 1, 0);
-  
-    for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
-        const currentDate = new Date(year, month, i + 1);
+    let currentDate = startDate;
+    let dayIndex = 0;
+
+    const numberOfEmptyDays = emptyDaysAtStart.value;
+
+    while (currentDate <= endDate) {
         days.push({
-            date: currentDate,
-            index: (i - 1) + emptyDaysAtStart.value,
+            date: new Date(currentDate),
+            index: dayIndex + numberOfEmptyDays,
             dayOfWeek: getDayOfWeek(currentDate.getDay()),
             dayOfWeekShort: getDayOfWeekShort(currentDate.getDay()),
         });
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+        dayIndex++;
     }
 
-    console.log(days.length)
-  
     return days;
 }
 
@@ -122,6 +199,7 @@ h2 h3 {
 }
 
 .days-grid {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     grid-auto-columns: minmax(0, 1fr);
@@ -133,28 +211,32 @@ h2 h3 {
     transition: height 0.5s ease;
 }
 
-.list-enter-active,
-.list-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+.list-enter-active {
+  transition: transform 0.2s ease;
 }
-.list-enter-from,
-.list-leave-to {
-  opacity: 0;
+
+.list-enter-from {
   transform: translateY(10px);
 }
-.list-move {
-  transition: transform 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+.list-enter-to {
+  transform: translateY(0);
+}
+
+.list-leave-active {
+    transition: transform 0s; /* Instant fade out */
+}
+
+.list-leave-to {
+    opacity: 0;
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+    transition: opacity 0.4s ease;
 }
 .fade-enter-from,
 .fade-leave-to {
-  opacity: 0;
-}
-.fade-move {
-  transition: opacity 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+    opacity: 0;
 }
 </style>
