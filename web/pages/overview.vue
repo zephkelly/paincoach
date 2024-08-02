@@ -2,7 +2,7 @@
     <main>
         <OverviewHeader />
         <div class="page-container">
-            <OverviewCalendar />
+            <OverviewCalendar :initialDate="newDate" />
             <OverviewLifestyleScore :lifestyleScore="82"/>
             <OverviewPainFactors :painFactors="factors" />
         </div>
@@ -10,6 +10,8 @@
 </template>
 
 <script lang="ts" setup>
+const newDate = ref(new Date())
+
 definePageMeta({
     alias: ['/'],
     title: 'Overview',

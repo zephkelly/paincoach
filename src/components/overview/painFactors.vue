@@ -58,12 +58,11 @@ function openOverlay(factorID: string) {
     
     timeoutScrollID.value = setTimeout(() => {
         smoothScroll(factorIdSelector);
-            // document.body.style.overflow = 'hidden';
-    }, 100);
+    }, 200);
 
     timeoutOverflowID.value = setTimeout(() => {
         document.body.style.overflow = 'hidden';
-    }, 800);
+    }, 1000);
 }
 
 function closeOverlay() {

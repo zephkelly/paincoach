@@ -2,17 +2,27 @@
     <section class="calendar overview panel" :class="currentTimeline" ref="parentContainer">
         <div class="headers wrapper">
             <h2>This <span>{{ currentTimeline }}</span></h2>
-            <h3>Aug 11</h3>
+            <h3>
+                August 11
+            </h3>
         </div>
         <div class="wrapper days">
             <!-- <div ref="daysContainer" class="days-grid"> -->
                 <TransitionGroup name="list" tag="div" class="days-grid">
-                    <OverviewDayIndicator v-for="(day, index) in numberOfDays" 
-                        labelType="day"
-                        :key="index"
-                        :dayIndex="index" 
-                        :labelContent="dayLabels[index % 7]" 
-                        :painLevel="generatedPainLevels[index]" 
+                    <OverviewDayIndicator v-for="emptyDay in emptyDaysAtStart"
+                        :key="`empty-${emptyDay}`"
+                        :labelType="dayLabelType"
+                        :labelContent="daysOfWeekLabels[emptyDay - 1 % 7]"
+                        :isEmpty="true"
+                        :dayIndex="emptyDay"
+                    />
+                    <OverviewDayIndicator v-for="day in calendarDays"
+                        :key="day.date"
+                        :labelType="dayLabelType"
+                        :labelContent="daysOfWeekLabels[day.index % 7]"
+                        :painLevel="1"
+                        :isEmpty="false"
+                        :dayIndex="day.index"
                     />
                 </TransitionGroup>
             <!-- </div> -->
@@ -22,57 +32,58 @@
 
 <script setup lang="ts">
 //@ts-ignore
-import type { DayLabel, PainLevel } from '@types';
+import { getStartingDayOfWeekIndex, getMonthLabel, getMonthDays, getMonthLabelShort, getDayOfWeek, getDayOfWeekShort, getEmptyDaysAtStartOfMonth, type CalendarDay, type CalendarMonth } from '@types/calendar';
+//@ts-ignore
+import type { DayIndicatorLabelType } from '@types/dayIndicator';
+//@ts-ignore
+import { daysOfWeekLabels } from '@types/days';
 
-const { currentTimeline, setTimeline } = useOverviewTimeline();
+const props = defineProps<{
+  initialDate: Date;
+}>();
 
 const isMounted = ref(false);
 
-// define our day labels
-const dayLabels: DayLabel[] = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-
-// Rand pain levels
-const painLevels: PainLevel[] = [0, 1, 2, 3, 'none'];
-
-const generatedPainLevels = ref<PainLevel[]>([]);
-
-function generatePainLevels(count: number) {
-  return Array.from({ length: count }, () => {
-    const randomIndex = Math.floor(Math.random() * painLevels.length);
-    return painLevels[randomIndex];
-  });
-}
-
-watch(currentTimeline, () => {
-    setNumberOfDays();
+const { currentTimeline } = useOverviewTimeline();
+const currentMonth = ref<CalendarMonth>({
+    date: props.initialDate,
+    days: [],
+    startingDayOfWeek: getStartingDayOfWeekIndex(props.initialDate)
 });
 
+const dayLabelType = ref<DayIndicatorLabelType>('day');
 
-const numberOfDays = ref(7);
-function setNumberOfDays() {
-    switch (currentTimeline.value) {
-        case 'week':
-            numberOfDays.value = 7;
-            break;
-        case 'fortnight':
-            numberOfDays.value = 14;
-            break;
-        case 'month':
-            numberOfDays.value = 30;
-            break;
-        default:
-            numberOfDays.value = 7;
-            break;
+const emptyDaysAtStart = computed(() => {
+    return getEmptyDaysAtStartOfMonth(currentMonth.value.startingDayOfWeek);
+});
+
+const calendarDays = computed(() => {
+    return generateCalendarMonthDays(currentMonth.value.date);
+});
+
+function generateCalendarMonthDays(date: Date): CalendarDay[] {
+    const days: CalendarDay[] = [];
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+  
+    for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+        const currentDate = new Date(year, month, i + 1);
+        days.push({
+            date: currentDate,
+            index: (i - 1) + emptyDaysAtStart.value,
+            dayOfWeek: getDayOfWeek(currentDate.getDay()),
+            dayOfWeekShort: getDayOfWeekShort(currentDate.getDay()),
+        });
     }
 
-    generatedPainLevels.value = generatePainLevels(numberOfDays.value);
+    console.log(days.length)
+  
+    return days;
 }
 
 onMounted(() => {
     isMounted.value = true;
-    generatedPainLevels.value = generatePainLevels(numberOfDays.value);
-
-    setNumberOfDays();
 });
 </script>
 
@@ -124,7 +135,7 @@ h2 h3 {
 
 .list-enter-active,
 .list-leave-active {
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 .list-enter-from,
 .list-leave-to {
@@ -133,5 +144,17 @@ h2 h3 {
 }
 .list-move {
   transition: transform 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-move {
+  transition: opacity 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 </style>

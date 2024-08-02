@@ -1,7 +1,7 @@
 //@ts-ignore
 import { ref, Ref } from 'vue'
-
-import type { TimelineOverview } from '../types/timeline';
+//@ts-ignore
+import { TimelineOverview } from './../types/timeline'
 
 export const useOverviewTimeline = () => {
     const currentTimeline: Ref<TimelineOverview> = useState<TimelineOverview>('currentTimeline', () => 'week')

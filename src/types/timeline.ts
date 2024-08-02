@@ -1,1 +1,1 @@
-export type TimelineOverview = 'week' | 'fortnight' | 'month'
+export type TimelineOverview = 'week' | 'month' | 'year';

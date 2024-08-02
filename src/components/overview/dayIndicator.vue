@@ -2,22 +2,27 @@
     <div>
         <p class="day-label" v-if="dayIndex <= 6">{{ labelContent }}</p>
         <span class="visual first-row" :class="[`pain-level-${painLevel}`]" v-if="dayIndex <= 6"></span>
-        <span class="visual" :class="[`pain-level-${painLevel}`]" v-if="dayIndex > 6"></span>
+        <span class="visual" :class="[`pain-level-${painLevel}`]" v-if="dayIndex > 6 "></span>
     </div>
 </template>
 
 <script setup lang="ts">
 //@ts-ignore
-import type { DayIndicatorLabel, DayLabel } from '@types/dayIndicator';
+import { type DayIndicatorLabelType } from '@types/dayIndicator';
 //@ts-ignore
 import type { PainLevel } from '@types/painLevel';
+//@ts-ignore
+import type { DayOfWeekLabel } from '@type/days';
 
 interface Props {
-    labelType: DayIndicatorLabel,
-    labelContent: DayLabel | number,
-    painLevel: PainLevel,
+    isEmpty: boolean,
+    labelType: DayIndicatorLabelType,
+    labelContent: DayOfWeekLabel | number,
     dayIndex: number
+    painLevel?: PainLevel | null,
 }
+
+
 
 const props = defineProps<Props>();
 </script>
@@ -70,6 +75,7 @@ span {
     border-radius: 50%;
     will-change: width, height;
     transition: width 0.28s ease, height 0.28s ease, background-color 0.28s ease;
+    overflow: visible;
 }
 
 span.first-row {
@@ -96,5 +102,9 @@ span.first-row {
 
 .pain-level-3 {
     background-color: var(--pain-3);
+}
+
+.pain-level-none, .pain-level-undefined {
+    background-color: transparent;
 }
 </style>

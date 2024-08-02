@@ -52,7 +52,7 @@ h1 {
     font-family: 'Inter', sans-serif;
     color: var(--text-color);
     font-weight: 300;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     letter-spacing: 0.1px;;
 }
 
@@ -70,5 +70,7 @@ h1 {
 
 .btn.search svg {
     fill: var(--text-color);
+    width: 28px;
+    height: 28px;
 }
 </style>

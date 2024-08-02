@@ -1,2 +1,9 @@
-export type DayIndicatorLabel = 'day' | 'number';
-export type DayLabel = 'S' | 'M' | 'T' | 'W' | 'T' | 'F' | 'S';
+import type { DayOfWeekLabel } from "./days";
+
+export type DayIndicatorLabelType = 'day' | number;
+
+export interface DayIndicatorProps {
+    labelType: DayIndicatorLabelType;
+    label: DayOfWeekLabel | number;
+    date: Date;
+}

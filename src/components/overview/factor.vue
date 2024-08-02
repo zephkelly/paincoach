@@ -1,5 +1,5 @@
 <template>
-    <button class="factor panel" :class="{ expanded: isExpanded }" @click.prevent="handleClick">
+    <button class="factor panel" :class="{ expanded: isExpanded, mounted: isMounted }" @click.prevent="handleClick">
         <Transition name="fade">
             <div class="content loaded" v-if="isMounted">
                 <div class="wrapper labels">
@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <div class="wrapper info">
-                    <div class="group text unloaded"><span class="factor-title" :style="{ width: getRandomWidth() }"></span></div>
+                    <div class="group text unloaded"><span class="factor-title" :style="{ width: factorWidthStyle }"></span></div>
                     <span class="status indicator"></span>
                 </div>
             </div> 
@@ -49,6 +49,7 @@ import debounce from './../../utils/debounce';
 
 const { factorsExpanded, isFactorExpanded } = useFactorsExpanded();
 const isExpanded = computed(() => isFactorExpanded(props.factorID));
+const factorWidthStyle = ref(`${Math.floor(Math.random() * 42) + 24}%`);
 
 interface Props {
     factorID: PainFactorID,
@@ -60,9 +61,6 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(['factorClicked']);
 
-function getRandomWidth(): string {
-    return `${Math.floor(Math.random() * 42) + 24}%`;
-}
 
 function getFactorColor(): string {
     if (props.factorValue >= 0 && props.factorValue <= 2) {
@@ -122,6 +120,7 @@ onMounted(() => {
 .content.unloaded .status.indicator {
     background-color: var(--pain-none);
     opacity: 0.2;
+    height: 100%;
 }
 
 .content.unloaded .icons div {
@@ -182,6 +181,13 @@ button.factor.panel {
     padding: 0px;
     background-color: var(--panel);
     overflow: hidden;
+    cursor: default;
+    pointer-events: none;
+}
+
+button.factor.panel.mounted {
+    cursor: pointer;
+    pointer-events: all;
 }
 
 h3.factor-title {
