@@ -47,6 +47,7 @@ div {
     align-items: center;
     max-width: 60px;
     aspect-ratio: 1/1;
+    will-change: transform;
 }
 
 p {

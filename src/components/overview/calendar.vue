@@ -210,7 +210,7 @@ h2 h3 {
     box-sizing: border-box;
     transition: height 0.5s ease;
 }
-
+/* 
 .list-enter-active {
   transition: transform 0.2s ease;
 }
@@ -224,19 +224,10 @@ h2 h3 {
 }
 
 .list-leave-active {
-    transition: transform 0s; /* Instant fade out */
+    transition: transform 0s;
 }
 
 .list-leave-to {
     opacity: 0;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.4s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
+} */
 </style>
