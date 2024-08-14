@@ -74,8 +74,8 @@ const { getValue } = useSettings();
         color: var(--text-color);
         font-size: var(--font-size-20);
         text-align: center;
-        margin-top: 2rem;
-        margin-bottom: 3rem;
+        margin-top: 0.8rem;
+        margin-bottom: 2.709rem;
     }
 
     h2, h3 {

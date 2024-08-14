@@ -3,7 +3,7 @@ import { ref, Ref } from 'vue'
 
 export const useSettings = () => {
     const settingsState = ref(useState<Record<string, boolean | string | number>>('settings', () => ({
-        "reminder": false,
+        "reminder": true,
         'reminderTime': '08:00',
         'displayMode': true,
         "colorScheme": 'green',

@@ -5,9 +5,9 @@
         </div>
         <div class="wrapper factors-container">
             <div class="loaded factors">
-                <Transition name="fade">
-                    <div class="overlay" v-if="showOverlay && anyFactorExpanded" @click="closeOverlay"></div>
-                </Transition>
+                <!-- <Transition name="fade"> -->
+                    <div class="overlay" :class="{ active: showOverlay && anyFactorExpanded }" v-if="showOverlay && anyFactorExpanded" @click="closeOverlay"></div>
+                <!-- </Transition> -->
                 <OverviewFactor 
                 v-for="factor in orderedFactors"
                 :id="factor.factorID"
@@ -62,7 +62,7 @@ function openOverlay(factorID: string) {
 
     timeoutOverflowID.value = setTimeout(() => {
         document.body.style.overflow = 'hidden';
-    }, 1000);
+    }, 800);
 }
 
 function closeOverlay() {
@@ -122,7 +122,7 @@ h2 {
 
 <style lang="css" scoped>
 .fade-enter-active, .fade-leave-active {
-    transition: opacity 0.5s;
+    
 }
 
 .fade-enter, .fade-leave-to {
@@ -142,5 +142,9 @@ h2 {
     background-color: var(--background-color-overlay);
     z-index: 80;
     will-change: opacity;
+}
+
+.overlay.active {
+    
 }
 </style>

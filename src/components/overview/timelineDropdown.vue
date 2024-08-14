@@ -130,10 +130,13 @@ button.main p {
 }
 
 button p {
+    position: relative;
+    top: -1px;
     margin: 0;
     font-family: 'Inter', sans-serif;
     color: var(--text-color);
     font-size: 12px;
+    line-height: 12px;
     font-weight: 500;
     display: inline-bock;
     text-align: left;
