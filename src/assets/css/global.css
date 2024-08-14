@@ -59,11 +59,18 @@
     --panel-hover: var(--panel-light-hover);
 
     --text-light: #000000;
+    --text-light-secondary: #646464;
     --text-light-inactive: #838383;
     --text-dark: #FFFFFF;
+    --text-dark-secondary: #868686;
     --text-dark-inactive: #838383;
     --text-color: var(--text-light);
     --text-color-inactive: var(--text-light-inactive);
+    --text-color-secondary: var(--text-light-secondary);
+
+    --border-light: #a9a9a9;
+    --border-dark: #5b5b5b;
+    --border: var(--border-light);
 
     --pain-none: #838383;
     --pain-0: #83A45D;
@@ -83,12 +90,16 @@
         --panel: var(--panel-dark);
         --panel-hover: var(--panel-dark-hover);
         --text-color: var(--text-dark);
+        --text-color-secondary: var(--text-dark-secondary);
         --text-color-inactive: var(--text-dark-inactive);
+        --border: var(--border-dark);
     }
 }
 
 
 :root {
     --font-size-14: clamp(12px, 3.9vw, 16px);
+    --font-size-16: clamp(14px, 4.5vw, 18px);
     --font-size-18: clamp(16px, 5vw, 20px);
+    --font-size-20: clamp(18px, 5.5vw, 22px);
 }

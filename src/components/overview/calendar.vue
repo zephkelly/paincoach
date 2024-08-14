@@ -20,7 +20,7 @@
                         :key="day.date"
                         :labelType="dayLabelType"
                         :labelContent="daysOfWeekLabels[day.index % 7]"
-                        :painLevel="1"
+                        :painLevel="day.painLevel"
                         :isEmpty="false"
                         :dayIndex="day.index"
                     />
@@ -148,6 +148,7 @@ function generateCalendarDays(startDate: Date, endDate: Date): CalendarDay[] {
         days.push({
             date: new Date(currentDate),
             index: dayIndex + numberOfEmptyDays,
+            painLevel: Math.floor(Math.random() * 6),
             dayOfWeek: getDayOfWeek(currentDate.getDay()),
             dayOfWeekShort: getDayOfWeekShort(currentDate.getDay()),
         });

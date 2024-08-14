@@ -15,6 +15,7 @@ declare global {
   const useOverviewTimeline: typeof import('@/composables/overviewTimeline')['useOverviewTimeline']
   const useScroll: typeof import('@/composables/useScroll')['useScroll']
   const useFactorsExpanded: typeof import('@/composables/useFactorsExpanded')['useFactorsExpanded']
+  const useSettings: typeof import('@/composables/useSettings')['useSettings']
 //   const useMyComposable: typeof import('@/composables/myComposable')['useMyComposable']
 }
 
