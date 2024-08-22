@@ -93,14 +93,22 @@ const { getValue } = useSettings();
     }
 
     article {
+        box-sizing: border-box;
         display: flex;
         flex-direction: column;
-        width: stretch;
+        width: 100%;
         height: auto;
         padding: 0rem 1rem;
         background-color: var(--panel);
         border-radius: 16px;
         margin-bottom: 1rem;
+
+        max-width: 482px;
+        min-width: 268px;
+    }
+
+    article:last-child {
+        margin-bottom: 7rem;
     }
 
     .setting {
