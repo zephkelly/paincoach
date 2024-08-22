@@ -2,10 +2,10 @@
     <section class="header overview">
         <header class="overview-header">
             <div class="wrapper timeline">
-                <OverviewTimelineDropdown />
+                <component :is="dynamicDropdownComponent" />
             </div>
             <div class="wrapper">
-                <h1>Overview</h1>
+                <h1>{{ title }}</h1>
             </div>
             <div class="wrapper search">
                 <button class="btn search">
@@ -17,6 +17,13 @@
 </template>
 
 <script setup lang="ts">
+//define props for the h1 element title
+const props = defineProps<{
+    title: string;
+    dynamicDropdownComponent: object;
+}>();
+
+
 </script>
 
 <style lang="css" scoped>

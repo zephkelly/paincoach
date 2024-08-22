@@ -1,10 +1,14 @@
 <template>
-    <div class="page-container">
-        
-    </div>
+    <main>
+        <MainHeader title="Calendar" :dynamicDropdownComponent="OverviewTimelineDropdown"/>
+    </main>
 </template>
 
 <script lang="ts" setup>
+import MainHeader from '@/components/mainHeader.vue';
+import OverviewTimelineDropdown from '@/components/overview/timelineDropdown.vue';
+
+
 definePageMeta({
     alias: ['/calendar'],
     title: 'Calendar',

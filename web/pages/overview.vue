@@ -1,6 +1,6 @@
 <template>
     <main>
-        <OverviewHeader />
+        <MainHeader :title="'Overview'" :dynamicDropdownComponent="OverviewTimelineDropdown" />
         <div class="page-container">
             <OverviewCalendar :initialDate="newDate" />
             <OverviewLifestyleScore :lifestyleScore="82"/>
@@ -10,6 +10,9 @@
 </template>
 
 <script lang="ts" setup>
+// import MainHeader from '~/components/mainHeader.vue';
+import OverviewTimelineDropdown from '@/components/overview/timelineDropdown.vue';
+
 const newDate = ref(new Date())
 
 definePageMeta({

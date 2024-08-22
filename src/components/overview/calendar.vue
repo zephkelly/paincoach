@@ -13,6 +13,7 @@
                         :key="`empty-${emptyDay}`"
                         :labelType="dayLabelType"
                         :labelContent="daysOfWeekLabels[emptyDay - 1 % 7]"
+                        :painLevel="mull"
                         :isEmpty="true"
                         :dayIndex="emptyDay"
                     />
@@ -32,11 +33,14 @@
 
 <script setup lang="ts">
 //@ts-ignore
-import { getStartingDayOfWeekIndex, getMonthLabel, getMonthDays, getMonthLabelShort, getDayOfWeek, getDayOfWeekShort, getEmptyDaysAtStartOfMonth, type CalendarDay, type CalendarMonth } from '@types/calendar';
+import { getStartingDayOfWeekIndex, getMonthDays,  getDayOfWeek, getDayOfWeekShort, type CalendarDay, type CalendarMonth } from '@types/calendar';
 //@ts-ignore
 import type { DayIndicatorLabelType } from '@types/dayIndicator';
 //@ts-ignore
 import { daysOfWeekLabels } from '@types/days';
+//@ts-ignore
+import { getEmptyDaysAtStart, generateCalendarDays, getStartOfWeek, getEndOfWeek, getStartOfFortnight, getEndOfFortnight } from './../../utils/calendar';
+// import { getEmptyDaysAtStart } from 'src/utils/calendar';
 
 const props = defineProps<{
   initialDate: Date;
@@ -53,24 +57,8 @@ const currentMonth = ref<CalendarMonth>({
 
 const dayLabelType = ref<DayIndicatorLabelType>('day');
 
-const emptyDaysAtStart = computed(() => {
-    const today = new Date();
-    let startDate: Date;
-
-    switch(currentTimeline.value) {
-        case 'week':
-            startDate = getStartOfWeek(today);
-            break;
-        case 'fortnight':
-            startDate = getStartOfFortnight(today);
-            break;
-        case 'month':
-        default:
-            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-            break;
-    }
-
-    return startDate.getDay();
+const emptyDaysAtStart = computed(() => { 
+    return getEmptyDaysAtStart(new Date(), currentTimeline.value);
 });
 
 const calendarDays = computed(() => {
@@ -94,71 +82,8 @@ const calendarDays = computed(() => {
             break;
     }
 
-    return generateCalendarDays(startDate, endDate);
+    return generateCalendarDays(startDate, endDate, emptyDaysAtStart.value);
 });
-
-function getStartOfWeek(date: Date): Date {
-    const d = new Date(date);
-    const day = d.getDay();
-    d.setDate(d.getDate() - day);
-    return d;
-}
-
-function getEndOfWeek(date: Date): Date {
-    const d = new Date(date);
-    const day = d.getDay();
-    d.setDate(d.getDate() + (6 - day));
-    return d;
-}
-
-function getStartOfFortnight(date: Date): Date {
-    const d = new Date(date);
-    const dayOfMonth = d.getDate();
-    
-    if (dayOfMonth <= 14) {
-        d.setDate(1);
-    } else {
-        d.setDate(15);
-    }
-    
-    return d;
-}
-
-function getEndOfFortnight(date: Date): Date {
-    const d = new Date(date);
-    const dayOfMonth = d.getDate();
-    
-    if (dayOfMonth <= 14) {
-        d.setDate(14);
-    } else {
-        d.setDate(getMonthDays(d));
-    }
-    
-    return d;
-}
-
-function generateCalendarDays(startDate: Date, endDate: Date): CalendarDay[] {
-    const days: CalendarDay[] = [];
-    let currentDate = startDate;
-    let dayIndex = 0;
-
-    const numberOfEmptyDays = emptyDaysAtStart.value;
-
-    while (currentDate <= endDate) {
-        days.push({
-            date: new Date(currentDate),
-            index: dayIndex + numberOfEmptyDays,
-            painLevel: Math.floor(Math.random() * 6),
-            dayOfWeek: getDayOfWeek(currentDate.getDay()),
-            dayOfWeekShort: getDayOfWeekShort(currentDate.getDay()),
-        });
-        
-        currentDate.setDate(currentDate.getDate() + 1);
-        dayIndex++;
-    }
-
-    return days;
-}
 
 onMounted(() => {
     isMounted.value = true;
@@ -175,6 +100,7 @@ onMounted(() => {
 .headers.wrapper {
     display: flex;
     justify-content: flex-start;
+    margin-bottom: calc(1.5rem + 2rem);
 }
 
 h2 h3 {
@@ -204,13 +130,14 @@ h2 h3 {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     grid-auto-columns: minmax(0, 1fr);
+    grid-auto-rows: 1fr;
     grid-template-rows: 1fr;
     justify-content: space-around;
     gap: 0.5rem 0.5rem;
     margin: 0 auto;
     box-sizing: border-box;
-    transition: height 0.5s ease;
-    will-change: height;
+    transition: height 0.5s ease, width 0.5s ease;
+    will-change: height, width;
 }
 
 .list-enter-active {

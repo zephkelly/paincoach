@@ -1,8 +1,9 @@
 <template>
     <div>
         <p class="day-label" v-if="dayIndex <= 6">{{ labelContent }}</p>
-        <span class="visual first-row" :class="[`pain-level-${painLevel}`]" v-if="dayIndex <= 6"></span>
-        <span class="visual" :class="[`pain-level-${painLevel}`]" v-if="dayIndex > 6 "></span>
+        <span class="visual" :class="[`pain-level-${painLevel}`, { 'first-row': dayIndex <= 6 }]"></span>
+        <!-- <span class="visual first-row" :class="[`pain-level-${painLevel}`]" v-if="dayIndex <= 6"></span>
+        <span class="visual" :class="[`pain-level-${painLevel}`]" v-if="dayIndex > 6 "></span> -->
     </div>
 </template>
 
@@ -12,17 +13,15 @@ import { type DayIndicatorLabelType } from '@types/dayIndicator';
 //@ts-ignore
 import type { PainLevel } from '@types/painLevel';
 //@ts-ignore
-import type { DayOfWeekLabel } from '@type/days';
+import type { DayOfWeekLabel } from '@types/days';
 
 interface Props {
     isEmpty: boolean,
     labelType: DayIndicatorLabelType,
     labelContent: DayOfWeekLabel | number,
     dayIndex: number
-    painLevel?: PainLevel | null,
+    painLevel: PainLevel | null,
 }
-
-
 
 const props = defineProps<Props>();
 </script>
@@ -51,6 +50,8 @@ div {
 }
 
 p {
+    position: absolute;
+    top: -32px;
     font-family: 'Inter', sans-serif;
     text-align: center;
     font-size: 10px;
