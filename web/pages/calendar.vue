@@ -15,11 +15,11 @@
 //@ts-ignore
 import MainHeader from '@/components/mainHeader.vue';
 //@ts-ignore
-import Calendar from '@/components/calendar/calendar.vue';
+import Calendar from './../../src/components/calendar/calendar.vue';
 //@ts-ignore
 import CalendarTimelineDropdown from './../../src/components/calendar/timelineDropdown.vue';
 //@ts-ignore
-import DayOverview from '@/components/calendar/dayOverview.vue';
+import DayOverview from './../../src/components/calendar/dayOverview.vue';
 //@ts-ignore
 import { getStartOfWeek, getEndOfWeek, getStartOfFortnight, getEndOfFortnight, getEmptyDaysAtStart, generateCalendarDays } from '@/utils/calendar';
 
