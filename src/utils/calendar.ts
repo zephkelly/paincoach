@@ -52,7 +52,7 @@ export function generateCalendarDays(startDate: Date, endDate: Date, emptyDaysAt
     days.push({
       date: new Date(currentDate),
       index: dayIndex + emptyDaysAtStart,
-      painLevel: Math.floor(Math.random() * 6),
+      painLevel: Math.floor(Math.random() * 4),
       dayOfWeek: getDayOfWeek(currentDate.getDay()),
       dayOfWeekShort: getDayOfWeekShort(currentDate.getDay()),
     });

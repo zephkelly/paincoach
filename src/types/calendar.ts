@@ -3,8 +3,6 @@ import { monthLabels, monthLabelsShort, monthDays, type MonthLabel, type MonthLa
 
 export type TimelineCalendarOverview = 'week' | 'fortnight' | 'month';
 
-
-
 export interface CalendarDay {
     date: Date;
     index: number;

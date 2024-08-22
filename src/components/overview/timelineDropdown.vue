@@ -137,7 +137,7 @@ button p {
     color: var(--text-color);
     font-size: 12px;
     line-height: 12px;
-    font-weight: 500;
+    font-weight: 400;
     display: inline-bock;
     text-align: left;
 }

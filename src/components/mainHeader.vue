@@ -58,7 +58,7 @@ section {
 h1 {
     font-family: 'Inter', sans-serif;
     color: var(--text-color);
-    font-weight: 300;
+    font-weight: 400;
     font-size: var(--font-size-14);
     letter-spacing: 0.1px;;
 }

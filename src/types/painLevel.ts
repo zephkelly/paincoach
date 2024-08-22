@@ -1,1 +1,1 @@
-export type PainLevel = 0 | 1 | 2 | 3 | 'none'
+export type PainLevel = 0 | 1 | 2 | 3 | 'none' | 'missing';

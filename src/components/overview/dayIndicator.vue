@@ -2,8 +2,6 @@
     <div>
         <p class="day-label" v-if="dayIndex <= 6">{{ labelContent }}</p>
         <span class="visual" :class="[`pain-level-${painLevel}`, { 'first-row': dayIndex <= 6 }]"></span>
-        <!-- <span class="visual first-row" :class="[`pain-level-${painLevel}`]" v-if="dayIndex <= 6"></span>
-        <span class="visual" :class="[`pain-level-${painLevel}`]" v-if="dayIndex > 6 "></span> -->
     </div>
 </template>
 
@@ -57,7 +55,7 @@ p {
     font-size: 10px;
     color: var(--text-color);
     margin-bottom: 8px;
-    font-size: clamp(10px, 3vw, 14px);
+    font-size: var(--font-size-12);
     opacity: 0.3;
 }
 
@@ -73,7 +71,7 @@ span {
     height: 100%;
     max-height: 60px;
     max-width: 60px;
-    background-color: var(--pain-none);
+    background-color: var(--pain-missing);
     border-radius: 50%;
     will-change: width, height;
     transition: width 0.28s ease, height 0.28s ease, background-color 0.28s ease;
@@ -104,6 +102,10 @@ span.first-row {
 
 .pain-level-3 {
     background-color: var(--pain-3);
+}
+
+.pain-level-missing {
+    background-color: var(--pain-missing);
 }
 
 .pain-level-none, .pain-level-undefined {

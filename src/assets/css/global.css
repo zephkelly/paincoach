@@ -1,6 +1,13 @@
 /* Inter */
 @font-face {
     font-family: 'Inter';
+    src: url('../fonts/inter-500.ttf') format('truetype');
+    font-weight: 500;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Inter';
     src: url('../fonts/inter-400.ttf') format('truetype');
     font-weight: 400;
     font-display: swap;
@@ -72,7 +79,7 @@
     --border-dark: #5b5b5b;
     --border: var(--border-light);
 
-    --pain-none: #838383;
+    --pain-missing: #58585829;
     --pain-0: #83A45D;
     --pain-1: #E8CB9F;
     --pain-2: #EF8D56;
@@ -98,6 +105,8 @@
 
 
 :root {
+    --font-size-10: clamp(8px, 2.5vw, 12px);
+    --font-size-12: clamp(10px, 3vw, 14px);
     --font-size-14: clamp(12px, 3.9vw, 16px);
     --font-size-16: clamp(14px, 4.5vw, 18px);
     --font-size-18: clamp(16px, 5vw, 20px);

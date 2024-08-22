@@ -11,6 +11,7 @@
 
 <script lang="ts" setup>
 // import MainHeader from '~/components/mainHeader.vue';
+//@ts-expect-error
 import OverviewTimelineDropdown from '@/components/overview/timelineDropdown.vue';
 
 const newDate = ref(new Date())
