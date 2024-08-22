@@ -17,7 +17,7 @@ import MainHeader from '@/components/mainHeader.vue';
 //@ts-ignore
 import Calendar from '@/components/calendar/calendar.vue';
 //@ts-ignore
-import CalendarTimelineDropdown from '@/components/calendar/timelineDropdown.vue';
+import CalendarTimelineDropdown from './../../src/components/calendar/timelineDropdown.vue';
 //@ts-ignore
 import DayOverview from '@/components/calendar/dayOverview.vue';
 //@ts-ignore
