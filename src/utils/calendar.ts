@@ -82,3 +82,9 @@ export function getEmptyDaysAtStart(date: Date, timeline: string): number {
 
   return startDate.getDay();
 }
+
+export function currentDateMonthDay(): String {
+    const today = new Date();
+    const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric' };
+    return today.toLocaleDateString('en-US', options);
+}

@@ -67,6 +67,13 @@ onMounted(() => {
 </script>
 
 <style lang="css" scoped>
+.lifestyle-score {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 452px;
+    min-width: 268px;
+}
+
 .headers.wrapper {
     display: flex;
     justify-content: space-between;

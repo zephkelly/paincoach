@@ -97,6 +97,9 @@ h2 {
     margin-top: 42px;
     padding-top: 0px;
     padding-bottom: 0px;
+    width: 100%;
+    max-width: 482px;
+    min-width: 268px;
 }
 
 .headers.wrapper {

@@ -29,7 +29,7 @@ const debouncedToggle = debounce(toggle, 100);
 .toggle {
     cursor: pointer;
     position: relative;
-    background-color: var(--pain-none);
+    background-color: var(--background-color);
     height: 32px;
     width: 60px;
     border-radius: 32px;

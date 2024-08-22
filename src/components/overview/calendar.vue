@@ -3,7 +3,7 @@
         <div class="headers wrapper">
             <h2>This <span>{{ currentTimeline }}</span></h2>
             <h3>
-                August 11
+                {{ currentDateLabel }}
             </h3>
         </div>
         <div class="wrapper days">
@@ -39,7 +39,7 @@ import type { DayIndicatorLabelType } from '@types/dayIndicator';
 //@ts-ignore
 import { daysOfWeekLabels } from '@types/days';
 //@ts-ignore
-import { getEmptyDaysAtStart, generateCalendarDays, getStartOfWeek, getEndOfWeek, getStartOfFortnight, getEndOfFortnight } from './../../utils/calendar';
+import { getEmptyDaysAtStart, generateCalendarDays, getStartOfWeek, getEndOfWeek, getStartOfFortnight, getEndOfFortnight, currentDateMonthDay } from './../../utils/calendar';
 // import { getEmptyDaysAtStart } from 'src/utils/calendar';
 
 const props = defineProps<{
@@ -85,6 +85,20 @@ const calendarDays = computed(() => {
     return generateCalendarDays(startDate, endDate, emptyDaysAtStart.value);
 });
 
+const currentDateLabel = computed(() => {
+    if (isMounted.value === false) return currentDateMonthDay();
+
+    switch (currentTimeline.value) {
+        case 'week':
+            return currentDateMonthDay();
+        case 'fortnight':
+            return currentDateMonthDay();
+        case 'month':
+        default:
+            return currentMonth.value.date.toLocaleString('default', { month: 'long', year: 'numeric' });
+    }
+});
+
 onMounted(() => {
     isMounted.value = true;
 });
@@ -92,6 +106,8 @@ onMounted(() => {
 
 <style lang="css" scoped>
 .calendar {
+    width: 100%;
+    box-sizing: border-box;
     max-width: 452px;
     min-width: 268px;
     transition: height 0.5s ease;
