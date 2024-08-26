@@ -75,7 +75,7 @@ const { getValue } = useSettings();
         font-size: var(--font-size-20);
         text-align: center;
         margin-top: 0.8rem;
-        margin-bottom: 2.709rem;
+        margin-bottom: 2rem;
     }
 
     h2, h3 {
