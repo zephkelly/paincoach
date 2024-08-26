@@ -22,7 +22,6 @@ definePageMeta({
     description: 'This is the overview page',
 })
 
-
 const factor1: PainFactorProps = {
     factorID: 'psychological',
     factorType: 'psychological distress',
