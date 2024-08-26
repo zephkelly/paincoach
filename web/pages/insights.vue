@@ -7,8 +7,8 @@
                 <div class="headers wrapper">
                     <h2>Your Pain Factors</h2>
                 </div>
-                <img :src="currentImage" alt="Your Image">
-                <img src="./../assets/images/insights-light.webp" alt="Your Image">
+                <img v-if="colorScheme.value === 'light'" src="./../assets/images/insights-light.webp" alt="Your Image">
+                <img v-else src="./../assets/images/insights.webp" alt="Your Image">
             </section>
         </div>
     </main>
@@ -27,18 +27,13 @@ const updateColorScheme = () => {
 onMounted(() => {
   updateColorScheme();
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateColorScheme);
+
+  console.log(colorScheme.value);
 });
 
 onUnmounted(() => {
   window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', updateColorScheme);
 });
-
-const currentImage = computed(() => {
-  return colorScheme.value === 'light' 
-    ? "./../assets/images/insights-light.webp"
-    : "./../assets/images/insights.webp";
-});
-
 </script>
 
 <style lang="scss" scoped>
