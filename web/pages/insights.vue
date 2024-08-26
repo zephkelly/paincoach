@@ -8,7 +8,7 @@
                     <h2>Your Pain Factors</h2>
                     <!-- <img src="~/assets/images/insights-demo-1.JPG" alt="Insights icon" /> -->
                 </div>
-                <img src="./../assets/images/insights.webp" alt="Your Image">
+                <img :src="currentImage" alt="Your Image">
             </section>
         </div>
     </main>
@@ -18,7 +18,26 @@
 //@ts-ignore
 import ContributionChart from '@/components/insights/contributionChart.vue';
 
+const colorScheme = ref('light');
 
+const updateColorScheme = () => {
+  colorScheme.value = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
+onMounted(() => {
+  updateColorScheme();
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateColorScheme);
+});
+
+onUnmounted(() => {
+  window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', updateColorScheme);
+});
+
+const currentImage = computed(() => {
+  return colorScheme.value === 'light' 
+    ? new URL('../assets/images/insights-light.webp', import.meta.url).href
+    : new URL('../assets/images/insights.webp', import.meta.url).href;
+});
 
 </script>
 
