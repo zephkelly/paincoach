@@ -1,5 +1,5 @@
 <template>
-    <article class="day-overview">
+    <article class="day-overview" id="calendar-day-overview">
         <span class="severity-indicator" :style="{ backgroundColor: getPainColor(painLevel) }"></span>
         <div class="wrapper title">
             <Transition name="fade" mode="out-in">
@@ -32,7 +32,7 @@ const getPainColor = (level: number) => {
 .day-overview {
     box-sizing: border-box;
     position: relative;
-    margin-top: 3rem;
+    margin-top: 2rem;
     background-color: var(--panel);
     height: 250px;
     width: 100%;

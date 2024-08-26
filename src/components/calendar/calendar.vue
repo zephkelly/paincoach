@@ -25,73 +25,86 @@
   </template>
   
 <script setup lang="ts">
-    // @ts-expect-error
-    import type { CalendarDay } from '@/types/calendar';
-    import debounce from './../../utils/debounce';
-  
-    const props = defineProps<{
-        calendarDays: CalendarDay[];
-        currentMonth: Date;
-    }>();
-    
-    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const { smoothScroll } = useScroll();
+// @ts-expect-error
+import type { CalendarDay } from '@/types/calendar';
+import debounce from './../../utils/debounce';
 
-    const activeDay = ref<Date | null>(null);
-    
-    const flatCalendarDays = computed(() => {
-        const days: CalendarDay[] = [];
-        const firstDay = props.calendarDays[0].date.getDay();
-        
-        // Add empty days at the start
-        for (let i = 0; i < firstDay; i++) {
-            days.push({ date: null, painLevel: undefined, index: -1 });
-        }
-        
-        // Add actual calendar days
-        days.push(...props.calendarDays);
-        
-        // Add empty days at the end to make total days a multiple of 7
-        while (days.length % 7 !== 0) {
-            days.push({ date: null, painLevel: undefined, index: -1 });
-        }
-        
-        return days;
-    });
+const props = defineProps<{
+    calendarDays: CalendarDay[];
+    currentMonth: Date;
+}>();
 
-    function debounceHandlePainLevelClick(day: CalendarDay) {
-        debounce(() => handlePainLevelClick(day), 100);
+const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+const activeDay = ref<Date | null>(null);
+
+const flatCalendarDays = computed(() => {
+    const days: CalendarDay[] = [];
+    const firstDay = props.calendarDays[0].date.getDay();
+    
+    // Add empty days at the start
+    for (let i = 0; i < firstDay; i++) {
+        days.push({ date: null, painLevel: undefined, index: -1 });
     }
-
-    const handlePainLevelClick = (day: CalendarDay) => {
-        if (day.date) {
-            if (activeDay.value && day.date.getTime() === activeDay.value.getTime()) {
-                // If clicking the already active day, deactivate it
-                activeDay.value = null;
-                emit('closeDataComponent');
-            } else {
-                // Activate the clicked day
-                activeDay.value = day.date;
-                emit('openDataComponent', {
-                    date: day.date,
-                    dayShort: daysOfWeek[day.date.getDay()].slice(0, 3),
-                    dayNumber: day.date.getDate(),
-                    month: day.date.toLocaleString('default', { month: 'long' }),
-                    year: day.date.getFullYear(),
-                    painLevel: day.painLevel
-                });
-            }
-        }
-    };
-  
-    const formatMonth = (date: Date) => {
-        return date.toLocaleString('default', { month: 'long', year: 'numeric' });
-    };
     
-    const formatDate = (date: Date) => {
-        return date.toISOString().split('T')[0];
-    };
+    // Add actual calendar days
+    days.push(...props.calendarDays);
+    
+    // Add empty days at the end to make total days a multiple of 7
+    while (days.length % 7 !== 0) {
+        days.push({ date: null, painLevel: undefined, index: -1 });
+    }
+    
+    return days;
+});
 
-    const emit = defineEmits(['openDataComponent', 'closeDataComponent']);
+function debounceHandlePainLevelClick(day: CalendarDay) {
+    debounce(() => handlePainLevelClick(day), 100);
+}
+
+const handlePainLevelClick = (day: CalendarDay) => {
+    if (day.date) {
+        if (activeDay.value && day.date.getTime() === activeDay.value.getTime()) {
+            // If clicking the already active day, deactivate it
+            activeDay.value = null;
+            emit('closeDataComponent');
+        } else {
+            // Activate the clicked day
+            activeDay.value = day.date;
+            emit('openDataComponent', {
+                date: day.date,
+                dayShort: daysOfWeek[day.date.getDay()].slice(0, 3),
+                dayNumber: day.date.getDate(),
+                month: day.date.toLocaleString('default', { month: 'long' }),
+                year: day.date.getFullYear(),
+                painLevel: day.painLevel
+            });
+        }
+
+        scrollToOverview();
+    }
+};
+
+const timeoutScrollID = ref<number | null>(null);
+
+function scrollToOverview() {
+    const factorIdSelector = "#calendar-day-overview";
+    
+    timeoutScrollID.value = setTimeout(() => {
+        smoothScroll(factorIdSelector);
+    }, 100);
+}
+
+const formatMonth = (date: Date) => {
+    return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+};
+
+const formatDate = (date: Date) => {
+    return date.toISOString().split('T')[0];
+};
+
+const emit = defineEmits(['openDataComponent', 'closeDataComponent']);
 </script>
   
 <style scoped>
@@ -117,14 +130,15 @@
     
     .calendar-header-cell {
         text-align: center;
-        font-weight: 500;
+        font-weight: 400;
         color: var(--text-color-secondary);
+        font-size: var(--font-size-14);
     }
     
     .calendar-body {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 0.5rem;
+        gap: 0.2rem 0.8rem;
     }
     
     .calendar-cell {

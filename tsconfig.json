@@ -10,6 +10,7 @@
         "baseUrl": ".",
         "paths": {
             "~/*": ["./src/*"],
+            "@assets/*": ["./src/assets/*"],
             "@composables/*": ["./src/composables/*"],
             "@components/*": ["./src/components/*"],
             "@types/*": ["./src/types/*"],
@@ -17,11 +18,11 @@
         }
     },
     "extends": "./web/.nuxt/tsconfig.json",
-    "references": [
-        { "path": "./web/tsconfig.json" },
-        { "path": "./src/tsconfig.json" },
-        { "path": "./mobile/tsconfig.json" }
-    ],
+    // "references": [
+    //     { "path": "./web/tsconfig.json" },
+    //     { "path": "./src/tsconfig.json" },
+    //     { "path": "./mobile/tsconfig.json" }
+    // ],
     "include": [
         "./src/**/*.ts",
         "./src/**/*.d.ts",

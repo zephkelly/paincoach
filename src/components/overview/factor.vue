@@ -16,9 +16,10 @@
             </div>
         </Transition>
         <Transition name="expand">
-            <div class="more" :class="{ active: isExpanded}" v-show="isExpanded">
+            <div class="more" :class="{ active: isExpanded}" >
                 <p>
-                    Psychological Distress is responsible for 45% of the change in your pain levels.
+                    <span>{{ factorName }}</span>
+                    is responsible for 45% of the change in your pain levels.
                 </p>
                 <p>
                     There is a strong positive correlation, indicating that higher psychological distress is associated with higher pain levels.
@@ -94,10 +95,10 @@ onMounted(() => {
     opacity: 0;
 }
 
-.expand-enter-active,
+/* .expand-enter-active,
 .expand-leave-active {
-  opacity: 1;
-  transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .expand-enter-from,
@@ -105,7 +106,7 @@ onMounted(() => {
   opacity: 0;
   transform: translateY(-10px);
   overflow: hidden;
-}
+} */
 </style>
 
 <!-- Unloaded Factors -->
@@ -161,15 +162,14 @@ onMounted(() => {
 </style>
 
 <style lang="css" scoped>
-
 .factor {
     display: flex;
     flex-direction: column;
     position: relative;
     cursor: pointer;
-    /* transition: top 0.5s ease; */
+    transition: height 0.5s ease;
     min-height: 66.75px;
-    will-change: height, position, ;
+    will-change: height, transform;
 }
 
 .factor.expanded {
@@ -253,17 +253,24 @@ h3.factor-title {
 }
 
 .more {
-    padding: 24px 16px;
-    padding-top: 0px;
+    height: 0;
+    opacity: 0;
+    padding: 0px 16px;
     padding-right: 32px;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    will-change: transform, max-height, opacity;
+    will-change: transform, height, opacity;
+    transition: height 0.4s cubic-bezier(0.075, 0.82, 0.165, 1), opacity 0.2s ease;
 }
 
 .more.active {
-    transition: opacity 0.5s cubic-bezier(0.075, 0.82, 0.165, 1), max-height 0.6s ease, transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+    height: 120px;
+    padding: 24px 16px;
+    padding-top: 8px;
+    padding-right: 32px;
+    opacity: 1;
+    transition: height 0.1s cubic-bezier(0.075, 0.82, 0.165, 1), opacity 0.5s ease;
 }
 
 .more p {
@@ -273,5 +280,9 @@ h3.factor-title {
     font-weight: 300;
     text-align: left;
     opacity: 0.7;
+
+    span {
+        text-transform: capitalize;
+    }
 }
 </style>

@@ -58,11 +58,11 @@ function openOverlay(factorID: string) {
     
     timeoutScrollID.value = setTimeout(() => {
         smoothScroll(factorIdSelector);
-    }, 200);
+    }, 100);
 
     timeoutOverflowID.value = setTimeout(() => {
         document.body.style.overflow = 'hidden';
-    }, 800);
+    }, 500);
 }
 
 function closeOverlay() {
@@ -86,8 +86,6 @@ onMounted(() => {
 </script>
 
 <style lang="css" scoped>
-
-
 h2 {
     padding-left: 1rem;
 }
@@ -118,16 +116,10 @@ h2 {
     gap: 1rem;
     width: 100%;
     will-change: height;
-    /* position: relative; */
 }
-
 </style>
 
 <style lang="css" scoped>
-.fade-enter-active, .fade-leave-active {
-    
-}
-
 .fade-enter, .fade-leave-to {
     opacity: 0;
 }
@@ -145,9 +137,5 @@ h2 {
     background-color: var(--background-color-overlay);
     z-index: 80;
     will-change: opacity;
-}
-
-.overlay.active {
-    
 }
 </style>

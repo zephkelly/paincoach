@@ -6,6 +6,7 @@
         "rootDir": "../",
         "paths": {
             "~/*": ["./"],
+            "@assets/*": ["./assets/*"],
             "@composables/*": ["./composables/*"],
             "@components/*": ["./components/*"],
             "@types/*": ["./types/*"],

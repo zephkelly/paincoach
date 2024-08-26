@@ -5,7 +5,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"><path d="M480-397.85 311.85-566h336.3L480-397.85Z"/></svg>
         </button>
         <Transition name="fade">
-            <nav v-show="isEnabled" class="menu">
+            <nav v-show="" class="menu">
                 <ul>
                     <li v-for="option in dropdownOptions" :key="option.value">
                         <button @click.prevent="debouncedSelectTimeline(option.value)" :class="option.value">
