@@ -8,7 +8,7 @@
                     <h2>Your Pain Factors</h2>
                     <!-- <img src="~/assets/images/insights-demo-1.JPG" alt="Insights icon" /> -->
                 </div>
-                <img src="./../assets/images/insights.JPG" alt="Your Image">
+                <img src="./../assets/images/insights.webp" alt="Your Image">
             </section>
         </div>
     </main>
