@@ -35,8 +35,8 @@ onUnmounted(() => {
 
 const currentImage = computed(() => {
   return colorScheme.value === 'light' 
-    ? new URL('./../assets/images/insights-light.webp', import.meta.url).href
-    : new URL('./../assets/images/insights.webp', import.meta.url).href;
+    ? "./../assets/images/insights-light.webp"
+    : "./../assets/images/insights.webp";
 });
 
 </script>
