@@ -6,9 +6,9 @@
             <section class="panel">
                 <div class="headers wrapper">
                     <h2>Your Pain Factors</h2>
-                    <!-- <img src="~/assets/images/insights-demo-1.JPG" alt="Insights icon" /> -->
                 </div>
                 <img :src="currentImage" alt="Your Image">
+                <img src="./../assets/images/insights-light.webp" alt="Your Image">
             </section>
         </div>
     </main>
@@ -35,8 +35,8 @@ onUnmounted(() => {
 
 const currentImage = computed(() => {
   return colorScheme.value === 'light' 
-    ? new URL('../assets/images/insights-light.webp', import.meta.url).href
-    : new URL('../assets/images/insights.webp', import.meta.url).href;
+    ? new URL('./../assets/images/insights-light.webp', import.meta.url).href
+    : new URL('./../assets/images/insights.webp', import.meta.url).href;
 });
 
 </script>
