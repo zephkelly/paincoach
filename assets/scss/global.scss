@@ -1,0 +1,136 @@
+@import '~/assets/scss/reset.scss';
+
+@font-face {
+    font-family: 'Geist';
+    src: url('/fonts/geist-300.woff') format('woff');
+    font-weight: 300;
+    font-display: swap;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Geist';
+    src: url('/fonts/geist-500.woff') format('woff');
+    font-weight: 500;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Geist';
+    src: url('/fonts/geist-600.woff') format('woff');
+    font-weight: 600;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Geist';
+    src: url('/fonts/geist-700.woff') format('woff');
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Geist';
+    src: url('/fonts/geist-800.woff') format('woff');
+    font-weight: 800;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'NotoSerif';
+    src: url('/fonts/notoserif-600.ttf') format('truetype');
+    font-weight: 600;
+    font-display: swap;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'NotoSerif';
+    src: url('/fonts/notoserif-700.ttf') format('truetype');
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'NotoSerif';
+    src: url('/fonts/notoserif-900.ttf') format('truetype');
+    font-weight: 900;
+    font-display: swap;
+}
+
+:root {
+    --background-light: #ffffff;
+    --background-dark: #09090b;
+
+    --background-secondary-light: #f4f4f5;
+    --background-secondary-dark: #27272a;
+
+    --accent-light: #1e1e22;
+    --accent-dark: #f4f4f5;
+
+    --accent-hover-light: #222224;
+    --accent-hover-dark: #cdcdcd;
+
+    --text-light: #0d0d0e;
+    --text-dark: #FFF;
+
+    --completed-light: #39ce0b;
+    --completed-dark: #2bb401;
+}
+
+// Light theme
+:root {
+    --background: var(--background-light);
+    --background: var(--background-secondary-light);
+    --accent: var(--accent-light);
+    --accent-hover: var(--accent-hover-light);
+    --text-color: var(--text-light);
+
+    --completed: var(--completed-light);
+}
+
+//Dark theme
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: var(--background-dark);
+        --background-secondary: var(--background-secondary-dark);
+        --accent: var(--accent-dark);
+        --accent-hover: var(--accent-hover-dark);
+        --text-color: var(--text-dark);
+
+        --completed: var(--completed-dark);
+    }
+}
+
+body {
+    font-family: 'Geist', sans-serif;
+    color: var(--text-color);
+    background-color: var(--background);
+}
+
+h1, h2 {
+    tab-size: 4;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: -1.2px;
+    line-height: 37.5px;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+h3 {
+    tab-size: 4;
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+p {
+    font-weight: 300;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 28px;
+    color: var(--text-color);
+}
