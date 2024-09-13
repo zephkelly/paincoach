@@ -113,7 +113,7 @@ section {
     z-index: 2;
     pointer-events: none;
     user-select: none;
-    // display: none;
+    display: none;
 
     @media (prefers-color-scheme: light) {
         height: 200px;

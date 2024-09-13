@@ -5,10 +5,10 @@
             Introducing <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>. Your personalised pain and lifestyle assistant, backed by real science
         </p>
         <BaseButton href class="waitlist-link">Get Started</BaseButton>
-        <div class="landing-video">
+        <!-- <div class="landing-video">
             <div class="video-container">
             </div>
-        </div>
+        </div> -->
     </section>
 </template>
 

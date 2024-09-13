@@ -7,6 +7,7 @@
         <scrollToReveal>
             <how class="how"/>
         </scrollToReveal>
+        <WaitingList />
     </main>
 </template>
 

@@ -197,10 +197,10 @@
 
         @keyframes floatUpDown {
             0%, 100% {
-                transform: rotate(-90deg) translateX(3px);
+                transform: rotate(-90deg) translateX(5px);
             }
             50% {
-                transform: rotate(-90deg) translateX(-3px);
+                transform: rotate(-90deg) translateX(-5px);
             }
         }
     }
