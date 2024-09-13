@@ -2,7 +2,7 @@
     <section>
         <h1>Take Control of Your Pain, Reclaim Your Life</h1>
         <p class="subtitle">
-            Introducing <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>. Your personalised, science-backed, pain management assistant
+            Introducing <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>. Your personalised pain and lifestyle assistant, backed by real science
         </p>
         <BaseButton href class="waitlist-link">Get Started</BaseButton>
         <div class="landing-video">

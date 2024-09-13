@@ -37,6 +37,8 @@
   
   <style scoped>
   .reveal-element {
+    position: relative;
+    z-index: 3;
     opacity: 0;
     transform: translateX(-6px);
     transition: opacity 1.2s cubic-bezier(0.075, 0.82, 0.165, 1), transform 0.6s ease;

@@ -1,6 +1,6 @@
 <template>
     <section>
-        <h2>How it works in <span>three</span> simple steps:</h2>
+        <h2>How it works in <span>three</span> steps:</h2>
         <ol class="steps-list">
             <li>
                 <div class="wrapper">
@@ -12,49 +12,7 @@
                     <p class="subtitle">Make a record of your day by answering a few simple questions</p>
                     <div class="illustration-container">
                         <div class="illustration-top-fade"></div>
-                        <div class="survey">
-                            <div class="row 1">
-                                <div class="timeline">
-                                    <div class="circle"></div>
-                                    <div class="line straight"></div>
-                                </div>
-                                <div class="content">
-                                    <svg class="factor-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M491-339q70 0 119-45t49-109q0-57-36.5-96.5T534-629q-47 0-79.5 30T422-525q0 19 7.5 37t21.5 33l57-57q-3-2-4.5-5t-1.5-7q0-11 9-17.5t23-6.5q20 0 33 16.5t13 39.5q0 31-25.5 52.5T492-418q-47 0-79.5-38T380-549q0-29 11-55.5t31-46.5l-57-57q-32 31-49 72t-17 86q0 88 56 149.5T491-339ZM240-80v-172q-57-52-88.5-121.5T120-520q0-150 105-255t255-105q125 0 221.5 73.5T827-615l52 205q5 19-7 34.5T840-360h-80v120q0 33-23.5 56.5T680-160h-80v80h-80v-160h160v-200h108l-38-155q-23-91-98-148t-172-57q-116 0-198 81t-82 197q0 60 24.5 114t69.5 96l26 24v208h-80Zm254-360Z"/></svg>
-                                    <p>Psychological Distress</p>
-                                    <div class="checkbox">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M382-208 122-468l90-90 170 170 366-366 90 90-456 456Z"/></svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="timeline">
-                                    <div class="circle"></div>
-                                    <div class="line straight"></div>
-                                </div>
-                                <div class="content">
-                                    <svg class="factor-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M491-339q70 0 119-45t49-109q0-57-36.5-96.5T534-629q-47 0-79.5 30T422-525q0 19 7.5 37t21.5 33l57-57q-3-2-4.5-5t-1.5-7q0-11 9-17.5t23-6.5q20 0 33 16.5t13 39.5q0 31-25.5 52.5T492-418q-47 0-79.5-38T380-549q0-29 11-55.5t31-46.5l-57-57q-32 31-49 72t-17 86q0 88 56 149.5T491-339ZM240-80v-172q-57-52-88.5-121.5T120-520q0-150 105-255t255-105q125 0 221.5 73.5T827-615l52 205q5 19-7 34.5T840-360h-80v120q0 33-23.5 56.5T680-160h-80v80h-80v-160h160v-200h108l-38-155q-23-91-98-148t-172-57q-116 0-198 81t-82 197q0 60 24.5 114t69.5 96l26 24v208h-80Zm254-360Z"/></svg>
-                                    <p>Psychological Distress</p>
-                                    <div class="checkbox">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M382-208 122-468l90-90 170 170 366-366 90 90-456 456Z"/></svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="line">
-
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="line">
-
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="line">
-
-                                </div>
-                            </div>
-                        </div>
+                        <AnimatedSurvey />
                     </div>
                 </div>
             </li>
@@ -102,15 +60,34 @@ section {
             flex-direction: column;
             min-height: 400px;
             margin-bottom: 1rem;
-        
+
+            .wrapper {
+                position: relative;
+                z-index: 4;   
+            }
+
+            .wrapper.body {
+                z-index: 2;
+            }
+
+            .wrapper.body {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                width: 100%;
+
+                p.subtitle {
+                    height: 56px;
+                    z-index: 3;
+                }
+            }
+
             h3 {
                 font-family: 'NotoSerif', 'Geist', serif;
-                font-weight: 900;
-                margin-top: 0;
                 padding-left: 3.2rem;
-                
+                font-weight: 900;
+
                 &::before {
-                    font-family: 'Geist', serif;
                     content: counter(step-counter) ".";
                     counter-increment: step-counter;
                     font-style: oblique 6deg;
@@ -122,158 +99,39 @@ section {
                     font-family: inherit;
                 }
             }
-
-            .wrapper.body {
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                height: 100%;
-                width: 100%;
-
-                p.subtitle {
-                    height: 56px;
-                    z-index: 10;
-                }
-            }
         }
     }
 }
 
 .illustration-top-fade {
     position: absolute;
-    top: -16%;
+    top: -3rem;
     left: 0;
-    height: 180px;
+    height: 200px;
     width: 100%;
-    background: linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, var(--background) 100%);
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0) 10%, var(--background) 85%);
     z-index: 2;
     pointer-events: none;
     user-select: none;
+    // display: none;
+
+    @media (prefers-color-scheme: light) {
+        height: 200px;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0) 20%, var(--background) 85%);
+        // background: linear-gradient(0deg, rgba(0, 0, 0, 0) 75%, var(--background) 85%); // transition to this
+    }
 }
 
 .illustration-container {
     position: relative;
-    height: 200px;
+    height: auto;
+    padding: 0rem 0.5rem;
     width: auto;
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin-top: 1rem;
-    z-idex: 1;
-
-    .survey {
-        margin-left: 2rem;
-        height: 100%;
-        width: 100%;
-
-        .row {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            height: 50px;
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-
-            .timeline {
-                position: relative;
-                height: 100%;
-                width: 10%;
-                // margin-right: 1rem;
-            }
-
-            .content {
-                position: relative;
-                box-sizing: border-box;
-                height: 100%;
-                display: flex;
-                justify-content: flex-start;
-                align-items: center;
-                font-weight: 600;
-                letter-spacing: 0.5px;
-                background-color: var(--text-color);
-                color: var(--background);
-                padding: 0.5rem 1rem;
-                border-radius: 8px;
-
-                svg.factor-icon {
-                    position: relative;
-                    left: -4px;
-                    top: -1px;
-                    height: 22px;
-                    width: auto;
-                    fill: currentColor;
-                    margin-right: 0.3rem;
-                }
-
-                p {
-                    font-weight: 500;
-                    font-size: 0.9rem;
-                    margin-right: 1.2rem;
-                    color: var(--background);
-                }
-
-                .checkbox {
-                    position: relative;
-                    height: 18px;
-                    width: 18px;
-                    border-radius: 50%;
-                    background-color: var(--completed);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-
-                    svg {
-                        position: relative;
-                        height: 12px;
-                        width: 12px;
-                        fill: var(--text-color);
-                    }
-                }
-            }
-        }
-
-        .row {
-            height: 54px;
-            
-            &:nth-child(1) {
-                .line.straight {
-                    height: 120%;
-                    top: -16px;
-                }
-
-                // .content {
-                //     opacity: 0.9;
-                //     background-color: var(--accent-hover);
-
-                //     p {
-                //         font-size: 0.7rem;
-                //     }
-                // }
-            }
-
-
-            .circle {
-                position: absolute;
-                bottom: 0;
-                right: 0;
-                height: 50%;
-                width: 50%;
-                border-top-left-radius: 50%;
-                border: 1px solid var(--accent);
-                border-right: none;
-                border-bottom: none;
-            }
-
-            .line.straight {
-                position: absolute;
-                top: -32px;
-                right: 0;
-                height: 140%;
-                width: 50%;
-                border-left: 1px solid var(--accent);
-            }
-        }
-    }
+    margin-top: 2rem;
+    z-index: 1;
 }
 </style>
