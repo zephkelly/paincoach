@@ -7,6 +7,7 @@
         <scrollToReveal>
             <how class="how"/>
         </scrollToReveal>
+        <Quote quote="People in pain want simple, actionable advice but are often left to drown in the complexity of modern pain sciences" author="- Lachlan Townend (Founder)" />
         <WaitingList />
     </main>
 </template>
@@ -17,16 +18,11 @@ import scrollToReveal from '~/components/scrollToReveal.vue';
 
 <style lang="scss" scoped>
 main {
-    height: 1200px;
     text-rendering: optimizeLegibility;
 }
 
 .hero {
-    margin-top: 3.5rem;
-
-    &.main {
-        margin-top: 7rem;
-    }
+    margin-top: 12rem;
 }
 
 .how {

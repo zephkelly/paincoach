@@ -16,8 +16,8 @@ const props = defineProps({
 <style lang="scss" scoped>
 .button {
     display: inline-block;
-    padding: 0.5rem 1rem;
-    font-size: 12px;
+    padding: 0.8rem 1.5rem;
+    font-size: 14px;
     font-weight: 500;
     line-height: 16px;
     color: var(--background);

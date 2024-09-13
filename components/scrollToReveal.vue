@@ -9,6 +9,8 @@
   
   const revealEl = ref<HTMLElement | null>(null)
   const isVisible = ref(false)
+
+  const emit = defineEmits(['visible'])
   
   let observer: IntersectionObserver | null = null
   
@@ -16,8 +18,9 @@
     observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          isVisible.value = true
-          observer?.disconnect() // Stop observing once visible
+            isVisible.value = true
+            emit('visible', true)
+            observer?.disconnect() // Stop observing once visible
         }
       },
       { threshold: 0.2 } // Trigger when 10% of the element is visible

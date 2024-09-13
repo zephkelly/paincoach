@@ -1,23 +1,25 @@
 <template>
     <section :class="{ docked: isDocked }">
-        <nav>
-            <ul>
-                <li>
-                    <div class="image-container">
-                        <img src="/public/images/logo.png" />
-                    </div>
-                </li>
-                <li>
-                    <button class="svg-container">
-                        <svg stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5">
-                            <path d="M3 5H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <path d="M3 12H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <path d="M3 19H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
-                    </button>
-                </li>
-            </ul>
-        </nav>
+        <div class="container section">
+            <nav>
+                <ul>
+                    <li>
+                        <div class="image-container">
+                            <img src="/public/images/logo.png" />
+                        </div>
+                    </li>
+                    <li>
+                        <button class="svg-container">
+                            <svg stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5">
+                                <path d="M3 5H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M3 12H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M3 19H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </section>
 </template>
 
@@ -62,10 +64,10 @@ section {
     top: 0;
     left: 0;
     right: 0;
-    background-color: hsl(var(--background-color)/0.6);
+    background-color: var(--background-transparent);
     backdrop-filter: blur(8px);
-    color: white;
     z-index: 1000;
+    padding: 0rem 1rem;
 
     transition: background-color 0.5s cubic-bezier(0.075, 0.82, 0.165, 1), backdrop-filter 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
     will-change: background-color, backdrop-filter;
@@ -78,7 +80,6 @@ section {
 nav {
     display: flex;
     justify-content: space-between;
-    padding: 1rem;
     height: 56px;
 
     ul {
@@ -96,6 +97,7 @@ nav {
 
             &:last-child {
                 justify-content: flex-end;
+                align-items: center;
             }
         }
     }
@@ -112,7 +114,7 @@ nav {
     img {
         position: relative;
         top: 2px;
-        left: -4px;
+        left: -5px;
         width: 100px;
         transition: 
             height 0.2s cubic-bezier(0.075, 0.82, 0.165, 1),
@@ -138,7 +140,7 @@ nav {
     position: relative;
     height: 34px;
     width: 34px;
-    top: -5px;
+    // top: -5px;
     background-color: transparent;
     border: none;
     border-radius: 0;

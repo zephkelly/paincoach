@@ -1,44 +1,44 @@
 <template>
     <section>
-        <h2>How it works in <span>three</span> steps:</h2>
-        <ol class="steps-list">
-            <li>
-                <div class="wrapper">
-                    <ScrollToReveal>
-                        <h3>Log your day</h3>
-                    </ScrollToReveal>
-                </div>
-                <div class="wrapper body">
-                    <p class="subtitle">Make a record of your day by answering a few simple questions</p>
-                    <div class="illustration-container">
-                        <div class="illustration-top-fade"></div>
-                        <AnimatedSurvey />
+        <div class="container section">
+            <h2>How it works in <span>three</span> steps:</h2>
+            <ol class="steps-list">
+                <li>
+                    <div class="wrapper">
+                        <ScrollToReveal>
+                            <h3>Log your day</h3>
+                        </ScrollToReveal>
                     </div>
-                </div>
-            </li>
-            <li>
-                <ScrollToReveal>
-                    <h3>Pain Coach learns</h3>
-                </ScrollToReveal>
-                <p>The algorithm learns about your lifestyle, becoming more accurate with longer use</p>
-            </li>
-            <li>
-                <ScrollToReveal>
-                    <h3>Find your insights</h3>
-                </ScrollToReveal>
-                <p>You get a personalised profile highlighting what is contributing to your pain</p>
-            </li>
-        </ol>
+                    <div class="wrapper body">
+                        <p class="subtitle">Make a record of your day by answering a few simple questions</p>
+                        <div class="illustration-container">
+                            <AnimatedSurvey />
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <ScrollToReveal>
+                        <h3>Pain Coach learns</h3>
+                    </ScrollToReveal>
+                    <p>The algorithm learns about your lifestyle, becoming more accurate with longer use</p>
+                </li>
+                <li>
+                    <ScrollToReveal>
+                        <h3>You find insights</h3>
+                    </ScrollToReveal>
+                    <p>You get a personalised profile highlighting what is contributing to your pain</p>
+                </li>
+            </ol>
+        </div>
     </section>
 </template>
 
 <script lang="ts" setup>
-import scrollToReveal from '~/components/scrollToReveal.vue';
 </script>
 
 <style lang="scss" scoped>
 section {
-    padding: 1rem;
+    padding: 0rem 1rem;
     
     h2 {
         span {
@@ -103,35 +103,17 @@ section {
     }
 }
 
-.illustration-top-fade {
-    position: absolute;
-    top: -3rem;
-    left: 0;
-    height: 200px;
-    width: 100%;
-    background: linear-gradient(0deg, rgba(255, 255, 255, 0) 10%, var(--background) 85%);
-    z-index: 2;
-    pointer-events: none;
-    user-select: none;
-    display: none;
-
-    @media (prefers-color-scheme: light) {
-        height: 200px;
-        background: linear-gradient(0deg, rgba(0, 0, 0, 0) 20%, var(--background) 85%);
-        // background: linear-gradient(0deg, rgba(0, 0, 0, 0) 75%, var(--background) 85%); // transition to this
-    }
-}
-
 .illustration-container {
     position: relative;
     height: auto;
-    padding: 0rem 0.5rem;
+    padding: 0rem 1rem;
     width: auto;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     margin-top: 2rem;
+    margin-bottom: 6rem;
     z-index: 1;
 }
 </style>

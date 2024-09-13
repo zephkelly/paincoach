@@ -1,14 +1,16 @@
 <template>
     <section>
-        <h1>Take Control of Your Pain, Reclaim Your Life</h1>
-        <p class="subtitle">
-            Introducing <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>. Your personalised pain and lifestyle assistant, backed by real science
-        </p>
-        <BaseButton href class="waitlist-link">Get Started</BaseButton>
-        <!-- <div class="landing-video">
-            <div class="video-container">
+        <div class="container section">
+            <h1>Take Control of Your Pain, Reclaim Your Life</h1>
+            <p class="subtitle">
+                Introducing <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>. Your personalised pain and lifestyle assistant, backed by real science
+            </p>
+            <BaseButton href class="waitlist-link">Get Started</BaseButton>
+            <div class="landing-video">
+                <div class="video-container">
+                </div>
             </div>
-        </div> -->
+        </div>
     </section>
 </template>
 
@@ -18,7 +20,7 @@
 
 <style lang="scss" scoped>
 section {
-    margin: 1rem 1rem;
+    padding: 0rem 1rem;
 
     .subtitle {
         // margin-top: 1rem;
