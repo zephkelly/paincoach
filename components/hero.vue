@@ -6,8 +6,13 @@
                 Introducing <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>. Your personalised pain and lifestyle assistant, backed by real science
             </p>
             <BaseButton href class="waitlist-link">Get Started</BaseButton>
-            <div class="landing-video">
-                <div class="video-container">
+            <div class="landing-image">
+                <div class="image-container">
+                    <!-- <img src="~/images/step-one.JPG" alt="Step One" /> -->
+                    <div class="wrapper">
+                        <IphoneMockup href="/images/mockup-dark.png" />
+                        <IphoneMockup href="/images/mockup-light.png" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -38,17 +43,59 @@ section {
     margin-top: 1.2rem;
 }
 
-.landing-video {
+.landing-image {
     width: 100%;
     aspect-ratio: 16/9;
     margin-top: 4rem;
 
-    .video-container {
-        position: relative;
+    .image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 100%;
         height: 100%;
         background-color: var(--text-color);
         border-radius: 8px;
+        overflow: hidden;
+        
+        .wrapper {
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 75%;
+
+            svg {
+                margin: 0rem;
+            }
+
+            .mockup-container:first-child {
+                margin-right: 1rem;
+                margin-left: 0rem;
+            }
+    
+            .mockup-container:last-child {
+                margin-left: 1rem;
+                margin-right: 0rem;
+            }
+
+            @media (prefers-color-scheme: light) {
+                flex-direction: row-reverse;
+
+                .mockup-container:first-child {
+                    margin-left: 1rem;
+                    margin-right: 0rem;
+                }
+
+                .mockup-container:last-child {
+                    margin-left: 0;
+                    margin-right: 1rem;
+                }
+            }
+        }
+        
+
     }
 }
 
