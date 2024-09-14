@@ -22,7 +22,7 @@ main {
 }
 
 .hero {
-    margin-top: 12rem;
+    margin-top: 4rem;
 }
 
 .how {

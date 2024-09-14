@@ -1,11 +1,6 @@
 <template>
     <section>
         <div class="container section">
-            <h1>Take Control of Your Pain, Reclaim Your Life</h1>
-            <p class="subtitle">
-                Introducing <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>. Your personalised pain and lifestyle assistant, backed by real science
-            </p>
-            <BaseButton href class="waitlist-link">Get Started</BaseButton>
             <div class="landing-image">
                 <div class="image-container">
                     <!-- <img src="~/images/step-one.JPG" alt="Step One" /> -->
@@ -15,6 +10,13 @@
                     </div>
                 </div>
             </div>
+            <h1 class="introduction"><span class="mobile-hidden">Introducing</span> <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>.</h1>
+            <h2><span>Take Control, Reclaim Your Life.</span></h2>
+            <p class="subtitle">
+                Your personalised pain and lifestyle assistant, backed by real science.
+            </p>
+            <BaseButton href class="waitlist-link">Get Started</BaseButton>
+            <HeroGraphic class="hero-graphic"/>
         </div>
     </section>
 </template>
@@ -27,6 +29,15 @@
 section {
     padding: 0rem 1rem;
 
+    h1 {
+        margin-bottom: 0rem;
+        margin-top: clamp(2.5rem, 8vw, 4rem);
+    }
+
+    h2 {
+        margin-top: clamp(0.2rem, 1vw, 1rem);
+    }
+
     .subtitle {
         // margin-top: 1rem;
         tab-size: 4;
@@ -37,6 +48,11 @@ section {
             letter-spacing: 0.3px;
         }
     }
+}
+
+.hero-graphic {
+    margin-bottom: 4rem;
+    margin-top: clamp(6rem, 14vw, 10rem);
 }
 
 .waitlist-link {
@@ -156,6 +172,12 @@ section {
     }
     75% {
         background-position: 0% 100%;
+    }
+}
+
+.mobile-hidden {
+    @media (max-width: 330px) {
+        display: none;
     }
 }
 </style>

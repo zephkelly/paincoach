@@ -25,7 +25,7 @@ section {
     padding: 0rem 1rem;
 
     blockquote {
-        padding: 0rem 4rem;
+        padding: 0rem clamp(1.5rem, 8vw, 4rem);
 
         p {
             font-family: 'NotoSerif', serif;
@@ -41,8 +41,12 @@ section {
 
             &.author {
                 font-size: 1.2rem;
-                padding-right: 4rem;
-                // font-family: 'Geist', 'NotoSerif', sans-serif;
+                padding-right: clamp(2rem, 6vw, 4rem);
+                // font-family: 'Geist', 'NotoSerif', sans-serif;\
+        
+                @media (max-width: 500px) {
+                    padding-right: 0rem;
+                }
             }
 
             &:last-child {

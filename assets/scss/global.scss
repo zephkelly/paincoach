@@ -74,8 +74,8 @@
     --accent-hover-light: #222224;
     --accent-hover-dark: #cdcdcd;
 
-    --text-light: #0d0d0e;
-    --text-dark: #FFF;
+    --text-light: #09090b;
+    --text-dark: #ffffff;
 
     --completed-light: #39ce0b;
     --completed-dark: #2bb401;
@@ -133,16 +133,16 @@ section {
 
 .container.section {
     width: 100%;
-    max-width: 1000px;
+    max-width: 800px;
     box-sizing: border-box;
 }
 
 h1, h2 {
     tab-size: 4;
     font-weight: 700;
-    font-size: 30px;
+    font-size: clamp(28px, 5vw, 32px);
     letter-spacing: -1.2px;
-    line-height: 37.5px;
+    line-height: 38px;
     margin-bottom: 1rem;
     color: var(--text-color);
 }
