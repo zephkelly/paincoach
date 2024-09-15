@@ -1,10 +1,10 @@
 <template>
-  <ClientOnly>
+  <!-- <ClientOnly> -->
     <section>
       <div class="container section">
         <ScrollToReveal>                    
           <div class="video container" :class="{ loaded: !isLoading }">
-            <ScrollToReveal @visible="onVisible" :threshold="0.8" :centerAlign="true">
+            <ScrollToReveal @visible="onVisible" :threshold="0.85" :centerAlign="true">
               <video
                 ref="videoRef"
                 muted
@@ -21,7 +21,7 @@
         </ScrollToReveal>
       </div>
     </section>
-  </ClientOnly>
+  <!-- </ClientOnly> -->
 </template>
 
 <script lang="ts" setup>
@@ -112,6 +112,7 @@ watch(isVisible, (newValue) => {
     animation: pulse 4s infinite;
     transition: background-color 0.5s ease, opacity 0.3s ease;
     opacity: 0;
+    transform: scale(0.8);
   
   &.loaded {
     animation: none;
@@ -140,7 +141,6 @@ watch(isVisible, (newValue) => {
     width: 100%;
     height: 100%;
     top: -1px;
-    left: -2px;
     width: 101%;
     opacity: 0;
     transition: opacity 0.5s ease;

@@ -1,5 +1,5 @@
 <template>
-    <div ref="revealEl" :class="['reveal-element', { 'is-visible': isVisible }, { center: centerAlign }]">
+    <div ref="revealEl" :class="['reveal-element', { 'is-visible': isVisible }, { center: centerAlign }, { 'fill-parent': fillParent }]">
       <slot></slot>
     </div>
   </template>
@@ -14,6 +14,10 @@
       default: 0.2
       },
       centerAlign: {
+        type: Boolean,
+        default: false
+      },
+      fillParent: {
         type: Boolean,
         default: false
       }
@@ -47,24 +51,29 @@
   })
   </script>
   
-  <style scoped>
-  .reveal-element {
-    position: relative;
-    z-index: 3;
-    opacity: 0;
-    transform: translateX(-6px);
-    transition: opacity 1.2s cubic-bezier(0.075, 0.82, 0.165, 1), transform 0.6s ease;
-    will-change: opacity, transform;
-  }
+<style scoped>
+    .reveal-element {
+        position: relative;
+        z-index: 3;
+        opacity: 0;
+        transform: translateX(-6px);
+        transition: opacity 1.2s cubic-bezier(0.075, 0.82, 0.165, 1), transform 0.6s ease;
+        will-change: opacity, transform;
+    }
 
     .reveal-element.center {
         display: flex;
         justify-content: center;
         align-items: center;
     }
+
+    .reveal-element.fill-parent {
+        width: 100%;
+        height: 100%;
+    }
   
-  .reveal-element.is-visible {
-    opacity: 1;
-    transform: translateY(0) translateX(0);
-  }
-  </style>
+    .reveal-element.is-visible {
+        opacity: 1;
+        transform: translateY(0) translateX(0);
+    }
+</style>

@@ -1,17 +1,19 @@
 <template>
     <section>
         <div class="container section">
-            <h2>How it works in <span>three</span> steps:</h2>
+            <ScrollToReveal>
+                <h2>How it Works in <span class="complex-shimmer" data-text="Three">Three</span> Steps:</h2>
+            </ScrollToReveal>
             <ol class="steps-list">
                 <li>
                     <div class="wrapper">
                         <ScrollToReveal>
                             <h3>Log your day</h3>
+                            <p class="subtitle">Make a record of your day by answering a few simple questions</p>
                         </ScrollToReveal>
                     </div>
                     <div class="wrapper body">
-                        <p class="subtitle">Make a record of your day by answering a few simple questions</p>
-                        <div class="illustration-container">
+                        <div class="record-container">
                             <IphoneMockup halfScreen fullWidth src="/images/mockup/record-dark.png" class="dark record" />
                             <IphoneMockup halfScreen fullWidth src="/images/mockup/calendar-singular-dark.png" class="dark calendar" />
                             <IphoneMockup halfScreen fullWidth src="/images/mockup/record-light.png" class="light record" />
@@ -22,17 +24,26 @@
                 <li>
                     <ScrollToReveal>
                         <h3>Pain Coach learns</h3>
+                        <p class="subtitle">The algorithm begins to learn, building an accurate model of your lifestyle</p>
                     </ScrollToReveal>
-                    <p>The algorithm learns about your lifestyle, becoming more accurate with longer use</p>
-                    <div class="learn-container">
-                        <AnimatedSurvey />
+                    <div class="wrapper body">
+                        <div class="learn-container">
+                            <div class="fade"/>
+                            <AnimatedSurvey />
+                        </div>
                     </div>
                 </li>
                 <li>
                     <ScrollToReveal>
                         <h3>You find insights</h3>
+                        <p class="subtitle">You get a personalised, exportable, profile highlighting what is contributing to your pain</p>
                     </ScrollToReveal>
-                    <p>You get a personalised profile highlighting what is contributing to your pain</p>
+                    <div class="wrapper body">
+                        <div class="insights-container">
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/insights-dark.png" class="dark insight" />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/insights-light.png" class="light insight" />
+                        </div>
+                    </div>
                 </li>
             </ol>
         </div>
@@ -51,6 +62,7 @@ section {
             font-family: 'NotoSerif', serif;
             font-weight: 900;
             font-style: oblique 6deg;
+            text-decoration: underline;
         }
     }
 
@@ -65,7 +77,11 @@ section {
             display: flex;
             flex-direction: column;
             min-height: 400px;
-            margin-bottom: 1rem;
+            margin-bottom: 7rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
 
             .wrapper {
                 position: relative;
@@ -81,17 +97,13 @@ section {
                 flex-direction: column;
                 height: 100%;
                 width: 100%;
-
-                p.subtitle {
-                    height: 56px;
-                    z-index: 3;
-                }
             }
 
             h3 {
                 font-family: 'NotoSerif', 'Geist', serif;
                 padding-left: 3.2rem;
                 font-weight: 900;
+                
 
                 &::before {
                     content: counter(step-counter) ".";
@@ -99,17 +111,23 @@ section {
                     font-style: oblique 6deg;
                     position: absolute;
                     left: 0;
-                    top: -4px;
-                    font-weight: 600;
-                    font-size: 2.3rem;
+                    top: -2px;
+                    font-weight: 900;
+                    font-size: 2.2rem;
                     font-family: inherit;
                 }
             }
         }
     }
+
+    p.subtitle {
+        min-height: 56px;
+        z-index: 3;
+        // margin-bottom: 1rem;
+    }
 }
 
-.illustration-container {
+.record-container {
     position: relative;
     height: 400px;
     // padding: 0rem 1rem;
@@ -119,7 +137,6 @@ section {
     justify-content: center;
     align-items: center;
     margin-top: 2rem;
-    margin-bottom: 6rem;
     z-index: 1;
 
     @media (prefers-color-scheme: dark) {
@@ -135,7 +152,7 @@ section {
     }
 }
 
-:deep(.illustration-container) {
+:deep(.record-container) {
     .dark.calendar {
         .fade {
             border-bottom-left-radius: 0px;
@@ -161,12 +178,8 @@ section {
     }
 }
 
-.learn-container {
-    padding: 0rem 4rem;
-}
-
 @media (max-width: 768px) {
-    :deep(.illustration-container) {
+    :deep(.record-container) {
         .dark.calendar {
             .fade {
                 border-bottom-left-radius: 0px;
@@ -184,7 +197,6 @@ section {
         }
 
         .light.record {
-
             svg {
                 top: 0;
                 height: 150%;
@@ -196,6 +208,59 @@ section {
 @media (max-width: 470px) {
     .learn-container {
         padding: 0rem clamp(1rem, 5vw, 4rem);
+    }
+}
+
+.learn-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    margin-top: 2rem;
+    padding: 0rem clamp(0.5rem, 6vw, 4rem);
+
+    .fade {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--text-color) 100%);
+        opacity: 0.3;
+        border-radius: 8px;
+        z-index: 1;
+    }
+}
+
+:deep(.insights-container) {
+    @media (max-width: 768px) {
+        .light {
+            display: none;
+        }
+    } 
+}
+
+.insights-container {
+    position: relative;
+    height: 400px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    z-index: 1;
+}
+
+:deep(.insights-container) {
+    .dark {
+        .fade {
+            border-bottom-right-radius: 0px;
+        }
+    }
+
+    .light {
+        .fade {
+            border-bottom-left-radius: 0px;
+        }
     }
 }
 </style>

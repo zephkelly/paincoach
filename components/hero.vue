@@ -1,6 +1,12 @@
 <template>
     <section>
         <div class="container section">
+            <h1 class="introduction"><span class="mobile-hidden">Introducing</span><span class="desktop-hidden">Meet</span> <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>.</h1>
+            <h2><span>Take Control, Reclaim Your Life.</span></h2>
+            <p class="subtitle">
+                Your personalised pain and lifestyle assistant, backed by real science.
+            </p>
+            <BaseButton href class="waitlist-link">Get Started</BaseButton>
             <div class="landing-image">
                 <div class="image-container">
                     <div class="fade"></div>
@@ -10,12 +16,6 @@
                     </div>
                 </div>
             </div>
-            <h1 class="introduction"><span class="mobile-hidden">Introducing</span> <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>.</h1>
-            <h2><span>Take Control, Reclaim Your Life.</span></h2>
-            <p class="subtitle">
-                Your personalised pain and lifestyle assistant, backed by real science.
-            </p>
-            <BaseButton href class="waitlist-link">Get Started</BaseButton>
         </div>
     </section>
 </template>
@@ -34,7 +34,12 @@ section {
     }
 
     h2 {
-        margin-top: clamp(0.2rem, 1vw, 1rem);
+        display: flex;
+        margin-top: 1rem;
+
+        @media (max-width: 580px) {
+            margin-top: 0.5rem;
+        }
     }
 
     .subtitle {
@@ -78,7 +83,7 @@ section {
             height: 100%;
             width: 100%;
             background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--text-color) 100%);
-            opacity: 0.2;
+            opacity: 0.3;
             border-radius: 8px;
             display: none;
         }
@@ -132,68 +137,26 @@ section {
     }
 }
 
-.complex-shimmer {
-    display: inline-block;
-    position: relative;
-    color: #d63636;
-   
-    &::before, &::after {
-        content: attr(data-text);
-        position: absolute;
-        left: 0;
-        right: 0;
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-size: 300% 300%;
-        animation: complexShine 6s linear infinite;
-    }
-
-    &::before {
-        background-image: linear-gradient(
-            45deg,
-            rgba(210, 70, 70, 0.1) 0%,
-            rgba(239, 141, 86, 0.3) 20%,
-            rgba(239, 141, 86, 0.8) 40%,
-            #ef8d56 50%,
-            rgba(220, 64, 64, 0.8) 60%,
-            rgba(210, 70, 70, 0.3) 80%,
-            rgba(210, 70, 70, 0.1) 100%
-        );
-    }
-
-    &::after {
-        background-image: linear-gradient(
-            135deg,
-            rgba(210, 70, 70, 0.1) 0%,
-            rgba(215, 57, 57, 0.374) 20%,
-            rgba(225, 63, 63, 0.8) 40%,
-            #d24646 50%,
-            rgba(239, 141, 86, 0.8) 60%,
-            rgba(239, 141, 86, 0.3) 80%,
-            rgba(239, 141, 86, 0.1) 100%
-        );
-        animation-delay: -3s;
-    }
-}
-
-@keyframes complexShine {
-    0%, 100% {
-        background-position: 0% 0%;
-    }
-    25% {
-        background-position: 100% 100%;
-    }
-    50% {
-        background-position: 100% 0%;
-    }
-    75% {
-        background-position: 0% 100%;
+@media (max-width: 354px) {
+    section {
+        .introduction {
+            margin-bottom: 0.5rem;
+        }
+    
+        h2 {
+            display: none;
+        }
     }
 }
 
 .mobile-hidden {
-    @media (max-width: 330px) {
+    @media (max-width: 354px) {
+        display: none;
+    }
+}
+
+.desktop-hidden {
+    @media (min-width: 354px) {
         display: none;
     }
 }

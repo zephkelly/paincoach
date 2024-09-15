@@ -201,7 +201,7 @@ svg {
     position: absolute;
     height: 100%;
     width: auto;
-    .s0 { fill: #5e465d } 
+    .s0 { fill: #624444 } 
     .s1 { fill: #1d1d1b } 
     .s2 { fill: #ffffff } 
     .s3 { fill: url(#g1) } 
@@ -228,7 +228,7 @@ svg {
     height: 100%;
     width: 100%;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--text-color) 100%);
-    opacity: 0.2;
+    opacity: 0.3;
     border-radius: 8px;
 }
 

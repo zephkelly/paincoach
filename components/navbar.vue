@@ -148,6 +148,8 @@ nav {
     cursor: pointer;
 
     svg {
+        position: relative;
+        right: -4px;
         height: 100%;
         width: auto;
         fill: none;

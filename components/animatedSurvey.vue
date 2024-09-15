@@ -1,7 +1,7 @@
 <template>
-    <ScrollToReveal @visible="handleVisible">
-        <div class="survey" :class="{ hide: isVisible }">
-            <div class="illustration-top-fade"></div>
+    <ScrollToReveal @visible="handleVisible" :centerAlign="true" :fillParent="true">
+        <div class="factors" :class="{ hide: isVisible }">
+            <!-- <div class="illustration-top-fade"></div> -->
             <div class="questions">
                 <div class="row">
                     <div class="timeline">
@@ -81,9 +81,8 @@ function handleVisible() {
 </script>
 
 <style lang="scss" scoped>
-.survey {
+.factors {
     position: relative;
-    height: 100%;
     width: 100%;
     overflow-x: hidden;
 
@@ -369,7 +368,7 @@ function handleVisible() {
     }
 }
 
-.survey {
+.factors {
     &.hide {
         .illustration-top-fade {
             opacity: 0;
