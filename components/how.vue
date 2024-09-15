@@ -164,4 +164,38 @@ section {
 .learn-container {
     padding: 0rem 4rem;
 }
+
+@media (max-width: 768px) {
+    :deep(.illustration-container) {
+        .dark.calendar {
+            .fade {
+                border-bottom-left-radius: 0px;
+            }
+        }
+
+        .dark.record {
+            .fade {
+                border-bottom-right-radius: 0px;
+            }
+        }
+
+        .light.calendar {
+            display: none;
+        }
+
+        .light.record {
+
+            svg {
+                top: 0;
+                height: 150%;
+            }
+        }
+    }
+}
+
+@media (max-width: 470px) {
+    .learn-container {
+        padding: 0rem clamp(1rem, 5vw, 4rem);
+    }
+}
 </style>

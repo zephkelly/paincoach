@@ -172,7 +172,7 @@ function handleVisible() {
                     display: none;
                 }
 
-                @media (min-width: 360px) {
+                @media (min-width: 470px) {
                     .short {
                         display: none;
                     }

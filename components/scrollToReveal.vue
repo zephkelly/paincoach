@@ -1,5 +1,5 @@
 <template>
-    <div ref="revealEl" :class="['reveal-element', { 'is-visible': isVisible }]">
+    <div ref="revealEl" :class="['reveal-element', { 'is-visible': isVisible }, { center: centerAlign }]">
       <slot></slot>
     </div>
   </template>
@@ -12,7 +12,11 @@
     threshold: {
       type: Number,
       default: 0.2
-    }
+      },
+      centerAlign: {
+        type: Boolean,
+        default: false
+      }
   })
 
   const emit = defineEmits(['visible'])
@@ -52,6 +56,12 @@
     transition: opacity 1.2s cubic-bezier(0.075, 0.82, 0.165, 1), transform 0.6s ease;
     will-change: opacity, transform;
   }
+
+    .reveal-element.center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
   
   .reveal-element.is-visible {
     opacity: 1;

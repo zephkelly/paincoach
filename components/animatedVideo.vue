@@ -4,7 +4,7 @@
       <div class="container section">
         <ScrollToReveal>                    
           <div class="video container" :class="{ loaded: !isLoading }">
-            <ScrollToReveal @visible="onVisible" :threshold="0.8">
+            <ScrollToReveal @visible="onVisible" :threshold="0.8" :centerAlign="true">
               <video
                 ref="videoRef"
                 muted
@@ -38,14 +38,34 @@ const onVisible = () => {
   playAppropriateVideo();
 };
 
-const playAppropriateVideo = () => {
+const playAppropriateVideo = async () => {
   if (videoRef.value && isVisible.value) {
     const sources = videoRef.value.getElementsByTagName('source');
     for (let i = 0; i < sources.length; i++) {
-      if ((isDarkMode.value && sources[i].classList.contains('dark')) || 
+      if ((isDarkMode.value && sources[i].classList.contains('dark')) ||
           (!isDarkMode.value && sources[i].classList.contains('light'))) {
         videoRef.value.src = sources[i].src;
-        videoRef.value.play().catch(error => console.error('Error playing video:', error));
+        videoRef.value.load(); // Explicitly load the new source
+        
+        try {
+          // Wait for the video to be ready to play
+          await new Promise((resolve, reject) => {
+            videoRef.value!.oncanplay = resolve;
+            videoRef.value!.onerror = reject;
+            // Set a timeout in case the video takes too long to load
+            setTimeout(reject, 5000); // 5 second timeout
+          });
+          
+          // Add a small delay before playing
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          await videoRef.value.play();
+          console.log('Video started playing successfully');
+        } catch (error) {
+          console.error('Error loading or playing video:', error);
+          // Optionally, you can set isLoading to false here if you want to remove the loading state even if the video fails to play
+          // isLoading.value = false;
+        }
         break;
       }
     }
@@ -60,9 +80,9 @@ onMounted(() => {
   if (videoRef.value) {
     videoRef.value.preload = 'metadata';
   }
-  
+ 
   updateColorScheme();
-  
+ 
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateColorScheme);
 });
 
@@ -81,14 +101,17 @@ watch(isVisible, (newValue) => {
 
 <style lang="scss" scoped>
 .video.container {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 2/1;
-  border-radius: 8px;
-  overflow: hidden;
-  animation: pulse 4s infinite;
-  transition: background-color 0.5s ease, opacity 0.3s ease;
-  opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2/1;
+    border-radius: 8px;
+    overflow: hidden;
+    animation: pulse 4s infinite;
+    transition: background-color 0.5s ease, opacity 0.3s ease;
+    opacity: 0;
   
   &.loaded {
     animation: none;
@@ -114,7 +137,10 @@ watch(isVisible, (newValue) => {
   
   video {
     position: relative;
+    width: 100%;
+    height: 100%;
     top: -1px;
+    left: -2px;
     width: 101%;
     opacity: 0;
     transition: opacity 0.5s ease;

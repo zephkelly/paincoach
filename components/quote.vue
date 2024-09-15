@@ -37,6 +37,7 @@ section {
                 margin-bottom: 2rem;
                 font-style: oblique 8deg;
                 font-weight: 700;
+                text-align: center
             }
 
             &.author {
