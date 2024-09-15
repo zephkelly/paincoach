@@ -3,10 +3,10 @@
         <div class="container section">
             <div class="landing-image">
                 <div class="image-container">
-                    <!-- <img src="~/images/step-one.JPG" alt="Step One" /> -->
+                    <div class="fade"></div>
                     <div class="wrapper">
-                        <IphoneMockup href="/images/mockup-dark.png" />
-                        <IphoneMockup href="/images/mockup-light.png" />
+                        <IphoneMockup src="/images/mockup/landing-dark.png" />
+                        <IphoneMockup src="/images/mockup/landing-light.png" />
                     </div>
                 </div>
             </div>
@@ -16,7 +16,6 @@
                 Your personalised pain and lifestyle assistant, backed by real science.
             </p>
             <BaseButton href class="waitlist-link">Get Started</BaseButton>
-            <HeroGraphic class="hero-graphic"/>
         </div>
     </section>
 </template>
@@ -39,7 +38,6 @@ section {
     }
 
     .subtitle {
-        // margin-top: 1rem;
         tab-size: 4;
 
         strong {
@@ -65,6 +63,7 @@ section {
     margin-top: 4rem;
 
     .image-container {
+        position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -73,7 +72,25 @@ section {
         background-color: var(--text-color);
         border-radius: 8px;
         overflow: hidden;
-        
+
+        .fade {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--text-color) 100%);
+            opacity: 0.2;
+            border-radius: 8px;
+            display: none;
+        }
+
+        @media (prefers-color-scheme: light) {
+            background-color: transparent;
+
+            .fade {
+                display: block;
+            }
+        }
+
         .wrapper {
             height: 100%;
             position: relative;

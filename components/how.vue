@@ -12,7 +12,10 @@
                     <div class="wrapper body">
                         <p class="subtitle">Make a record of your day by answering a few simple questions</p>
                         <div class="illustration-container">
-                            <AnimatedSurvey />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/record-dark.png" class="dark record" />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/calendar-singular-dark.png" class="dark calendar" />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/record-light.png" class="light record" />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/calendar-singular-light.png" class="light calendar" />
                         </div>
                     </div>
                 </li>
@@ -21,6 +24,9 @@
                         <h3>Pain Coach learns</h3>
                     </ScrollToReveal>
                     <p>The algorithm learns about your lifestyle, becoming more accurate with longer use</p>
+                    <div class="learn-container">
+                        <AnimatedSurvey />
+                    </div>
                 </li>
                 <li>
                     <ScrollToReveal>
@@ -105,8 +111,8 @@ section {
 
 .illustration-container {
     position: relative;
-    height: auto;
-    padding: 0rem 1rem;
+    height: 400px;
+    // padding: 0rem 1rem;
     width: auto;
     display: flex;
     flex-direction: row;
@@ -115,5 +121,47 @@ section {
     margin-top: 2rem;
     margin-bottom: 6rem;
     z-index: 1;
+
+    @media (prefers-color-scheme: dark) {
+        .dark {
+            display: none;
+        }
+    }
+
+    @media (prefers-color-scheme: light) {
+        .light {
+            display: none;
+        }
+    }
+}
+
+:deep(.illustration-container) {
+    .dark.calendar {
+        .fade {
+            border-bottom-left-radius: 0px;
+        }
+    }
+
+    .dark.record {
+        .fade {
+            border-bottom-right-radius: 0px;
+        }
+    }
+
+    .light.calendar {
+        .fade {
+            border-bottom-left-radius: 0px;
+        }
+    }
+
+    .light.record {
+        .fade {
+            border-bottom-right-radius: 0px;
+        }
+    }
+}
+
+.learn-container {
+    padding: 0rem 4rem;
 }
 </style>

@@ -5,10 +5,15 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, onMounted, onUnmounted } from 'vue'
-  
   const revealEl = ref<HTMLElement | null>(null)
   const isVisible = ref(false)
+
+  const props = defineProps({
+    threshold: {
+      type: Number,
+      default: 0.2
+    }
+  })
 
   const emit = defineEmits(['visible'])
   
@@ -23,7 +28,7 @@
             observer?.disconnect() // Stop observing once visible
         }
       },
-      { threshold: 0.2 } // Trigger when 10% of the element is visible
+      { threshold: props.threshold } // Trigger when 10% of the element is visible
     )
   
     if (revealEl.value) {

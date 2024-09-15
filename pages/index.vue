@@ -7,6 +7,7 @@
         <scrollToReveal>
             <how class="how"/>
         </scrollToReveal>
+        <AnimatedVideo class="animated-video"/>
         <Quote quote="People in pain want simple, actionable advice but are often left to drown in the complexity of modern pain sciences" author="- Lachlan Townend (Founder)" />
         <WaitingList class="waitlist" />
     </main>
@@ -23,6 +24,10 @@ main {
 
 .hero {
     margin-top: 4rem;
+}
+
+.animated-video {
+    margin-top: 7rem;
 }
 
 .how {
