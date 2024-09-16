@@ -3,9 +3,9 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { email } = body
 
-    const dc = process.env.MAILCHIMP_DC
-    const listId = process.env.MAILCHIMP_LIST_ID
-    const apiKey = process.env.MAILCHIMP_API_KEY
+    const dc = config.mailchimpDc
+    const listId = config.mailchimpListId
+    const apiKey = config.mailchimpApiKey
 
     const url = `https://${dc}.api.mailchimp.com/3.0/lists/${listId}/members`
 
