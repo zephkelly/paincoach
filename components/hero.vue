@@ -21,8 +21,6 @@
 </template>
 
 <script lang="ts" setup>
-const landingImageDark = '../assets/images/mockup/landing-dark.png'
-
 import { useScroll } from '@/composables/useScroll'
 
 const { smoothScroll } = useScroll()

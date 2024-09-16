@@ -32,7 +32,7 @@ export default defineNuxtConfig({
                 {
                 hid: 'og:description',
                 property: 'og:description',
-                content: 'Pain Coach - Your personalised pain and lifestyle assistant. Find your clarity.',
+                content: 'Your personalised pain and lifestyle assistant.',
                 },
                 {
                 hid: 'og:type',

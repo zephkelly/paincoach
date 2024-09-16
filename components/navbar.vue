@@ -5,7 +5,7 @@
                 <ul>
                     <li>
                         <div class="image-container">
-                            <img src="~/assets/images/logo.webp" />
+                            <img @click.prevent="scrollToTop" src="~/assets/images/logo.webp" />
                         </div>
                     </li>
                     <li>
@@ -27,6 +27,10 @@
 <script lang="ts" setup>
 const isDocked = ref(true);
 const observer = ref<IntersectionObserver | null>(null);
+
+import { useScroll } from '@/composables/useScroll'
+
+const { scrollToTop } = useScroll()
 
 onMounted(() => {
   const options = {
@@ -112,6 +116,7 @@ nav {
     align-items: center;
 
     img {
+        cursor: pointer;
         position: relative;
         top: 2px;
         left: -5px;
