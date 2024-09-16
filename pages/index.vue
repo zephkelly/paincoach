@@ -1,12 +1,13 @@
 <template>
     <main>
-        <navbar />
+        <Navbar />
         <ScrollToReveal>
             <hero class="hero main"/>
         </ScrollToReveal>
         <Spacer class="spacer"/>
-        <how class="how"/>
+        <How class="how"/>
         <ScrollToReveal>
+        <Spacer class="spacer"/>
         <Quote class="quote"
             quote="People in pain want simple, actionable advice but are often left to drown in the complexity of modern pain sciences. I want to change that."
             by="- Lachlan Townend (Founder)"
@@ -19,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-const profilePhoto = '/images/headshot-lachlan.jpg';
+const profilePhoto = '/images/headshot-lachlan.webp';
 </script>
 
 <style lang="scss" scoped>
@@ -36,7 +37,6 @@ main {
 }
 
 .how {
-    // margin-top: 12rem;
     margin-bottom: clamp(4rem, 7vw, 6rem);
 }
 
@@ -46,12 +46,11 @@ main {
 
     @media (max-width: 768px) {
         min-height: 128px; 
-        margin-top: 2rem;
     }
 }
 
 .quote {
-    margin-top: 4rem;
+    margin-bottom: clamp(4rem, 7vw, 6rem);
 }
 
 .waitlist {

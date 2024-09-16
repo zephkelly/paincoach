@@ -6,13 +6,13 @@
             <p class="subtitle">
                 Your personalised pain and lifestyle assistant, backed by real science.
             </p>
-            <BaseButton href class="waitlist-link" @click.prevent="scrollToWaitlist">Join Waitlist</BaseButton>
+            <BaseButton href class="waitlist-link" @click.prevent="scrollToWaitlist">Join the Waitlist</BaseButton>
             <div class="landing-image">
                 <div class="image-container">
                     <div class="fade"></div>
                     <div class="wrapper">
-                        <IphoneMockup src="/images/mockup/landing-dark.png" />
-                        <IphoneMockup src="/images/mockup/landing-light.png" />
+                        <IphoneMockup src="/images/mockup/landing-dark.webp" />
+                        <IphoneMockup src="/images/mockup/landing-light.webp" />
                     </div>
                 </div>
             </div>
@@ -21,6 +21,8 @@
 </template>
 
 <script lang="ts" setup>
+const landingImageDark = '../assets/images/mockup/landing-dark.png'
+
 import { useScroll } from '@/composables/useScroll'
 
 const { smoothScroll } = useScroll()
@@ -66,6 +68,7 @@ section {
 
 .waitlist-link {
     margin-top: 1.2rem;
+    font-size: 1.1rem;
 }
 
 .landing-image {

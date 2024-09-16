@@ -32,13 +32,12 @@ section {
 
         @media (max-width: 500px) {
             padding: 0rem 0.5rem;
-            margin-top: 4rem;
+            // margin-top: 4rem;
             margin-bottom: 2rem;
         }
 
         p {
             font-family: 'NotoSerif', serif;
-            opacity: 0.7;
             
             &.quote {
                 font-size: 1.4rem;
@@ -47,7 +46,7 @@ section {
                 font-style: oblique 8deg;
                 font-weight: 700;
                 text-align: center;
-
+                opacity: 0.7;
             }
 
             &.author {
@@ -58,6 +57,7 @@ section {
 
                 strong {
                     text-align: right;
+                    opacity: 0.7;
                 }
                 
                 img {

@@ -14,10 +14,10 @@
                     </div>
                     <div class="wrapper body">
                         <div class="record-container">
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/record-dark.png" class="dark record" />
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/calendar-singular-dark.png" class="dark calendar" />
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/record-light.png" class="light record" />
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/calendar-singular-light.png" class="light calendar" />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/record-dark.webp" class="dark record" />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/calendar-singular-dark.webp" class="dark calendar" />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/record-light.webp" class="light record" />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/calendar-singular-light.webp" class="light calendar" />
                         </div>
                     </div>
                 </li>
@@ -29,7 +29,7 @@
                     <div class="wrapper body">
                         <div class="learn-container">
                             <div class="fade"/>
-                            <AnimatedSurvey />
+                            <AnimatedFactors />
                         </div>
                     </div>
                 </li>
@@ -181,6 +181,7 @@ section {
 @media (max-width: 768px) {
     :deep(.record-container) {
         .dark.calendar {
+            display: none;
             .fade {
                 border-bottom-left-radius: 0px;
             }
@@ -188,7 +189,7 @@ section {
 
         .dark.record {
             .fade {
-                border-bottom-right-radius: 0px;
+                border-bottom-right-radius: 8px;
             }
         }
 
@@ -197,6 +198,8 @@ section {
         }
 
         .light.record {
+            border-bottom-right-radius: 8px;
+
             svg {
                 top: 0;
                 height: 150%;
@@ -232,12 +235,51 @@ section {
 }
 
 :deep(.insights-container) {
+    .dark {
+        .fade {
+            border-bottom-right-radius: 0px;
+        }
+    }
+
+    .light {
+        .fade {
+            border-bottom-left-radius: 0px;
+        }
+    }
+
     @media (max-width: 768px) {
-        .light {
-            display: none;
+       @media (prefers-color-scheme: dark) {
+            .dark {
+                display: none;
+
+                .fade {
+                    border-bottom-right-radius: 8px;
+                }
+            }
+
+            .light {
+                .fade {
+                    border-bottom-left-radius: 8px;
+                }
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .light {
+                display: none;
+            }
+
+            .dark {
+                .fade {
+                    border-bottom-right-radius: 8px;
+                }
+            }
         }
     } 
 }
+
+// :deep(.insights-container) {
+// }
 
 .insights-container {
     position: relative;
@@ -250,17 +292,4 @@ section {
     z-index: 1;
 }
 
-:deep(.insights-container) {
-    .dark {
-        .fade {
-            border-bottom-right-radius: 0px;
-        }
-    }
-
-    .light {
-        .fade {
-            border-bottom-left-radius: 0px;
-        }
-    }
-}
 </style>

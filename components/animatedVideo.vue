@@ -53,7 +53,7 @@ const playAppropriateVideo = async () => {
             videoRef.value!.oncanplay = resolve;
             videoRef.value!.onerror = reject;
             // Set a timeout in case the video takes too long to load
-            setTimeout(reject, 5000); // 5 second timeout
+            setTimeout(reject, 10000); // 5 second timeout
           });
           
           // Add a small delay before playing

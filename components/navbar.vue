@@ -5,7 +5,7 @@
                 <ul>
                     <li>
                         <div class="image-container">
-                            <img src="/public/images/logo.png" />
+                            <img src="~/assets/images/logo.webp" />
                         </div>
                     </li>
                     <li>

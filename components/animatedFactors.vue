@@ -143,7 +143,8 @@ function handleVisible() {
                 font-size: 0.9rem;
                 color: var(--background);
                 white-space: nowrap;
-                overflow: ellipsis;
+                overflow: hidden;
+                text-overflow: ellipsis;
                 margin-right: 1rem;
             }
 

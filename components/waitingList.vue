@@ -125,10 +125,14 @@ async function submitForm() {
 section {
     padding: 0rem 1rem;
     min-height: 200px;
+
+    @media (max-width: 768px) {
+        padding: 0rem 3rem;
+    }
 }
 
 form {
-    position: realtive;
+    position: relative;
 
     .group {
         &:first-child {
@@ -141,6 +145,10 @@ form {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
+
+        // @media (max-width: 768px) {
+        //     padding: 0 1rem;
+        // }
 
         label {
             font-size: 1.4rem;
