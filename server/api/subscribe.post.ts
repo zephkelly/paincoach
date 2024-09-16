@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
         console.error('Mailchimp API Error:', error)
         return { 
             success: false, 
-            error: error.response?.data?.detail || 'An error occurred while subscribing.'
+            error: error + 'An error occurred while subscribing.'
         }
     }
 })
