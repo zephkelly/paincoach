@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section id="waitlist">
         <div class="section container">
             <h2>Find <span class="complex-shimmer" data-text="Clarity">Clarity</span>. Join the Waiting List Now:</h2>
             <form @submit.prevent="submitForm">

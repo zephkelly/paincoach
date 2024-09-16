@@ -6,7 +6,7 @@
             <p class="subtitle">
                 Your personalised pain and lifestyle assistant, backed by real science.
             </p>
-            <BaseButton href class="waitlist-link">Get Started</BaseButton>
+            <BaseButton href class="waitlist-link" @click.prevent="scrollToWaitlist">Join Waitlist</BaseButton>
             <div class="landing-image">
                 <div class="image-container">
                     <div class="fade"></div>
@@ -21,7 +21,13 @@
 </template>
 
 <script lang="ts" setup>
+import { useScroll } from '@/composables/useScroll'
 
+const { smoothScroll } = useScroll()
+
+const scrollToWaitlist = () => {
+  smoothScroll('#waitlist', 0)
+}
 </script>
 
 <style lang="scss" scoped>

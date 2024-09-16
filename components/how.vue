@@ -24,7 +24,7 @@
                 <li>
                     <ScrollToReveal>
                         <h3>Pain Coach learns</h3>
-                        <p class="subtitle">The algorithm begins to learn, building an accurate model of your lifestyle</p>
+                        <p class="subtitle">The algorithm learns how your lifestyle impacts your pain</p>
                     </ScrollToReveal>
                     <div class="wrapper body">
                         <div class="learn-container">
@@ -36,7 +36,7 @@
                 <li>
                     <ScrollToReveal>
                         <h3>You find insights</h3>
-                        <p class="subtitle">You get a personalised, exportable, profile highlighting what is contributing to your pain</p>
+                        <p class="subtitle">You get a personalised and exportable profile highlighting what is contributing to your pain</p>
                     </ScrollToReveal>
                     <div class="wrapper body">
                         <div class="insights-container">
