@@ -40,8 +40,8 @@
                     </ScrollToReveal>
                     <div class="wrapper body">
                         <div class="insights-container">
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/insights-dark.png" class="dark insight" />
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/insights-light.png" class="light insight" />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/insights-dark.webp" class="dark insight" />
+                            <IphoneMockup halfScreen fullWidth src="/images/mockup/insights-light.webp" class="light insight" />
                         </div>
                     </div>
                 </li>
