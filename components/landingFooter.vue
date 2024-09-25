@@ -48,7 +48,7 @@ footer {
     position: relative;
     display: flex;
     align-items: center;
-    opacity: 0.5;
+    opacity: 0.7;
     transition: opacity 0.3s ease;
 
     svg {

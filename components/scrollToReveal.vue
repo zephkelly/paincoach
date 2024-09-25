@@ -1,5 +1,5 @@
 <template>
-    <div ref="revealEl" :class="['reveal-element', { 'is-visible': isVisible }, { center: centerAlign }, { 'fill-parent': fillParent }]" :aria-hidden="!isVisible">
+    <div ref="revealEl" :class="['reveal-element', { 'is-visible': isVisible }, { center: centerAlign }, { 'fill-parent': fillParent }]">
       <slot></slot>
     </div>
   </template>

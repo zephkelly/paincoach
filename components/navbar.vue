@@ -5,7 +5,7 @@
                 <ul>
                     <li>
                         <div class="image-container">
-                            <button @click.prevent="handleClick" @keydown="handleKeyDown" aria-label="Return to top of page." tabindex="1"><img src="~/assets/images/logo.webp" loading="eager" alt="Logo of Physio Pain Coach."/></button>
+                            <button @click.prevent="handleClick" @keydown="handleKeyDown" aria-label="Return to top of page." tabindex="0"><img src="~/assets/images/logo.webp" loading="eager" alt="Logo of Physio Pain Coach."/></button>
                         </div>
                     </li>
                     <li>
