@@ -132,6 +132,18 @@ main {
         );
         animation-delay: -3s;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+        &::before, &::after {
+            animation: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        &::before, &::after {
+            animation: none;
+        }
+    }
 }
 
 @keyframes complexShine {
