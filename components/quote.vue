@@ -7,7 +7,7 @@
                 </p>
                 <p class="author">
                     <strong>{{ props.by }}</strong>
-                    <img :src="props.pic" :alt="`Profile photo of ${props.author}, Physio Pain Coach's founder.`" width="52" height="52" />
+                    <img :src="props.pic" :alt="`Profile photo of ${props.author}, Physio Pain Coach's founder.`" width="52" height="52" loading="lazy"/>
                 </p>
             </blockquote>
         </div>
