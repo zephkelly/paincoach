@@ -188,6 +188,10 @@ section.docked {
             left: -10px;
             width: 300px;
             top: 3rem;
+
+            @media (max-width: 768px) {
+                width: 200px;
+            }
         }
     }
 

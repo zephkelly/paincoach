@@ -1,7 +1,7 @@
 <template>
     <section id="waitlist">
         <div class="section container">
-            <h2 tabindex="0">Find <span class="complex-shimmer" data-text="Clarity">Clarity</span>.</h2>
+            <h2 class="clarity" tabindex="0">Find <span class="complex-shimmer" data-text="Clarity">Clarity</span>.</h2>
             <h2 tabindex="0">Join the Waiting List Now:</h2>
             <form @submit.prevent="submitForm">
                 <div class="group">
@@ -133,6 +133,10 @@ section {
     @media (max-width: 768px) {
         padding: 0rem 2rem;
     }
+}
+
+.clarity {
+    font-size: clamp(46px, 5vw, 48px);
 }
 
 form {

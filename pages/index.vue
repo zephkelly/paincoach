@@ -82,7 +82,7 @@ main {
     margin-bottom: clamp(10rem, 8vw, 12rem);
 
     @media (max-width: 768px) {
-        margin-top: 2rem;
+        margin-top: 2.5rem;
         margin-bottom: 7rem;
     }
 }
@@ -95,7 +95,7 @@ main {
     color: #d63636;
    
     &::before, &::after {
-        height: 42px;
+        height: 110%;
         width: 105%;
         content: attr(data-text);
         position: absolute;

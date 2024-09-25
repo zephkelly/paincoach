@@ -110,9 +110,9 @@ section {
                     font-style: oblique 6deg;
                     position: absolute;
                     left: 0;
-                    top: -2px;
+                    top: -1px;
                     font-weight: 900;
-                    font-size: 2.2rem;
+                    font-size: 2rem;
                     font-family: inherit;
                 }
             }

@@ -40,7 +40,7 @@ section {
             
             &.quote {
                 font-size: 1.4rem;
-                line-height: 48px;
+                line-height: 36px;
                 margin-bottom: 2rem;
                 font-style: oblique 8deg;
                 font-weight: 700;
