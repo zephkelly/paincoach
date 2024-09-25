@@ -7,6 +7,9 @@ export default defineNuxtConfig({
         mailchimpListId: process.env.MAILCHIMP_LIST_ID,
         mailchimpApiKey: process.env.MAILCHIMP_API_KEY,
     },
+    imports: {
+        dirs: ['composables']
+    },
     modules: ['nuxt-gtag'],
     gtag: {
         id: 'G-4P6YS7XXY3',

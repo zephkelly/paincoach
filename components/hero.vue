@@ -37,6 +37,7 @@ const { smoothScroll } = useScroll()
 
 const handleClick = () => {
     smoothScroll('#waitlist', 0)
+    console.log('clicked')
 }
 
 const handleKeyDown = (event: KeyboardEvent) => {

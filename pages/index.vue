@@ -38,7 +38,7 @@
             :pic="profilePhoto" />
         </ScrollToReveal>
         <AnimatedVideo class="animated-video"/>
-        <WaitingList id="join-waitlist" class="waitlist" />
+        <WaitingList class="waitlist" />
         <LandingFooter />
     </main>
 </template>
