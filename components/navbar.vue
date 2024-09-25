@@ -5,17 +5,10 @@
                 <ul>
                     <li>
                         <div class="image-container">
-                            <img @click.prevent="scrollToTop" src="~/assets/images/logo.webp" />
+                            <button @click.prevent="handleClick" @keydown="handleKeyDown" aria-label="Return to top of page." tabindex="1"><img src="~/assets/images/logo.webp" loading="eager" alt="Logo of Physio Pain Coach."/></button>
                         </div>
                     </li>
                     <li>
-                        <!-- <button class="svg-container">
-                            <svg stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5">
-                                <path d="M3 5H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                <path d="M3 12H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                <path d="M3 19H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
-                        </button> -->
                     </li>
                 </ul>
             </nav>
@@ -31,6 +24,16 @@ const observer = ref<IntersectionObserver | null>(null);
 import { useScroll } from '@/composables/useScroll'
 
 const { scrollToTop } = useScroll()
+
+const handleClick = () => {
+    scrollToTop()
+}
+
+const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+        scrollToTop()
+    }
+};
 
 onMounted(() => {
   const options = {
@@ -115,17 +118,21 @@ nav {
     justify-content: flex-start;
     align-items: center;
 
-    img {
+    button {
+        background-color: transparent;
+        border: none;
         cursor: pointer;
+    }
+
+    img {
         position: relative;
         top: 2px;
         left: -5px;
         width: 100px;
-        transition: 
-            height 0.2s cubic-bezier(0.075, 0.82, 0.165, 1),
-            top 0.3s cubic-bezier(0.075, 0.82, 0.165, 1),
-            left 0.3s cubic-bezier(0.075, 0.82, 0.165, 1),
-            width 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+        transition: height 0.2s cubic-bezier(0.19, 1, 0.22, 1),
+            top 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+            left 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+            width 0.3s cubic-bezier(0.19, 1, 0.22, 1);
         will-change: height, top, left;
 
         @media (prefers-reduced-motion: reduce) {
@@ -178,9 +185,9 @@ section.docked {
 
     .image-container {
         img {
-            left: -9px;
-            width: 200px;
-            top: 2rem;
+            left: -10px;
+            width: 300px;
+            top: 3rem;
         }
     }
 

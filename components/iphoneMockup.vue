@@ -1,7 +1,7 @@
 <template>
     <div class="mockup-container" :class="{ half: halfScreen, 'full-width': fullWidth }">
         <div v-if="halfScreen && !nofade" class="fade"></div>
-        <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+        <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500" alt="Graphic icon of an iphone used to display example photos from the mobile application.">
             <title>phone_14_01</title>
             <defs>
                 <linearGradient id="g1" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0,51.778,-1.226,0,356.834,144.368)">
@@ -138,7 +138,7 @@
                 <clipPath id="screenClip">
                     <path d="m305 44.7h16.4c13.2 0 24 10.8 24 24.1v361.2c0 13.3-10.8 24.1-24 24.1h-140.9c-13.3 0-24.1-10.8-24.1-24.1v-361.2c0-13.3 10.8-24.1 24.1-24.1 5.2 0 10.5 0 16.1 0z"/>
                 </clipPath>
-                <image x="156.4" y="44.7" width="188.4" height="409.4" clip-path="url(#screenClip)" :href="src" preserveAspectRatio="xMidYMid slice"/>
+                <image x="156.4" y="44.7" width="188.4" height="409.4" clip-path="url(#screenClip)" :href="src" :loading="loading" preserveAspectRatio="xMidYMid slice"/>
                 <g id="&lt;Group&gt;">
                     <g id="&lt;Group&gt;">
                         <path id="&lt;Path&gt;" class="s3" d="m355.6 196.1v-51.7h1.2v51.7z"/>
@@ -184,6 +184,7 @@ const props = defineProps<{
     halfScreen?: boolean;
     fullWidth?: boolean;
     nofade?: boolean;
+    loading: string;
 }>();
 </script>
 

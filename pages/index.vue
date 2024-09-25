@@ -22,13 +22,13 @@
         <meta name="google" content="notranslate" />
         <meta name="google-site-verification" content="google-site-verification" />
     </Head>
-    <main>
+    <main id="main-content">
         <Navbar />
         <ScrollToReveal>
-            <hero class="hero main"/>
+            <hero class="hero main" aria-label="Main hero section"/>
         </ScrollToReveal>
         <Spacer class="spacer"/>
-        <How class="how"/>
+        <How id="how-it-works" class="how"/>
         <ScrollToReveal>
         <Spacer class="spacer"/>
         <Quote class="quote"
@@ -38,7 +38,8 @@
             :pic="profilePhoto" />
         </ScrollToReveal>
         <AnimatedVideo class="animated-video"/>
-        <WaitingList class="waitlist" />
+        <WaitingList id="join-waitlist" class="waitlist" />
+        <LandingFooter />
     </main>
 </template>
 
@@ -65,7 +66,7 @@ main {
 
 .animated-video {
     margin-top: 0rem;
-    min-height: 400px;
+    min-height: 300px;
 
     @media (max-width: 768px) {
         min-height: 128px; 
@@ -73,16 +74,16 @@ main {
 }
 
 .quote {
-    margin-bottom: clamp(4rem, 7vw, 6rem);
+    margin-bottom: clamp(2rem, 7vw, 4rem);
 }
 
 .waitlist {
-    margin-top: clamp(4rem, 7vw, 6rem);
+    margin-top: clamp(2rem, 7vw, 4rem);
     margin-bottom: clamp(10rem, 8vw, 12rem);
 
     @media (max-width: 768px) {
         margin-top: 2rem;
-        margin-bottom: 9rem;
+        margin-bottom: 7rem;
     }
 }
 </style>
@@ -94,6 +95,8 @@ main {
     color: #d63636;
    
     &::before, &::after {
+        height: 42px;
+        width: 105%;
         content: attr(data-text);
         position: absolute;
         left: 0;
@@ -104,7 +107,6 @@ main {
         background-size: 300% 300%;
         animation: complexShine 6s linear infinite;
     }
-
     &::before {
         background-image: linear-gradient(
             45deg,
@@ -117,7 +119,6 @@ main {
             rgba(210, 70, 70, 0.1) 100%
         );
     }
-
     &::after {
         background-image: linear-gradient(
             135deg,

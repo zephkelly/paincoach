@@ -2,12 +2,12 @@
     <section>
         <div class="container section">
             <blockquote>
-                <p class="quote">
+                <p tabindex="0" class="quote">
                     "{{ props.quote }}"
                 </p>
                 <p class="author">
                     <strong>{{ props.by }}</strong>
-                    <img :src="props.pic" :alt="`Profile photo of ${props.author}`" />
+                    <img :src="props.pic" :alt="`Profile photo of ${props.author}, Physio Pain Coach's founder.`" width="52" height="52" />
                 </p>
             </blockquote>
         </div>
@@ -32,7 +32,6 @@ section {
 
         @media (max-width: 500px) {
             padding: 0rem 0.5rem;
-            // margin-top: 4rem;
             margin-bottom: 2rem;
         }
 

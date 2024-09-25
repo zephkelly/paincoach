@@ -2,46 +2,46 @@
     <section>
         <div class="container section">
             <ScrollToReveal>
-                <h2>How it Works in <span class="complex-shimmer" data-text="Three">Three</span> Steps:</h2>
+                <h2 tabindex="0">How it Works in <span class="complex-shimmer" data-text="Three">Three</span> Steps:</h2>
             </ScrollToReveal>
             <ol class="steps-list">
                 <li>
                     <div class="wrapper">
                         <ScrollToReveal>
-                            <h3>Log your day</h3>
-                            <p class="subtitle">Make a record of your day by answering a few simple questions</p>
+                            <h3 tabindex="0">Log your day</h3>
+                            <p tabindex="0" class="subtitle">Make a record of your day by answering a few simple questions</p>
                         </ScrollToReveal>
                     </div>
                     <div class="wrapper body">
                         <div class="record-container">
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/record-dark.webp" class="dark record" />
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/calendar-singular-dark.webp" class="dark calendar" />
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/record-light.webp" class="light record" />
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/calendar-singular-light.webp" class="light calendar" />
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/record-dark.webp" class="dark record" loading="lazy" alt="The 'Record' page of the mobile application. A short daily survey which asks questions like 'What would you rate your pain today?'."/>
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/calendar-singular-dark.webp" class="dark calendar" loading="lazy" alt="The 'Calendar' page of the mobile application. A colorful calendar displaying a visual record of the users pain over a month, click on a day to see more information." />
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/record-light.webp" class="light record" loading="lazy" alt="The 'Record' page of the mobile application. A short daily survey which asks questions like 'What would you rate your pain today?'."/>
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/calendar-singular-light.webp" class="light calendar" loading="lazy" alt="The 'Calendar' page of the mobile application. A colorful calendar displaying a visual record of the users pain over a month, click on a day to see more information."/>
                         </div>
                     </div>
                 </li>
                 <li>
                     <ScrollToReveal>
-                        <h3>Pain Coach learns</h3>
-                        <p class="subtitle">The algorithm learns how your lifestyle impacts your pain</p>
+                        <h3 tabindex="0">Pain Coach learns</h3>
+                        <p tabindex="0" class="subtitle">The algorithm learns how your lifestyle impacts your pain</p>
                     </ScrollToReveal>
                     <div class="wrapper body">
-                        <div class="learn-container">
+                        <div tabindex="-1" class="learn-container">
                             <div class="fade"/>
-                            <AnimatedFactors />
+                            <AnimatedFactors tabindex="-1" />
                         </div>
                     </div>
                 </li>
                 <li>
                     <ScrollToReveal>
-                        <h3>You find insights</h3>
-                        <p class="subtitle">You get a personalised and exportable profile highlighting what is contributing to your pain</p>
+                        <h3 tabindex="0">You find insights</h3>
+                        <p tabindex="0" class="subtitle">You get a personalised and exportable profile highlighting what is contributing to your pain</p>
                     </ScrollToReveal>
                     <div class="wrapper body">
                         <div class="insights-container">
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/insights-dark.webp" class="dark insight" />
-                            <IphoneMockup halfScreen fullWidth src="/images/mockup/insights-light.webp" class="light insight" />
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/insights-dark.webp" class="dark insight" loading="lazy" alt="Another closeup of the Insights page. Various diagrams and charts give an overview of a users pain and pain factors."/>
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/insights-light.webp" class="light insight" loading="lazy" alt="Another closeup view of the Insights page. The graphics fade to white as they reach the top of the screen, revealing more detailed charts like 'Sleep quality over time'."/>
                         </div>
                     </div>
                 </li>
@@ -62,7 +62,6 @@ section {
             font-family: 'NotoSerif', serif;
             font-weight: 900;
             font-style: oblique 6deg;
-            text-decoration: underline;
         }
     }
 

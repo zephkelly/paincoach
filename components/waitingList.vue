@@ -1,7 +1,8 @@
 <template>
     <section id="waitlist">
         <div class="section container">
-            <h2>Find <span class="complex-shimmer" data-text="Clarity">Clarity</span>. Join the Waiting List Now:</h2>
+            <h2 tabindex="0">Find <span class="complex-shimmer" data-text="Clarity">Clarity</span>.</h2>
+            <h2 tabindex="0">Join the Waiting List Now:</h2>
             <form @submit.prevent="submitForm">
                 <div class="group">
                     <label for="potFName" class="hidden">&nbsp;</label>
@@ -18,6 +19,7 @@
                         v-model="emailModel"
                         required
                         @input="verifyEmailInput"
+                        tabindex="0"
                     >
                     <button
                         type="submit"
@@ -26,6 +28,8 @@
                         class="button"
                         :class="{ error: statusError }"
                         :disabled="isSubmitting"
+                        tabindex="0"
+                        @keydown="submitForm"
                     >
                         {{ isSubmitting ? 'Submitting...' : 'Subscribe' }}
                     </button>
@@ -34,7 +38,7 @@
             </form>
         </div>
     </section>
-  </template>
+</template>
   
 <script lang="ts" setup>
 import { ref } from 'vue'
@@ -127,7 +131,7 @@ section {
     min-height: 200px;
 
     @media (max-width: 768px) {
-        padding: 0rem 3rem;
+        padding: 0rem 2rem;
     }
 }
 
@@ -145,10 +149,6 @@ form {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-
-        // @media (max-width: 768px) {
-        //     padding: 0 1rem;
-        // }
 
         label {
             font-size: 1.4rem;

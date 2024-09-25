@@ -1,18 +1,28 @@
 <template>
     <section>
         <div class="container section">
-            <h1 class="introduction"><span class="mobile-hidden">Introducing</span><span class="desktop-hidden">Meet</span> <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>.</h1>
-            <h2><span>Take Control, Reclaim Your Life.</span></h2>
-            <p class="subtitle">
+            <h1 tabindex="0" class="introduction">
+                <span class="mobile-hidden">Introducing</span> <span class="desktop-hidden">Meet</span> <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>.
+            </h1>
+            <h2 tabindex="0"><span>Take Control, Reclaim Your Life.</span></h2>
+            <p class="subtitle" tabindex="0">
                 Your personalised pain and lifestyle assistant, backed by real science.
             </p>
-            <BaseButton href class="waitlist-link" @click.prevent="scrollToWaitlist">Join the Waitlist</BaseButton>
+            <BaseButton 
+                tabindex="0" 
+                class="waitlist-link" 
+                @click.prevent="handleClick"
+                @keydown="handleKeyDown"
+                arialLabel="Sign up for the waitlist now!"   
+            >
+                Join the Waitlist
+            </BaseButton>
             <div class="landing-image">
                 <div class="image-container">
                     <div class="fade"></div>
                     <div class="wrapper">
-                        <IphoneMockup src="/images/mockup/landing-dark.webp" />
-                        <IphoneMockup src="/images/mockup/landing-light.webp" />
+                        <IphoneMockup tabindex="-1" src="/images/mockup/landing-dark.webp" loading="eager" alt="Home screen of the pain coach mobile application. Featuring a calendar tracking weekly pain, a 'lifestyle score', and a ranking of the users largest pain factors."/>
+                        <IphoneMockup tabindex="-1" src="/images/mockup/landing-light.webp" loading="eager" alt="Insights page of the pain coach mobile application. Featuring a doughnut chart of the factors contributing to pain, and a line graph showing pain over time." />
                     </div>
                 </div>
             </div>
@@ -25,9 +35,15 @@ import { useScroll } from '@/composables/useScroll'
 
 const { smoothScroll } = useScroll()
 
-const scrollToWaitlist = () => {
-  smoothScroll('#waitlist', 0)
+const handleClick = () => {
+    smoothScroll('#waitlist', 0)
 }
+
+const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+        smoothScroll('#waitlist', 0)
+    }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -35,16 +51,21 @@ section {
     padding: 0rem 1rem;
 
     h1 {
-        margin-bottom: 0rem;
+        margin-bottom: 1rem;
         margin-top: clamp(2.5rem, 8vw, 4rem);
+
+        @media (max-width: 500px) {
+            line-height: 1;
+            font-size: 3.25rem;
+        }
     }
 
     h2 {
         display: flex;
         margin-top: 1rem;
 
-        @media (max-width: 580px) {
-            margin-top: 0.5rem;
+        @media (max-width: 768px) {
+            display: none;
         }
     }
 

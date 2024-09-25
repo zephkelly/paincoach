@@ -1,7 +1,6 @@
 <template>
     <ScrollToReveal @visible="handleVisible" :centerAlign="true" :fillParent="true">
-        <div class="factors" :class="{ hide: isVisible }">
-            <!-- <div class="illustration-top-fade"></div> -->
+        <div class="factors" :class="{ hide: isVisible }" aria-hidden="true">
             <div class="questions">
                 <div class="row">
                     <div class="timeline">

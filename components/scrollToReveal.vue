@@ -1,5 +1,5 @@
 <template>
-    <div ref="revealEl" :class="['reveal-element', { 'is-visible': isVisible }, { center: centerAlign }, { 'fill-parent': fillParent }]">
+    <div ref="revealEl" :class="['reveal-element', { 'is-visible': isVisible }, { center: centerAlign }, { 'fill-parent': fillParent }]" :aria-hidden="!isVisible">
       <slot></slot>
     </div>
   </template>
@@ -49,7 +49,7 @@
       observer.disconnect()
     }
   })
-  </script>
+</script>
   
 <style scoped>
     .reveal-element {
