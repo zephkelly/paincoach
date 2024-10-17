@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: '2024-04-03',
-    css: ['~/assets/scss/global.scss'],
+    css: ['~/assets/scss/global.scss', '~/assets/scss/main.scss'],
     runtimeConfig: {
         mailchimpDc: process.env.MAILCHIMP_DC,
         mailchimpListId: process.env.MAILCHIMP_LIST_ID,

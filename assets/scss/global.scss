@@ -45,6 +45,65 @@
 }
 
 :root {
+    --background-light: #FFFFFF;
+    --background-light-overlay: #ffffffa0;
+    --background-dark: #121212;
+    --background-dark-overlay: #12121285;
+    --background-color: var(--background-light);
+    --background-color-overlay: var(--background-light-overlay);
+
+    --panel-light: #EFEFEF;
+    --panel-light-hover: #c4c4c4;
+    --panel-dark: #1C1C1E;
+    --panel-dark-hover: #2C2C2E;
+    --panel: var(--panel-light);
+    --panel-hover: var(--panel-light-hover);
+
+    --text-light: #000000;
+    --text-light-secondary: #646464;
+    --text-light-inactive: #838383;
+    --text-dark: #FFFFFF;
+    --text-dark-secondary: #868686;
+    --text-dark-inactive: #838383;
+    --text-color: var(--text-light);
+    --text-color-inactive: var(--text-light-inactive);
+    --text-color-secondary: var(--text-light-secondary);
+
+    --border-light: #a9a9a9;
+    --border-dark: #5b5b5b;
+    --border: var(--border-light);
+
+    --pain-missing: #58585829;
+    --pain-0: #83A45D;
+    --pain-0-hover: #6a8b46;
+    --pain-1: #E8CB9F;
+    --pain-1-hover: #cbac81;
+    --pain-2: #ef8e56;
+    --pain-2-hover: #cc713c;
+    --pain-3: #D24646;
+    --pain-3-hover: #ba3030;
+
+
+    --lifestyle-1: #39abc4;
+    --lifestyle-2: #2ca7c2;
+    --lifestyle-3: #3da4bc;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: var(--background-dark);
+        --background-color-overlay: var(--background-dark-overlay);
+        --panel: var(--panel-dark);
+        --panel-hover: var(--panel-dark-hover);
+        --text-color: var(--text-dark);
+        --text-color-secondary: var(--text-dark-secondary);
+        --text-color-inactive: var(--text-dark-inactive);
+        --border: var(--border-dark);
+    }
+}
+
+
+:root {
     --background-light: #ffffff;
     --background-dark: #09090b;
 
@@ -66,7 +125,7 @@
     --completed-light: #39ce0b;
     --completed-dark: #2bb401;
 
-    --pain-missing: #58585829;
+    --pain-missing: transparent;
     --pain-0: #83A45D;
     --pain-0-hover: #6a8b46;
     --pain-1: #E8CB9F;
