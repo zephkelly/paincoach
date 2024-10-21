@@ -8,8 +8,8 @@
                     <h2>Daily reminders</h2>
                 </div>
                 <SettingsToggle 
-                    :settingKey="'reminder'"
-                    :currentValue="getValue('reminder')"/>
+                    :settingKey="'reminders'"
+                    :currentValue="getValue('reminder') as boolean"/>
             </div>
             <div class="setting reminder-time">
                 <div class="label">
@@ -63,6 +63,8 @@
 </template>
 
 <script lang="ts" setup>
+import SettingsToggle from '@/components/app/settings/toggle.vue';
+
 const { getValue } = useAppSettings();
 
 definePageMeta({
@@ -76,6 +78,9 @@ definePageMeta({
 <style lang="css" scoped>
     main {
         padding: 0rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
     
     h1 {
