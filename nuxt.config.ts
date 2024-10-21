@@ -6,6 +6,7 @@ export default defineNuxtConfig({
         mailchimpDc: process.env.MAILCHIMP_DC,
         mailchimpListId: process.env.MAILCHIMP_LIST_ID,
         mailchimpApiKey: process.env.MAILCHIMP_API_KEY,
+        mailchimpTransactionalApiKey: process.env.MAILCHIMP_TRANSACTIONAL_API_KEY,
     },
     imports: {
         dirs: ['composables']
