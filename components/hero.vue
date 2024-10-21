@@ -6,7 +6,7 @@
             </h1>
             <h2 tabindex="0"><span>Take Control, Reclaim Your Life.</span></h2>
             <p class="subtitle" tabindex="0">
-                Your personalised pain and lifestyle assistant, backed by real science.
+                Your personalised pain and lifestyle tracker, backed by real science.
             </p>
             <BaseButton 
                 tabindex="0" 

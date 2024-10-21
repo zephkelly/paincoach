@@ -3,23 +3,27 @@
         <MainHeader :title="'Overview'" :dynamicDropdownComponent="OverviewTimelineDropdown" />
         <div class="page-container">
             <OverviewCalendar :initialDate="newDate" />
-            <!-- <OverviewLifestyleScore :lifestyleScore="82"/>
-            <OverviewPainFactors :painFactors="factors" /> -->
+            <OverviewLifestyleScore :lifestyleScore="82"/>
+            <OverviewPainFactors :painFactors="factors" />
         </div>
     </main>
 </template>
 
 <script lang="ts" setup>
-import MainHeader from '~/components/app/overview/mainHeader.vue';
+import MainHeader from '~/components/app/mainHeader.vue';
 import OverviewTimelineDropdown from '@/components/app/overview/timelineDropdown.vue';
 import OverviewCalendar from '@/components/app/overview/overviewCalendar.vue';
+import OverviewLifestyleScore from '@/components/app/overview/lifestyleScore.vue';
+import OverviewPainFactors from '@/components/app/overview/painFactors.vue';
 import { type PainFactorProps } from '~/types/painFactor';
 
 const newDate = ref(new Date())
 
 definePageMeta({
+    layout: 'application',
     title: 'Overview',
     description: 'This is the overview page',
+    middleware: 'verify-demo-token' 
 })
 
 const factor1: PainFactorProps = {
@@ -56,8 +60,8 @@ const factors: PainFactorProps[] = [factor5, factor1, factor2, factor3, factor4]
 </script>
 
 <style lang="css" scoped>
-.page {
-    min-height: 740px;
+.page-container {
+    
 }
 </style>
 

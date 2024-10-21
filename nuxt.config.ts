@@ -14,6 +14,10 @@ export default defineNuxtConfig({
     gtag: {
         id: 'G-4P6YS7XXY3',
     },
+    typescript: {
+        strict: true,
+    },
+    middleware: ['verifyDemoToken'],
     app: {
         head: {
             meta: [
@@ -49,10 +53,16 @@ export default defineNuxtConfig({
             htmlAttrs: { lang: 'en', },
         }
     },
+    serverMiddleware: [{ 
+            path: '/demo', handler: '~/server/middleware/verify-demo-token.ts' 
+        }
+    ],
     nitro: {
         routeRules: {
             '/images/**': { headers: { 'cache-control': 'max-age=31536000, immutable' } },
             '/fonts/**': { headers: { 'cache-control': 'max-age=31536000, immutable' } },
+
+            '/demo/**': { ssr: false },
         }
     }
 })

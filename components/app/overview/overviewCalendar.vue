@@ -79,8 +79,6 @@ const calendarDays = computed(() => {
             break;
     }
 
-    console.log(generateCalendarDays(startDate, endDate, emptyDaysAtStart.value));
-
     return generateCalendarDays(startDate, endDate, emptyDaysAtStart.value);
 });
 

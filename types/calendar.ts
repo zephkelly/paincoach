@@ -5,11 +5,11 @@ import type { PainLevel } from "./painLevel";
 export type TimelineCalendarOverview = 'week' | 'fortnight' | 'month';
 
 export interface CalendarDay {
-    date: Date;
+    date: Date | null;
     index: number;
     painLevel: number | PainLevel;
-    dayOfWeek: DayOfWeek;
-    dayOfWeekShort: DayOfWeekShort;
+    dayOfWeek: DayOfWeek | null;
+    dayOfWeekShort: DayOfWeekShort | null;
 }
 
 export interface CalendarMonth {

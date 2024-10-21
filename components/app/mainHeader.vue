@@ -28,7 +28,7 @@ const props = defineProps<{
 
 <style lang="css" scoped>
 section {
-    height: 44px;
+    /* height: 44px; */
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 2rem;
