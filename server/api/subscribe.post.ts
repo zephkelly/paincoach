@@ -1,33 +1,99 @@
+import { type User } from '@/types/user'
+import { createUser } from '@/server/utils/database/user'
+
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const body = await readBody(event)
     const { email } = body
 
-    const dc = process.env.MAILCHIMP_DC
-    const listId = process.env.MAILCHIMP_LIST_ID
-    const apiKey = process.env.MAILCHIMP_API_KEY
+    const dc = config.mailchimpDc
+    const listId = config.mailchimpListId
+    const apiKey = config.mailchimpApiKey
+    const transactionalApiKey = config.mailchimpTransactionalApiKey
 
     const url = `https://${dc}.api.mailchimp.com/3.0/lists/${listId}/members`
 
     try {
-        const response = await $fetch(url, {
+        const demoToken = generateHexToken(10)
+
+        const response: any = await $fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `apikey ${apiKey}`
+                'Authorization': `Basic ${Buffer.from(`anystring:${apiKey}`).toString('base64')}`
             },
             body: JSON.stringify({
                 email_address: email,
-                status: 'subscribed'
+                status: 'subscribed',
+                merge_fields: {
+                    DEMO_TOKEN: demoToken
+                }
             })
         })
 
-        return { success: true }
-    } catch (error: any) {
-        console.error('Mailchimp API Error:', error)
+        const newUser: User = {
+            email,
+            demoToken,
+            demoVisitCount: 0
+        }
+
+        await createUser(newUser);
+
+        const transactionalResponse = await sendTemplateEmail(email, transactionalApiKey, demoToken)
+
         return { 
-            success: false, 
-            error: error.response?.data?.detail || 'An error occurred while subscribing.'
+            success: true,
+            response,
+            transactionalResponse
+        }
+    }
+    catch (error: any) {
+        setResponseStatus(event, error.response?.status || 500)
+        return {
+            success: false,
+            error: error + 'An error occurred while processing your request.'
         }
     }
 })
+
+async function sendTemplateEmail(email: string, transactionKey: string, demoToken: string) {
+    const url = 'https://mandrillapp.com/api/1.0/messages/send-template.json'
+    
+    try {
+        const response = await $fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({
+                key: transactionKey,
+                template_name: 'pain-coach-demo-link',
+                template_content: [],
+                merge_language: 'MailChimp',
+                message: {
+                    to: [{ email }],
+                    subject: "You're in! Explore your Pain Coach demo today",
+                    from_email: 'admin@paincoach.online',
+                    from_name: 'Lachlan Townend',
+                    merge_vars: [{
+                        rcpt: email,
+                        vars: [{
+                            name: 'DEMO_TOKEN',
+                            content: demoToken
+                        }]
+                    }]
+                },
+            })
+        })
+        return response
+    } catch (error: any) {
+        console.error('Transactional API Error:', error)
+        throw error
+    }
+}
+
+function generateHexToken(length: number): string {
+    const characters = '0123456789ABCDEF'
+    let result = ''
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length))
+    }
+    return result
+}

@@ -1,28 +1,50 @@
 <template>
     <section>
         <div class="container section">
+            <h1 tabindex="0" class="introduction">
+                <span class="mobile-hidden">Introducing</span> <span class="desktop-hidden">Meet</span> <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>.
+            </h1>
+            <h2 tabindex="0"><span>Take Control, Reclaim Your Life.</span></h2>
+            <p class="subtitle" tabindex="0">
+                Your personalised pain and lifestyle tracker, backed by real science.
+            </p>
+            <BaseButton 
+                tabindex="0" 
+                class="waitlist-link" 
+                @click.prevent="handleClick"
+                @keydown="handleKeyDown"
+                arialLabel="Sign up for the waitlist now!"   
+            >
+                Join the Waitlist
+            </BaseButton>
             <div class="landing-image">
                 <div class="image-container">
-                    <!-- <img src="~/images/step-one.JPG" alt="Step One" /> -->
+                    <div class="fade"></div>
                     <div class="wrapper">
-                        <IphoneMockup href="/images/mockup-dark.png" />
-                        <IphoneMockup href="/images/mockup-light.png" />
+                        <IphoneMockup tabindex="-1" src="/images/mockup/landing-dark.webp" loading="eager" alt="Home screen of the pain coach mobile application. Featuring a calendar tracking weekly pain, a 'lifestyle score', and a ranking of the users largest pain factors."/>
+                        <IphoneMockup tabindex="-1" src="/images/mockup/landing-light.webp" loading="eager" alt="Insights page of the pain coach mobile application. Featuring a doughnut chart of the factors contributing to pain, and a line graph showing pain over time." />
                     </div>
                 </div>
             </div>
-            <h1 class="introduction"><span class="mobile-hidden">Introducing</span> <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>.</h1>
-            <h2><span>Take Control, Reclaim Your Life.</span></h2>
-            <p class="subtitle">
-                Your personalised pain and lifestyle assistant, backed by real science.
-            </p>
-            <BaseButton href class="waitlist-link">Get Started</BaseButton>
-            <HeroGraphic class="hero-graphic"/>
         </div>
     </section>
 </template>
 
 <script lang="ts" setup>
+import { useScroll } from '@/composables/useScroll'
 
+const { smoothScroll } = useScroll()
+
+const handleClick = () => {
+    smoothScroll('#waitlist', 0)
+    console.log('clicked')
+}
+
+const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+        smoothScroll('#waitlist', 0)
+    }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -30,16 +52,25 @@ section {
     padding: 0rem 1rem;
 
     h1 {
-        margin-bottom: 0rem;
+        margin-bottom: 1rem;
         margin-top: clamp(2.5rem, 8vw, 4rem);
+
+        @media (max-width: 500px) {
+            line-height: 1;
+            font-size: 3.25rem;
+        }
     }
 
     h2 {
-        margin-top: clamp(0.2rem, 1vw, 1rem);
+        display: flex;
+        margin-top: 1rem;
+
+        @media (max-width: 768px) {
+            display: none;
+        }
     }
 
     .subtitle {
-        // margin-top: 1rem;
         tab-size: 4;
 
         strong {
@@ -57,6 +88,7 @@ section {
 
 .waitlist-link {
     margin-top: 1.2rem;
+    font-size: 1.1rem;
 }
 
 .landing-image {
@@ -65,6 +97,7 @@ section {
     margin-top: 4rem;
 
     .image-container {
+        position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -73,7 +106,25 @@ section {
         background-color: var(--text-color);
         border-radius: 8px;
         overflow: hidden;
-        
+
+        .fade {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--text-color) 100%);
+            opacity: 0.3;
+            border-radius: 8px;
+            display: none;
+        }
+
+        @media (prefers-color-scheme: light) {
+            background-color: transparent;
+
+            .fade {
+                display: block;
+            }
+        }
+
         .wrapper {
             height: 100%;
             position: relative;
@@ -115,68 +166,26 @@ section {
     }
 }
 
-.complex-shimmer {
-    display: inline-block;
-    position: relative;
-    color: #d63636;
-   
-    &::before, &::after {
-        content: attr(data-text);
-        position: absolute;
-        left: 0;
-        right: 0;
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-size: 300% 300%;
-        animation: complexShine 6s linear infinite;
-    }
-
-    &::before {
-        background-image: linear-gradient(
-            45deg,
-            rgba(210, 70, 70, 0.1) 0%,
-            rgba(239, 141, 86, 0.3) 20%,
-            rgba(239, 141, 86, 0.8) 40%,
-            #ef8d56 50%,
-            rgba(220, 64, 64, 0.8) 60%,
-            rgba(210, 70, 70, 0.3) 80%,
-            rgba(210, 70, 70, 0.1) 100%
-        );
-    }
-
-    &::after {
-        background-image: linear-gradient(
-            135deg,
-            rgba(210, 70, 70, 0.1) 0%,
-            rgba(215, 57, 57, 0.374) 20%,
-            rgba(225, 63, 63, 0.8) 40%,
-            #d24646 50%,
-            rgba(239, 141, 86, 0.8) 60%,
-            rgba(239, 141, 86, 0.3) 80%,
-            rgba(239, 141, 86, 0.1) 100%
-        );
-        animation-delay: -3s;
-    }
-}
-
-@keyframes complexShine {
-    0%, 100% {
-        background-position: 0% 0%;
-    }
-    25% {
-        background-position: 100% 100%;
-    }
-    50% {
-        background-position: 100% 0%;
-    }
-    75% {
-        background-position: 0% 100%;
+@media (max-width: 354px) {
+    section {
+        .introduction {
+            margin-bottom: 0.5rem;
+        }
+    
+        h2 {
+            display: none;
+        }
     }
 }
 
 .mobile-hidden {
-    @media (max-width: 330px) {
+    @media (max-width: 354px) {
+        display: none;
+    }
+}
+
+.desktop-hidden {
+    @media (min-width: 354px) {
         display: none;
     }
 }

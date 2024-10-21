@@ -1,15 +1,16 @@
 <template>
-    <NuxtLink v-if="props.href" class="button link" to="/">
+    <NuxtLink v-if="props.to" class="button link" :to="to" :aria-label="ariaLabel">
             <slot></slot>
     </NuxtLink>
-    <button v-else class="button">
+    <button v-else class="button" :aria-label="ariaLabel">
         <slot></slot>
     </button>
 </template>
 
 <script lang="ts" setup>
 const props = defineProps({
-    href: Boolean,
+    to: String,
+    ariaLabel: String
 });
 </script>
 
