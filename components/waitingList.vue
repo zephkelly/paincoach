@@ -3,6 +3,7 @@
         <div class="section container">
             <h2 class="clarity" tabindex="0">Find <span class="complex-shimmer" data-text="Clarity">Clarity</span>.</h2>
             <h2 tabindex="0">Join the waiting list now:</h2>
+            <p>Want to give the app a try? Sign-up below and we'll send you an exclusive link to our <span class="complex-shimmer" data-text="demo">demo</span>.</p>
             <form @submit.prevent="submitForm">
                 <div class="group">
                     <label for="potFName" class="hidden">&nbsp;</label>
@@ -63,7 +64,7 @@ function verifyEmailInput() {
     emailInputTimeout.value = setTimeout(() => {
         validateEmail();
         emailInputTimeout.value = null;
-    }, 700);
+    }, 3000);
 }
 
 function validateEmail() {
@@ -106,17 +107,17 @@ async function submitForm() {
     
             if (response.success) {
                 statusError.value = false
-                statusMessage.value = 'Successfully subscribed!'
+                statusMessage.value = 'Successfully subscribed! Check your email for your demo link.'
                 emailModel.value = ''
             } else {
                 statusError.value = true
-                statusMessage.value = 'An error occurred. Please try again.'
+                statusMessage.value = 'An error occurred! Please try again.'
             }
         }
         catch (error) {
             console.error('Error:', error)
             statusError.value = true
-            statusMessage.value = 'There seems to be an error on our end. Please try again later.'
+            statusMessage.value = 'There seems to be an error on our end! Please try again later.'
         }
         finally {
             isSubmitting.value = false
@@ -137,6 +138,10 @@ section {
 
 .clarity {
     font-size: clamp(46px, 5vw, 48px);
+}
+
+p {
+    margin-bottom: 2rem;
 }
 
 form {
