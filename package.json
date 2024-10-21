@@ -10,13 +10,15 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "d3": "^7.9.0",
     "nuxt": "^3.13.0",
+    "pg": "^8.13.0",
     "vue": "latest",
-    "vue-router": "latest",
-    "d3": "^7.9.0"
+    "vue-router": "latest"
   },
   "devDependencies": {
-    "sass": "^1.78.0",
-    "nuxt-gtag": "^1.1.1"
+    "@types/pg": "^8.11.10",
+    "nuxt-gtag": "^1.1.1",
+    "sass": "^1.78.0"
   }
 }

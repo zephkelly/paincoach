@@ -1,3 +1,6 @@
+import { type User } from '@/types/user'
+import { createUser } from '@/server/utils/database/user'
+
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const body = await readBody(event)
@@ -11,7 +14,9 @@ export default defineEventHandler(async (event) => {
     const url = `https://${dc}.api.mailchimp.com/3.0/lists/${listId}/members`
 
     try {
-        const response = await $fetch(url, {
+        const demoToken = generateHexToken(10)
+
+        const response: any = await $fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -21,19 +26,28 @@ export default defineEventHandler(async (event) => {
                 email_address: email,
                 status: 'subscribed',
                 merge_fields: {
-                    DEMO_TOKEN: 'test'
+                    DEMO_TOKEN: demoToken
                 }
             })
         })
 
-        const transactionalResponse = await sendTemplateEmail(email, transactionalApiKey, 'test')
+        const newUser: User = {
+            email,
+            demoToken,
+            demoVisitCount: 0
+        }
+
+        await createUser(newUser);
+
+        const transactionalResponse = await sendTemplateEmail(email, transactionalApiKey, demoToken)
 
         return { 
             success: true,
             response,
             transactionalResponse
         }
-    } catch (error: any) {
+    }
+    catch (error: any) {
         setResponseStatus(event, error.response?.status || 500)
         return {
             success: false,
@@ -55,7 +69,7 @@ async function sendTemplateEmail(email: string, transactionKey: string, demoToke
                 merge_language: 'MailChimp',
                 message: {
                     to: [{ email }],
-                    subject: 'Welcome to our newsletter!',
+                    subject: "You're in! Explore your Pain Coach demo today",
                     from_email: 'admin@paincoach.online',
                     from_name: 'Lachlan Townend',
                     merge_vars: [{
@@ -73,4 +87,13 @@ async function sendTemplateEmail(email: string, transactionKey: string, demoToke
         console.error('Transactional API Error:', error)
         throw error
     }
+}
+
+function generateHexToken(length: number): string {
+    const characters = '0123456789ABCDEF'
+    let result = ''
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length))
+    }
+    return result
 }
