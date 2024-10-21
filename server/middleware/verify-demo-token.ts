@@ -3,7 +3,6 @@ import { checkUserByDemoToken } from '@/server/utils/database/user'
 import { incrementDemoViewCount } from '@/server/utils/database/user'
 
 export default defineEventHandler(async (event: H3Event) => {
-    console.log('Verifying demo token')
     try {
         const url = event.node.req.url || ''
         if (!url.startsWith('/demo/')) {
@@ -30,7 +29,6 @@ export default defineEventHandler(async (event: H3Event) => {
             return sendRedirect(event, '/', 302)
         }
 
-        console.log('Valid token, allowing access to demo')
         await incrementDemoViewCount(token)
     }
     catch (error) {

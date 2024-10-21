@@ -5,11 +5,7 @@ export default defineNuxtRouteMiddleware((to: any, from: any) => {
         return navigateTo('/')
     }
 
-    if(to.path.startsWith(`/demo/${token}`)) {
-        console.log('valid route')
-    }
-    else {
-        console.log('invalid route')
+    if(!to.path.startsWith(`/demo/${token}`)) {
         return navigateTo('/')
     }
 })

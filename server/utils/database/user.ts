@@ -34,8 +34,6 @@ export async function incrementDemoViewCount(demoToken: string): Promise<void> {
         if (result.rowCount === 0) {
             throw new Error('User not found')
         }
-    
-        console.log(`Demo view count updated for token ${demoToken}. New count: ${result.rows[0].demo_visit_count}`)
     }
     catch (error) {
         console.error('Error updating demo view count:', error)
