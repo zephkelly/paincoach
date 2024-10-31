@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     try {
         const demoToken = generateHexToken(10)
 
-        const response: any = await $fetch(url, {
+        const response: any = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
