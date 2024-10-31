@@ -1,10 +1,35 @@
 import { type User } from '@/types/user'
 import { createUser } from '@/server/utils/database/user'
+import { mergeProps } from 'vue'
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig()
     const body = await readBody(event)
     const { email } = body
+
+    if (!email) {
+        setResponseStatus(event, 400)
+        return {
+            success: false,
+            error: 'Email address is required.'
+        }
+    }
+
+    if (!email.includes('@')) {
+        setResponseStatus(event, 400)
+        return {
+            success: false,
+            error: 'Invalid email address.'
+        }
+    }
+
+    if (typeof email !== 'string') {
+        setResponseStatus(event, 400)
+        return {
+            success: false,
+            error: 'Invalid email address.'
+        }
+    }
 
     const dc = config.mailchimpDc
     const listId = config.mailchimpListId
@@ -20,7 +45,7 @@ export default defineEventHandler(async (event) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Basic ${Buffer.from(`anystring:${apiKey}`).toString('base64')}`
+                'Authorization': `Basic ${Buffer.from(`any:${apiKey}`).toString('base64')}`
             },
             body: JSON.stringify({
                 email_address: email,
@@ -39,19 +64,19 @@ export default defineEventHandler(async (event) => {
 
         await createUser(newUser);
 
-        const transactionalResponse = await sendTemplateEmail(email, transactionalApiKey, demoToken)
+        // const transactionalResponse = await sendTemplateEmail(email, transactionalApiKey, demoToken)
 
         return { 
             success: true,
-            response,
-            transactionalResponse
+            // transactionalResponse
         }
     }
     catch (error: any) {
         setResponseStatus(event, error.response?.status || 500)
+        console.log(error.response._data.title)
         return {
             success: false,
-            error: error + 'An error occurred while processing your request.'
+            error: error.response._data.title ? error.response._data.title : 'An error occurred while processing your request.'
         }
     }
 })
