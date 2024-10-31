@@ -74,13 +74,6 @@ export default defineEventHandler(async (event) => {
     catch (error: any) {
         setResponseStatus(event, error.response?.status || 500)
 
-        if (error.response._data) {
-            return {
-                success: false,
-                error: error.response._data.title ? error.response._data.title : 'An error occurred while processing your request.'
-            }
-        }
-
         return {
             success: false,
             error: 'An error occurred while processing your request.'
