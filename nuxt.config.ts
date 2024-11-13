@@ -25,14 +25,16 @@ export default defineNuxtConfig({
     },
     modules: ['nuxt-gtag', 'nuxt-nodemailer'],
     nodemailer: {
-        from: `Lachlan Townend <${process.env.NUXT_NODEMAILER_AUTH_USER}>`,
+        from: `"Lachlan Townend" <${process.env.NUXT_NODEMAILER_AUTH_USER}>`,
         host: 'smtp.gmail.com',
         port: 465,
         secure: true,
         auth: {
+            type: 'login',
             user: process.env.NUXT_NODEMAILER_AUTH_USER,
             pass: process.env.NUXT_NODEMAILER_AUTH_PASSWORD,
         },
+        debug: true
     },
     gtag: {
         id: 'G-4P6YS7XXY3',
