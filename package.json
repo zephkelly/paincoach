@@ -18,7 +18,9 @@
   },
   "devDependencies": {
     "@types/pg": "^8.11.10",
+    "nodemailer": "^6.9.16",
     "nuxt-gtag": "^1.1.1",
+    "nuxt-nodemailer": "^1.1.2",
     "sass": "^1.78.0"
   }
 }

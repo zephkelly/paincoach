@@ -1,6 +1,7 @@
 export interface User {
     id?: number
     email: string
-    demoToken: string
-    demoVisitCount: number
+    unsubscribe_token: string
+    demo_token: string
+    demo_visit_count: number
 }

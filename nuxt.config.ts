@@ -1,7 +1,21 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: '2024-04-03',
-    css: ['~/assets/scss/global.scss', '~/assets/scss/main.scss'],
+    css: [
+        '~/assets/scss/reset.scss',
+        '~/assets/scss/global.scss',
+        '~/assets/scss/main.scss',
+        '~/assets/scss/animations.scss',
+    ],
+    vite: {
+        css: {
+            preprocessorOptions: {
+                scss: {
+                    api: 'modern-compiler',
+                },
+            },
+        },
+    },
     runtimeConfig: {
         databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
         mailchimpDc: process.env.MAILCHIMP_DC,
@@ -9,10 +23,17 @@ export default defineNuxtConfig({
         mailchimpApiKey: process.env.MAILCHIMP_API_KEY,
         mailchimpTransactionalApiKey: process.env.MAILCHIMP_TRANSACTIONAL_API_KEY,
     },
-    imports: {
-        dirs: ['composables']
+    modules: ['nuxt-gtag', 'nuxt-nodemailer'],
+    nodemailer: {
+        from: `Lachlan Townend <${process.env.NUXT_NODEMAILER_AUTH_USER}>`,
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.NUXT_NODEMAILER_AUTH_USER,
+            pass: process.env.NUXT_NODEMAILER_AUTH_PASSWORD,
+        },
     },
-    modules: ['nuxt-gtag'],
     gtag: {
         id: 'G-4P6YS7XXY3',
     },

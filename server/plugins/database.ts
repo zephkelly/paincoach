@@ -38,6 +38,8 @@ export default defineNitroPlugin(async (nitroApp) => {
                 CREATE TABLE IF NOT EXISTS "private".users (
                     id SERIAL PRIMARY KEY,
                     email VARCHAR(255) UNIQUE NOT NULL,
+                    unsubscribe_token CHAR(18) UNIQUE NOT NULL,
+                    mailing_list BOOLEAN DEFAULT TRUE,
                     demo_token CHAR(10) UNIQUE NOT NULL,
                     demo_visit_count INTEGER DEFAULT 0
                 )
@@ -56,5 +58,6 @@ export default defineNitroPlugin(async (nitroApp) => {
 
     await createTablesIfNotExist()
 
+    //@ts-expect-error
     nitroApp.database = pool
 })

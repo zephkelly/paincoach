@@ -3,7 +3,7 @@
         <div class="section container">
             <h2 class="clarity" tabindex="0">Find <span class="complex-shimmer" data-text="Clarity">Clarity</span>.</h2>
             <h2 tabindex="0">Join the waiting list now:</h2>
-            <p>Want to give the app a try? Sign-up below and we'll send you an exclusive link to our <span class="complex-shimmer" data-text="demo">demo</span> when it is available.</p>
+            <p>Want to give the app a try? Sign-up below and we'll send you an exclusive link to our <span class="complex-shimmer" data-text="demo">demo</span>.</p>
             <form @submit.prevent="submitForm">
                 <div class="group">
                     <label for="potFName" class="hidden">&nbsp;</label>
@@ -42,6 +42,7 @@
 </template>
   
 <script lang="ts" setup>
+import { H3Error } from 'h3';
 import { ref } from 'vue'
 
 const isSubmitting = ref(false)
@@ -80,6 +81,14 @@ function validateEmail() {
     }
 }
 
+interface ISubscribeResponse {
+    statusCode: number;
+    statusText: string;
+    message: string;
+    data: {
+        success: boolean;
+    }
+}
 async function submitForm() {
     statusMessage.value = '';
     statusError.value = false;
@@ -100,12 +109,12 @@ async function submitForm() {
         statusMessage.value = ''
 
         try {
-            const response = await $fetch('/api/subscribe', {
+            const response = await $fetch<ISubscribeResponse>('/api/subscribe', {
                 method: 'POST',
                 body: { email: emailModel.value }
             })
     
-            if (response.success) {
+            if (response.statusCode === 201) {
                 statusError.value = false
                 statusMessage.value = 'Successfully subscribed!'
                 emailModel.value = ''
@@ -114,8 +123,13 @@ async function submitForm() {
                 statusMessage.value = 'An error occurred! Please try again.'
             }
         }
-        catch (error) {
-            console.error('Error:', error)
+        catch (error: any) {
+            if (error.statusCode === 409) {
+                statusError.value = true
+                statusMessage.value = 'You are already subscribed! Check your inbox for the link to your demo.'
+                return;
+            }
+
             statusError.value = true
             statusMessage.value = 'There seems to be an error on our end! Please try again later.'
         }
@@ -138,6 +152,7 @@ section {
 
 .clarity {
     font-size: clamp(46px, 5vw, 48px);
+    line-height: 48px;
 }
 
 p {

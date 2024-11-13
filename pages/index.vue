@@ -22,8 +22,7 @@
         <meta name="google" content="notranslate" />
         <meta name="google-site-verification" content="google-site-verification" />
     </Head>
-    <main id="main-content landing" class="landing-page">
-        <Navbar />
+    <main id="main-content landing" class="site-page">
         <ScrollToReveal>
             <hero class="hero main" aria-label="Main hero section"/>
         </ScrollToReveal>
@@ -39,7 +38,6 @@
         </ScrollToReveal>
         <AnimatedVideo class="animated-video"/>
         <WaitingList class="waitlist" />
-        <LandingFooter />
     </main>
 </template>
 
@@ -47,47 +45,10 @@
 const profilePhoto = '/images/headshot-lachlan.webp';
 </script>
 
-<style lang="css">
-main.landing-page {
-    h1, h2 {
-        tab-size: 4;
-        font-weight: 700;
-        font-size: clamp(40px, 5vw, 46px);
-        letter-spacing: -1.2px;
-        line-height: 34px;
-        margin-bottom: 1rem;
-        color: var(--text-color);
-    }
-    h1 {
-        font-size: clamp(42px, 7vw, 46px);
-        line-height: 38px;
-    }
-
-    h3 {
-        tab-size: 4;
-        font-weight: 600;
-        font-size: clamp(28px, 7vw, 32px);
-        line-height: 2rem;
-        margin-bottom: 1rem;
-        color: var(--text-color);
-    }
-
-    p {
-        font-size: 18px;
-        font-weight: 300;
-        line-height: 28px;
-        color: var(--text-color);
-    }
-}
-</style>
-
 <style lang="scss" scoped>
 main {
-    text-rendering: optimizeLegibility;
-}
-
-.hero {
     margin-top: 7rem;
+    text-rendering: optimizeLegibility;
 }
 
 .spacer {
@@ -118,80 +79,6 @@ main {
     @media (max-width: 768px) {
         margin-top: 2.5rem;
         margin-bottom: 7rem;
-    }
-}
-</style>
-
-<style lang="scss">
-.complex-shimmer {
-    display: inline-block;
-    position: relative;
-    color: #d63636;
-   
-    &::before, &::after {
-        height: 110%;
-        width: 105%;
-        content: attr(data-text);
-        position: absolute;
-        left: 0;
-        right: 0;
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-size: 300% 300%;
-        animation: complexShine 6s linear infinite;
-    }
-    &::before {
-        background-image: linear-gradient(
-            45deg,
-            rgba(210, 70, 70, 0.1) 0%,
-            rgba(239, 141, 86, 0.3) 20%,
-            rgba(239, 141, 86, 0.8) 40%,
-            #ef8d56 50%,
-            rgba(220, 64, 64, 0.8) 60%,
-            rgba(210, 70, 70, 0.3) 80%,
-            rgba(210, 70, 70, 0.1) 100%
-        );
-    }
-    &::after {
-        background-image: linear-gradient(
-            135deg,
-            rgba(210, 70, 70, 0.1) 0%,
-            rgba(215, 57, 57, 0.374) 20%,
-            rgba(225, 63, 63, 0.8) 40%,
-            #d24646 50%,
-            rgba(239, 141, 86, 0.8) 60%,
-            rgba(239, 141, 86, 0.3) 80%,
-            rgba(239, 141, 86, 0.1) 100%
-        );
-        animation-delay: -3s;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        &::before, &::after {
-            animation: none;
-        }
-    }
-
-    @media (max-width: 768px) {
-        &::before, &::after {
-            animation: none;
-        }
-    }
-}
-
-@keyframes complexShine {
-    0%, 100% {
-        background-position: 0% 0%;
-    }
-    25% {
-        background-position: 100% 100%;
-    }
-    50% {
-        background-position: 100% 0%;
-    }
-    75% {
-        background-position: 0% 100%;
     }
 }
 </style>

@@ -3,16 +3,24 @@ import { type User } from '@/types/user'
 
 export async function createUser(user: User): Promise<void> {
     const nitroApp = useNitroApp()
+    //@ts-expect-error
     const client: PoolClient = await nitroApp.database.connect()
   
     try {
         await client.query(
-            'INSERT INTO "private".users (email, demo_token) VALUES ($1, $2)',
-            [user.email, user.demoToken]
+            'INSERT INTO "private".users (email, unsubscribe_token, demo_token) VALUES ($1, $2, $3)',
+            [user.email, user.unsubscribe_token, user.demo_token]
         )
         console.log('User created.')
     }
-    catch (error) {
+    catch (error: any) {
+        if (error.code === '23505') {
+            throw createError({
+                statusCode: 409,
+                statusText: 'Conflict',
+                message: 'User already exists.'
+            })
+        }
         console.error('Error creating user:', error)
         throw error
     }
@@ -23,6 +31,7 @@ export async function createUser(user: User): Promise<void> {
   
 export async function incrementDemoViewCount(demoToken: string): Promise<void> {
     const nitroApp = useNitroApp()
+    //@ts-expect-error
     const client: PoolClient = await nitroApp.database.connect()
   
     try {
@@ -46,6 +55,7 @@ export async function incrementDemoViewCount(demoToken: string): Promise<void> {
 
 export async function checkUserByDemoToken(demoToken: string): Promise<boolean> {
     const nitroApp = useNitroApp()
+    //@ts-expect-error
     const client: PoolClient = await nitroApp.database.connect()
   
     try {
@@ -54,10 +64,33 @@ export async function checkUserByDemoToken(demoToken: string): Promise<boolean> 
             [demoToken]
         )
         return result.rows[0].exists
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Error checking user by demo token:', error)
         throw error
-    } finally {
+    }
+    finally {
+        client.release()
+    }
+}
+
+export async function checkUnsubscribeTokenExists(unsubToken: string): Promise<boolean> {
+    const nitroApp = useNitroApp()
+    //@ts-expect-error
+    const client: PoolClient = await nitroApp.database.connect()
+  
+    try {
+        const result = await client.query(
+            'SELECT EXISTS(SELECT 1 FROM "private".users WHERE unsubscribe_token = $1)',
+            [unsubToken]
+        )
+        return result.rows[0].exists
+    }
+    catch (error) {
+        console.error('Error checking unsubscribe token:', error)
+        throw error
+    }
+    finally {
         client.release()
     }
 }

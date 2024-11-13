@@ -25,8 +25,16 @@ import { useScroll } from '@/composables/useScroll'
 
 const { scrollToTop } = useScroll()
 
+const route = useRoute()
+const currentPage = ref(route.path)
+
 const handleClick = () => {
-    scrollToTop()
+    if (currentPage.value === '/') {
+        scrollToTop()
+        return
+    }
+
+    return navigateTo('/')
 }
 
 const handleKeyDown = (event: KeyboardEvent) => {
@@ -36,31 +44,31 @@ const handleKeyDown = (event: KeyboardEvent) => {
 };
 
 onMounted(() => {
-  const options = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 1.0
-  };
+    const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 1.0
+    };
 
-  observer.value = new IntersectionObserver(([entry]) => {
-    isDocked.value = entry.isIntersecting;
-  }, options);
+    observer.value = new IntersectionObserver(([entry]) => {
+        isDocked.value = entry.isIntersecting;
+    }, options);
 
-  const target = document.createElement('div');
-  target.style.height = '1px';
-  target.style.width = '100%';
-  target.style.position = 'absolute';
-  target.style.top = '0';
-  target.style.left = '0';
-  document.body.appendChild(target);
+    const target = document.createElement('div');
+    target.style.height = '1px';
+    target.style.width = '100%';
+    target.style.position = 'absolute';
+    target.style.top = '0';
+    target.style.left = '0';
+    document.body.appendChild(target);
 
-  observer.value.observe(target);
+    observer.value.observe(target);
 });
 
 onUnmounted(() => {
-  if (observer.value) {
-    observer.value.disconnect();
-  }
+    if (observer.value) {
+        observer.value.disconnect();
+    }
 });
 </script>
 

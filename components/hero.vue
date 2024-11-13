@@ -53,7 +53,7 @@ section {
 
     h1 {
         margin-bottom: 1rem;
-        margin-top: clamp(2.5rem, 8vw, 4rem);
+        margin-top: clamp(2.5rem, 7vw, 3rem);
 
         @media (max-width: 500px) {
             line-height: 1;
