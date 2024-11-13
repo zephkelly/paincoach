@@ -25,14 +25,17 @@ export default defineNuxtConfig({
     },
     modules: ['nuxt-gtag', 'nuxt-nodemailer'],
     nodemailer: {
-        from: `"Lachlan Townend" <${process.env.NUXT_NODEMAILER_AUTH_USER}>`,
+        from: `"Lachlan Townend" <${process.env.NODEMAILER_AUTH_USER}>`,
         host: 'smtp.gmail.com',
         port: 465,
         secure: true,
         auth: {
-            type: 'login',
-            user: process.env.NUXT_NODEMAILER_AUTH_USER,
-            pass: process.env.NUXT_NODEMAILER_AUTH_PASSWORD,
+            type: 'OAuth2',
+            user: process.env.NODEMAILER_AUTH_USER,
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+            accessToken: process.env.GOOGLE_ACCESS_TOKEN,
         },
         debug: true
     },
