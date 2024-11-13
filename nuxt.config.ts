@@ -30,14 +30,14 @@ export default defineNuxtConfig({
         port: 465,
         secure: true,
         auth: {
-            type: 'OAuth2',
+            type: 'OAUTH2',
             user: process.env.NODEMAILER_AUTH_USER,
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
             accessToken: process.env.GOOGLE_ACCESS_TOKEN,
+            expires: 3599,
         },
-        debug: true
     },
     gtag: {
         id: 'G-4P6YS7XXY3',
