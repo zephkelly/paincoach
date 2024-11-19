@@ -116,7 +116,7 @@ async function submitForm() {
     
             if (response.statusCode === 201) {
                 statusError.value = false
-                statusMessage.value = 'Successfully subscribed!'
+                statusMessage.value = "You've successfully joined the waiting list! If you don't receive an email from us, please check your spam folder."
                 emailModel.value = ''
             } else {
                 statusError.value = true
@@ -126,7 +126,7 @@ async function submitForm() {
         catch (error: any) {
             if (error.statusCode === 409) {
                 statusError.value = true
-                statusMessage.value = 'You are already subscribed! Check your inbox for the link to your demo.'
+                statusMessage.value = 'You are already subscribed! Check your inbox and spam folder for the link to your demo.'
                 return;
             }
 
