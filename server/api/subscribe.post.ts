@@ -94,7 +94,7 @@ async function sendTemplateEmail(email: string, transactionKey: string, unsubscr
                 message: {
                     to: [{ email }],
                     subject: "Explore the Pain Coach demo today",
-                    from_email: 'no-reply@paincoach.online',
+                    from_email: 'lachlan@physiopaincoach.com.au',
                     from_name: 'Lachlan Townend',
                     merge_vars: [{
                         rcpt: email,

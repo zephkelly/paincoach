@@ -97,7 +97,7 @@ async function submitForm() {
     {
         setTimeout(() => {
             statusError.value = false;
-            statusMessage.value = "You've successfully joined the waiting list!"
+            statusMessage.value = "You've successfully joined the waiting list! If you don't receive an email from us, please check your spam folder."
         }, 1500)
         return
     }
