@@ -65,7 +65,7 @@ function verifyEmailInput() {
     emailInputTimeout.value = setTimeout(() => {
         validateEmail();
         emailInputTimeout.value = null;
-    }, 3000);
+    }, 1000);
 }
 
 function validateEmail() {
