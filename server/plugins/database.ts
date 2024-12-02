@@ -45,6 +45,31 @@ export default defineNitroPlugin(async (nitroApp) => {
                 )
             `)
 
+            await client.query(`
+                CREATE TABLE IF NOT EXISTS "private".user (
+                    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    email TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL,
+                    mailing_list BOOLEAN DEFAULT TRUE,
+                    demo_token CHAR(10) UNIQUE NOT NULL,
+                    demo_visit_count INTEGER DEFAULT 0,
+                    unsubscribe_token CHAR(18) UNIQUE NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            `)
+
+            await client.query(`
+                CREATE TABLE IF NOT EXISTS "private".entry (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER REFERENCES "private".users(id),
+                    pain_level INTEGER NOT NULL,
+                    pain_location VARCHAR(255) NOT NULL,
+                    mood_level INTEGER NOT NULL,
+                    weather VARCHAR(255) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            `)
+
             console.log('Tables created or already exists')
         }
         catch (err) {

@@ -17,7 +17,19 @@ import OverviewLifestyleScore from '@/components/app/overview/lifestyleScore.vue
 import OverviewPainFactors from '@/components/app/overview/painFactors.vue';
 import { type PainFactorProps } from '~/types/painFactor';
 
+import { PainDataAnalyser } from '~~/server/utils/painDataAnalyser';
+
 const newDate = ref(new Date())
+
+
+const painDataAnalyser = new PainDataAnalyser();
+const testData = painDataAnalyser.generateSyntheticData(1000);
+
+const results = painDataAnalyser.analyzeHealthData(testData);
+
+// Access the results
+console.log('Correlations:', results.correlations);
+console.log('Regression Results:', results.regression);
 
 definePageMeta({
     layout: 'application',
@@ -59,11 +71,6 @@ const factor5: PainFactorProps = {
 const factors: PainFactorProps[] = [factor5, factor1, factor2, factor3, factor4];
 </script>
 
-<style lang="css" scoped>
-.page-container {
-    
-}
-</style>
 
 <style lang="css">
 .platform-web button {

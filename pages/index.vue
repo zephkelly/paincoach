@@ -43,6 +43,9 @@
 
 <script lang="ts" setup>
 const profilePhoto = '/images/headshot-lachlan.webp';
+
+
+
 </script>
 
 <style lang="scss" scoped>

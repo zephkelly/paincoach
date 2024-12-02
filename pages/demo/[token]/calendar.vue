@@ -21,21 +21,21 @@ const currentDate = ref(new Date());
 const { currentTimeline } = useOverviewTimeline();
 
 interface DayData {
-  dayShort: string;
-  dayNumber: number;
-  month: string;
-  year: number;
-  painLevel: number;
+    dayShort: string;
+    dayNumber: number;
+    month: string;
+    year: number;
+    painLevel: number;
 }
 
 const selectedDay = ref<DayData | null>(null);
 
 const calendarDays = computed(() => {
-  let startDate: Date = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1);
-  let endDate: Date = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0);
+    let startDate: Date = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1);
+    let endDate: Date = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0);
 
-  const emptyDaysAtStart = getEmptyDaysAtStart(currentDate.value, 'month');
-  return generateCalendarDays(startDate, endDate, emptyDaysAtStart);
+    const emptyDaysAtStart = getEmptyDaysAtStart(currentDate.value, 'month');
+    return generateCalendarDays(startDate, endDate, emptyDaysAtStart);
 });
 
 const handleOpenDataComponent = (dayData: any) => {
