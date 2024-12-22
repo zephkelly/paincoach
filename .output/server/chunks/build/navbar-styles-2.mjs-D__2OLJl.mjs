@@ -1,0 +1,4 @@
+const navbar_vue_vue_type_style_index_1_lang = "nav.navbar.footer{background-color:var(--panel);bottom:0;box-sizing:border-box;color:var(--text-color);font-family:Inter,sans-serif;height:84px;left:0;padding:1rem;position:fixed;right:0;z-index:1000}nav.navbar.footer ul{align-items:flex-start;display:flex;justify-content:space-around;list-style-type:none}nav.navbar.footer li{width:44px}nav.navbar.footer a{align-items:center;display:flex;height:100%;justify-content:center;width:100%}nav.navbar.footer svg{height:32px;width:32px;fill:var(--text-color-inactive);transition:fill .5s ease}nav.navbar.footer a.active svg{fill:var(--text-color);z-index:1}nav.navbar.footer svg.calendar,nav.navbar.footer svg.insights,nav.navbar.footer svg.settings{height:30px;width:30px}";
+
+export { navbar_vue_vue_type_style_index_1_lang as n };
+//# sourceMappingURL=navbar-styles-2.mjs-D__2OLJl.mjs.map

@@ -1,0 +1,1 @@
+function c(){const t=(e,l=0)=>{let o;if(typeof e=="string"?o=document.querySelector(e):o=e,o){const n=o.getBoundingClientRect().top+window.pageYOffset;window.scrollTo({top:n-l,behavior:"smooth"})}};return{smoothScroll:t,scrollToTop:()=>{t("body")}}}export{c as u};

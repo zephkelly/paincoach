@@ -1,0 +1,4 @@
+const landingFooter_vue_vue_type_style_index_0_scoped_b6282222_lang = "section[data-v-b6282222]{padding:0 2rem}footer[data-v-b6282222]{margin-bottom:1.2rem;min-height:48px}.footer-content[data-v-b6282222]{align-items:center;display:flex;justify-content:space-between}.return[data-v-b6282222],.trademark[data-v-b6282222]{font-size:.8rem}.trademark[data-v-b6282222]{opacity:.7}.footer-content.right[data-v-b6282222]{align-items:center;display:flex;opacity:.7;position:relative;transition:opacity .3s ease}.footer-content.right svg[data-v-b6282222]{height:1.2rem;position:relative;top:1px;width:1.2rem}.footer-content.right[data-v-b6282222]:hover{opacity:1}.return[data-v-b6282222]{background-color:transparent;border:none;color:var(--text-color);cursor:pointer}";
+
+export { landingFooter_vue_vue_type_style_index_0_scoped_b6282222_lang as l };
+//# sourceMappingURL=landingFooter-styles-1.mjs-B0ougz6z.mjs.map
