@@ -4,5 +4,13 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   future: {
     compatibilityVersion: 4
+  },
+  modules: [
+    './../nuxt-cron/src/module'
+  ],
+  cron: {
+    experimental: {
+        tasks: false
+    }
   }
 })
