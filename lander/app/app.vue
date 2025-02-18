@@ -21,16 +21,8 @@
         <meta name="googlebot" content="index, follow" />
         <meta name="google" content="notranslate" />
         <meta name="google-site-verification" content="google-site-verification" />
-    </Head>
-    <main id="main-content landing" class="site-page">
-        <NuxtLayout>
-            <NuxtPage />
-        </NuxtLayout>
-    </main>
+    </Head> 
+    <NuxtLayout>
+        <NuxtPage />
+    </NuxtLayout>
 </template>
-
-<style lang="scss" scoped>
-main {
-    text-rendering: optimizeLegibility;
-}
-</style>
