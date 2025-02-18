@@ -19,8 +19,8 @@
 </template>
 
 <script lang="ts" setup>
-import ScrollToReveal from '~~/layers/shared/components/scrollToReveal.vue';
-import Spacer from '~~/layers/shared/components/spacer.vue';
+// import ScrollToReveal from '~~/layers/shared/components/scrollToReveal.vue';
+// import Spacer from '~~/layers/shared/components/spacer.vue';
 
 const profilePhoto = '/images/headshot-lachlan.webp';
 </script>

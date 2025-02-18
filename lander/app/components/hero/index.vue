@@ -33,10 +33,10 @@
 <script lang="ts" setup>
 import IphoneMockup from '../iphoneMockup.vue'
 
-import landingDarkMockup from '~~/layers/landing/assets/images/mockup/landing-dark.webp'
-import landingLightMockup from '~~/layers/landing/assets/images/mockup/landing-light.webp'
+import landingDarkMockup from '~/assets/images/mockup/landing-dark.webp'
+import landingLightMockup from '~/assets/images/mockup/landing-light.webp'
 
-import { useScroll } from '~~/layers/shared/composables/useScroll'
+// import { useScroll } from '~~/layers/shared/composables/useScroll'
 
 const { smoothScroll } = useScroll()
 

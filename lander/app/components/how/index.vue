@@ -54,14 +54,14 @@
 import AnimatedFactors from './animatedFactors.vue';
 import IphoneMockup from '../iphoneMockup.vue';
 
-import recordDarkMockup from '~~/layers/landing/assets/images/mockup/record-dark.webp';
-import recordLightMockup from '~~/layers/landing/assets/images/mockup/record-light.webp';
+import recordDarkMockup from '~/assets/images/mockup/record-dark.webp';
+import recordLightMockup from '~/assets/images/mockup/record-light.webp';
 
-import calendarDarkMockup from '~~/layers/landing/assets/images/mockup/calendar-singular-dark.webp';
-import calendarLightMockup from '~~/layers/landing/assets/images/mockup/calendar-singular-light.webp';
+import calendarDarkMockup from '~/assets/images/mockup/calendar-singular-dark.webp';
+import calendarLightMockup from '~/assets/images/mockup/calendar-singular-light.webp';
 
-import insightsDarkMockup from '~~/layers/landing/assets/images/mockup/insights-dark.webp';
-import insightsLightMockup from '~~/layers/landing/assets/images/mockup/insights-light.webp';
+import insightsDarkMockup from '~/assets/images/mockup/insights-dark.webp';
+import insightsLightMockup from '~/assets/images/mockup/insights-light.webp';
 </script>
 
 <style lang="scss" scoped>

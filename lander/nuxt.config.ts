@@ -11,9 +11,6 @@ export default defineNuxtConfig({
         databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
     },
 
-    modules: [
-        './../nuxt-cron/src/module'
-    ],
     cron: {
         experimental: {
             tasks: false
@@ -21,8 +18,13 @@ export default defineNuxtConfig({
     },
 
     css: [
+        '~/assets/scss/animations.scss',
         '~/assets/scss/reset.scss',
         '~/assets/scss/global.scss',
+    ],
+
+    extends: [
+        './../shared/nuxt.config',
     ],
 
     app: {
