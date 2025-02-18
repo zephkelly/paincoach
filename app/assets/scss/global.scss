@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Geist';
-    src: url('@/assets/fonts/geist-300.woff') format('woff');
+    src: url('~~/layers/shared/assets/fonts/geist-300.woff') format('woff');
     font-weight: 300;
     font-display: swap;
     font-weight: normal;
@@ -8,21 +8,21 @@
 
 @font-face {
     font-family: 'Geist';
-    src: url('@/assets/fonts/geist-500.woff') format('woff');
+    src: url('~~/layers/shared/assets/fonts/geist-500.woff') format('woff');
     font-weight: 500;
     font-display: swap;
 }
 
 @font-face {
     font-family: 'Geist';
-    src: url('@/assets/fonts/geist-700.woff') format('woff');
+    src: url('~~/layers/shared/assets/fonts/geist-700.woff') format('woff');
     font-weight: 700;
     font-display: swap;
 }
 
 @font-face {
     font-family: 'NotoSerif';
-    src: url('@/assets/fonts/notosans-600.woff2') format('woff2');
+    src: url('~~/layers/shared/assets/fonts/notosans-600.woff2') format('woff2');
     font-weight: 600;
     font-display: swap;
     font-weight: normal;
@@ -30,35 +30,35 @@
 
 @font-face {
     font-family: 'NotoSerif';
-    src: url('@/assets/fonts/notosans-700.woff2') format('woff2');
+    src: url('~~/layers/shared/assets/fonts/notosans-700.woff2') format('woff2');
     font-weight: 700;
     font-display: swap;
 }
 
 @font-face {
     font-family: 'NotoSerif';
-    src: url('@/assets/fonts/notosans-900.woff2') format('woff2');
+    src: url('~~/layers/shared/assets/fonts/notosans-900.woff2') format('woff2');
     font-weight: 900;
     font-display: swap;
 }
 
 @font-face {
     font-family: 'Inter';
-    src: url('@/assets/fonts/inter-600.woff2') format('woff2');
+    src: url('~~/layers/shared/assets/fonts/inter-600.woff2') format('woff2');
     font-weight: 600;
     font-display: swap;
 }
 
 @font-face {
     font-family: 'Inter';
-    src: url('@/assets/fonts/inter-400.woff2') format('woff2');
+    src: url('~~/layers/shared/assets/fonts/inter-400.woff2') format('woff2');
     font-weight: 400;
     font-display: swap;
 }
 
 @font-face {
     font-family: 'Inter';
-    src: url('@/assets/fonts/inter-300.woff2') format('woff2');
+    src: url('~~/layers/shared/assets/fonts/inter-300.woff2') format('woff2');
     font-weight: 300;
     font-display: swap;
 }
@@ -200,4 +200,36 @@ section {
 
 svg {
     fill: var(--text-color);
+}
+
+section.panel, button.panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px 16px;
+    background-color: var(--panel);
+    border-radius: 16px;
+}
+
+section.panel > .headers > h2, section > .headers > h2,
+section.panel > .headers > h3, section > .headers > h3 {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+    font-size: var(--font-size-18);
+    font-weight: 400;
+}
+
+.panel > .headers {
+    margin-bottom: 1.5rem;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 7rem;
+    box-sizing: border-box;
 }

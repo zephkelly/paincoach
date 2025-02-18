@@ -21,8 +21,8 @@
                 <div class="image-container">
                     <div class="fade"></div>
                     <div class="wrapper">
-                        <IphoneMockup tabindex="-1" src="/images/mockup/landing-dark.webp" loading="eager" alt="Home screen of the pain coach mobile application. Featuring a calendar tracking weekly pain, a 'lifestyle score', and a ranking of the users largest pain factors."/>
-                        <IphoneMockup tabindex="-1" src="/images/mockup/landing-light.webp" loading="eager" alt="Insights page of the pain coach mobile application. Featuring a doughnut chart of the factors contributing to pain, and a line graph showing pain over time." />
+                        <IphoneMockup tabindex="-1" :src="landingDarkMockup" loading="eager" alt="Home screen of the pain coach mobile application. Featuring a calendar tracking weekly pain, a 'lifestyle score', and a ranking of the users largest pain factors."/>
+                        <IphoneMockup tabindex="-1" :src="landingLightMockup" loading="eager" alt="Insights page of the pain coach mobile application. Featuring a doughnut chart of the factors contributing to pain, and a line graph showing pain over time." />
                     </div>
                 </div>
             </div>
@@ -32,6 +32,9 @@
 
 <script lang="ts" setup>
 import IphoneMockup from '../iphoneMockup.vue'
+
+import landingDarkMockup from '~~/layers/landing/assets/images/mockup/landing-dark.webp'
+import landingLightMockup from '~~/layers/landing/assets/images/mockup/landing-light.webp'
 
 import { useScroll } from '~~/layers/shared/composables/useScroll'
 
@@ -54,8 +57,8 @@ section {
     padding: 0rem 1rem;
 
     h1 {
-        margin-bottom: 1rem;
         margin-top: clamp(2.5rem, 7vw, 3rem);
+        margin-bottom: 1rem;
 
         @media (max-width: 500px) {
             line-height: 1;

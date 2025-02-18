@@ -1,19 +1,21 @@
 <template>
-    <ScrollToReveal>
-        <hero class="hero main" aria-label="Main hero section"/>
-    </ScrollToReveal>
-    <Spacer class="spacer"/>
-    <How id="how-it-works" class="how"/>
-    <!-- <ScrollToReveal>
-    <Spacer class="spacer"/>
-    <Quote class="quote"
-        quote="People in pain want simple, actionable advice but are often left to drown in the complexity of modern pain sciences. I want to change that."
-        by="- Lachlan Townend (Founder)"
-        author="Lachlan Townend"
-        :pic="profilePhoto" />
-    </ScrollToReveal>
-    <AnimatedVideo class="animated-video"/>
-    <WaitingList class="waitlist" /> -->
+    <section class="landing-section">
+        <ScrollToReveal>
+            <hero class="hero main" aria-label="Main hero section"/>
+        </ScrollToReveal>
+        <Spacer class="spacer"/>
+        <How id="how-it-works" class="how"/>
+        <!-- <ScrollToReveal>
+        <Spacer class="spacer"/>
+        <Quote class="quote"
+            quote="People in pain want simple, actionable advice but are often left to drown in the complexity of modern pain sciences. I want to change that."
+            by="- Lachlan Townend (Founder)"
+            author="Lachlan Townend"
+            :pic="profilePhoto" />
+        </ScrollToReveal>
+        <AnimatedVideo class="animated-video"/>
+        <WaitingList class="waitlist" /> -->
+    </section>
 </template>
 
 <script lang="ts" setup>
@@ -53,5 +55,37 @@ const profilePhoto = '/images/headshot-lachlan.webp';
         margin-top: 2.5rem;
         margin-bottom: 7rem;
     }
+}
+</style>
+
+<style lang="scss">
+h1, h2 {
+    tab-size: 4;
+    font-weight: 700;
+    font-size: clamp(40px, 5vw, 46px);
+    letter-spacing: -1.2px;
+    line-height: 34px;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+h1 {
+    font-size: clamp(42px, 7vw, 46px);
+    line-height: 38px;
+}
+
+h3 {
+    tab-size: 4;
+    font-weight: 600;
+    font-size: clamp(28px, 7vw, 32px);
+    line-height: 2rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+p {
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 28px;
+    color: var(--text-color);
 }
 </style>

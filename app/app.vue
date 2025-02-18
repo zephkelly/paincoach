@@ -23,7 +23,9 @@
         <meta name="google-site-verification" content="google-site-verification" />
     </Head>
     <main id="main-content landing" class="site-page">
-        <Landing />
+        <NuxtLayout>
+            <NuxtPage />
+        </NuxtLayout>
     </main>
 </template>
 

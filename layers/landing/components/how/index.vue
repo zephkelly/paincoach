@@ -14,10 +14,10 @@
                     </div>
                     <div class="wrapper body">
                         <div class="record-container">
-                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/record-dark.webp" class="dark record" loading="lazy" alt="The 'Record' page of the mobile application. A short daily survey which asks questions like 'What would you rate your pain today?'."/>
-                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/calendar-singular-dark.webp" class="dark calendar" loading="lazy" alt="The 'Calendar' page of the mobile application. A colorful calendar displaying a visual record of the users pain over a month, click on a day to see more information." />
-                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/record-light.webp" class="light record" loading="lazy" alt="The 'Record' page of the mobile application. A short daily survey which asks questions like 'What would you rate your pain today?'."/>
-                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/calendar-singular-light.webp" class="light calendar" loading="lazy" alt="The 'Calendar' page of the mobile application. A colorful calendar displaying a visual record of the users pain over a month, click on a day to see more information."/>
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth :src="recordDarkMockup" class="dark record" loading="lazy" alt="The 'Record' page of the mobile application. A short daily survey which asks questions like 'What would you rate your pain today?'."/>
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth :src="calendarDarkMockup" class="dark calendar" loading="lazy" alt="The 'Calendar' page of the mobile application. A colorful calendar displaying a visual record of the users pain over a month, click on a day to see more information." />
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth :src="recordLightMockup" class="light record" loading="lazy" alt="The 'Record' page of the mobile application. A short daily survey which asks questions like 'What would you rate your pain today?'."/>
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth :src="calendarLightMockup" class="light calendar" loading="lazy" alt="The 'Calendar' page of the mobile application. A colorful calendar displaying a visual record of the users pain over a month, click on a day to see more information."/>
                         </div>
                     </div>
                 </li>
@@ -40,8 +40,8 @@
                     </ScrollToReveal>
                     <div class="wrapper body">
                         <div class="insights-container">
-                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/insights-dark.webp" class="dark insight" loading="lazy" alt="Another closeup of the Insights page. Various diagrams and charts give an overview of a users pain and pain factors."/>
-                            <IphoneMockup tabindex="-1" halfScreen fullWidth src="/images/mockup/insights-light.webp" class="light insight" loading="lazy" alt="Another closeup view of the Insights page. The graphics fade to white as they reach the top of the screen, revealing more detailed charts like 'Sleep quality over time'."/>
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth :src="insightsDarkMockup" class="dark insight" loading="lazy" alt="Another closeup of the Insights page. Various diagrams and charts give an overview of a users pain and pain factors."/>
+                            <IphoneMockup tabindex="-1" halfScreen fullWidth :src="insightsLightMockup" class="light insight" loading="lazy" alt="Another closeup view of the Insights page. The graphics fade to white as they reach the top of the screen, revealing more detailed charts like 'Sleep quality over time'."/>
                         </div>
                     </div>
                 </li>
@@ -53,6 +53,15 @@
 <script lang="ts" setup>
 import AnimatedFactors from './animatedFactors.vue';
 import IphoneMockup from '../iphoneMockup.vue';
+
+import recordDarkMockup from '~~/layers/landing/assets/images/mockup/record-dark.webp';
+import recordLightMockup from '~~/layers/landing/assets/images/mockup/record-light.webp';
+
+import calendarDarkMockup from '~~/layers/landing/assets/images/mockup/calendar-singular-dark.webp';
+import calendarLightMockup from '~~/layers/landing/assets/images/mockup/calendar-singular-light.webp';
+
+import insightsDarkMockup from '~~/layers/landing/assets/images/mockup/insights-dark.webp';
+import insightsLightMockup from '~~/layers/landing/assets/images/mockup/insights-light.webp';
 </script>
 
 <style lang="scss" scoped>
