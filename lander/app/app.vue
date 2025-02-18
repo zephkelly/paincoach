@@ -31,7 +31,6 @@
 
 <style lang="scss" scoped>
 main {
-    margin-top: 7rem;
     text-rendering: optimizeLegibility;
 }
 </style>

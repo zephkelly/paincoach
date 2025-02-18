@@ -59,6 +59,10 @@
         transform: translateX(-6px);
         transition: opacity 1.2s cubic-bezier(0.075, 0.82, 0.165, 1), transform 0.6s ease;
         will-change: opacity, transform;
+        width: 100%;
+        /* display: flex;
+        flex-direction: column;
+        align-items: center; */
     }
 
     .reveal-element.center {

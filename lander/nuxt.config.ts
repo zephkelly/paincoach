@@ -11,12 +11,6 @@ export default defineNuxtConfig({
         databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
     },
 
-    cron: {
-        experimental: {
-            tasks: false
-        }
-    },
-
     css: [
         '~/assets/scss/animations.scss',
         '~/assets/scss/reset.scss',

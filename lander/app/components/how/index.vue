@@ -66,7 +66,8 @@ import insightsLightMockup from '~/assets/images/mockup/insights-light.webp';
 
 <style lang="scss" scoped>
 section {
-    padding: 0rem 1rem;
+    width: 100%;
+    // padding: 0rem 1rem;
     
     h2 {
         span {

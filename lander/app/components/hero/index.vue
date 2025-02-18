@@ -1,33 +1,31 @@
 <template>
-    <section>
-        <div class="container section">
-            <h1 tabindex="0" class="introduction">
-                <span class="mobile-hidden">Introducing</span> <span class="desktop-hidden">Meet</span> <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>.
-            </h1>
-            <h2 tabindex="0"><span>Take Control, Reclaim Your Life.</span></h2>
-            <p class="subtitle" tabindex="0">
-                Your personalised pain and lifestyle tracker, backed by real science.
-            </p>
-            <button 
-                tabindex="0" 
-                class="waitlist-link" 
-                @click.prevent="handleClick"
-                @keydown="handleKeyDown"
-                arialLabel="Sign up for the waitlist now!"   
-            >
-                View the Demo
-            </button>
-            <div class="landing-image">
-                <div class="image-container">
-                    <div class="fade"></div>
-                    <div class="wrapper">
-                        <IphoneMockup tabindex="-1" :src="landingDarkMockup" loading="eager" alt="Home screen of the pain coach mobile application. Featuring a calendar tracking weekly pain, a 'lifestyle score', and a ranking of the users largest pain factors."/>
-                        <IphoneMockup tabindex="-1" :src="landingLightMockup" loading="eager" alt="Insights page of the pain coach mobile application. Featuring a doughnut chart of the factors contributing to pain, and a line graph showing pain over time." />
-                    </div>
+    <div class="container section">
+        <h1 tabindex="0" class="introduction">
+            <span class="mobile-hidden">Introducing</span> <span class="desktop-hidden">Meet</span> <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>.
+        </h1>
+        <h2 tabindex="0"><span>Take Control, Reclaim Your Life.</span></h2>
+        <p class="subtitle" tabindex="0">
+            Your personalised pain and lifestyle tracker, backed by real science.
+        </p>
+        <button 
+            tabindex="0" 
+            class="waitlist-link" 
+            @click.prevent="handleClick"
+            @keydown="handleKeyDown"
+            arialLabel="Sign up for the waitlist now!"   
+        >
+            View the Demo
+        </button>
+        <div class="landing-image">
+            <div class="image-container">
+                <div class="fade"></div>
+                <div class="wrapper">
+                    <IphoneMockup tabindex="-1" :src="landingDarkMockup" loading="eager" alt="Home screen of the pain coach mobile application. Featuring a calendar tracking weekly pain, a 'lifestyle score', and a ranking of the users largest pain factors."/>
+                    <IphoneMockup tabindex="-1" :src="landingLightMockup" loading="eager" alt="Insights page of the pain coach mobile application. Featuring a doughnut chart of the factors contributing to pain, and a line graph showing pain over time." />
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -53,8 +51,26 @@ const handleKeyDown = (event: KeyboardEvent) => {
 </script>
 
 <style lang="scss" scoped>
+button {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 16px;
+    color: var(--background);
+    background-color: var(--text-color);
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+
+    &:hover {
+        background-color: var(--accent-hover);
+    }
+}
 section {
     padding: 0rem 1rem;
+    width: 100%;
 
     h1 {
         margin-top: clamp(2.5rem, 7vw, 3rem);
