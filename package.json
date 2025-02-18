@@ -4,14 +4,13 @@
     "version": "0.0.1",
     "main": "./nuxt.config.ts",
     "scripts": {
-        "dev:lander": "pnpm --filter lander dev",
-        "install:lander": "pnpm --filter lander install"
-    },
-    "devDependencies": {
-      "@nuxt/eslint": "latest",
-      "eslint": "^9.20.1",
-      "nuxt": "^3.15.4",
-      "typescript": "^5.7.3",
-      "vue": "latest"
+        "dev:l": "pnpm --filter lander dev",
+        "install:l": "pnpm --filter lander install",
+
+        "dev:c": "pnpm --filter clinician dev",
+        "install:c": "pnpm --filter clinician install",
+
+        "dev:s": "pnpm --filter shared dev",
+        "install:s": "pnpm --filter shared install"
     }
   }

@@ -7,8 +7,20 @@ export default defineNuxtConfig({
         compatibilityVersion: 4
     },
 
+    modules: ['nuxt-auth-utils'],
+
     runtimeConfig: {
         databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
+        
+        // nuxt-auth-utils
+        session: {
+            name: 'paincoach-session',
+            password: process.env.NUXT_SESSION_PASSWORD || '',
+            cookie: {
+                domain: 'localhost',
+                sameSite: 'lax'
+            }
+        }
     },
 
     css: [
@@ -18,7 +30,7 @@ export default defineNuxtConfig({
     ],
 
     extends: [
-        './../shared/nuxt.config',
+        './../shared',
     ],
 
     app: {

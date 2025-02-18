@@ -1,13 +1,17 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    devtools: { enabled: true },
     compatibilityDate: '2024-11-01',
-
+    devtools: { enabled: true },
     future: {
         compatibilityVersion: 4
     },
 
+    modules: ['nuxt-auth-utils'],
+
     runtimeConfig: {
+        databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
+
+        // nuxt-auth-utils
         session: {
             name: 'paincoach-session',
             password: process.env.NUXT_SESSION_PASSWORD || '',
@@ -16,5 +20,9 @@ export default defineNuxtConfig({
                 sameSite: 'lax'
             }
         }
+    },
+
+    devServer: {
+        port: 3001
     },
 })
