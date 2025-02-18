@@ -1,1 +1,0 @@
-export type SettingName = 'reminders' | 'reminderTime' | 'displayMode' | 'colorScheme';

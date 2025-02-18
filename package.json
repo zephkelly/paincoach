@@ -10,17 +10,8 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "d3": "^7.9.0",
-    "nuxt": "^3.13.0",
-    "pg": "^8.13.0",
+    "nuxt": "^3.15.4",
     "vue": "latest",
     "vue-router": "latest"
-  },
-  "devDependencies": {
-    "@types/pg": "^8.11.10",
-    "nodemailer": "^6.9.16",
-    "nuxt-gtag": "^1.1.1",
-    "nuxt-nodemailer": "^1.1.2",
-    "sass": "^1.78.0"
   }
 }

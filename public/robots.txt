@@ -1,4 +1,1 @@
-User-agent: *
-Disallow: /demo/
 
-Sitemap: https://paincoach.online/sitemap.xml
