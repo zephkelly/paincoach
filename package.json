@@ -11,6 +11,8 @@
         "install:c": "pnpm --filter clinician install",
 
         "dev:s": "pnpm --filter shared dev",
-        "install:s": "pnpm --filter shared install"
+        "install:s": "pnpm --filter shared install",
+
+        "i": "pnpm --recursive install"
     }
   }

@@ -7,6 +7,12 @@ export default defineNuxtConfig({
         compatibilityVersion: 4
     },
 
+    imports: {
+        dirs: [
+            'shared/schemas'
+        ]
+    },
+    
     runtimeConfig: {
         session: {
             name: 'paincoach-session',
