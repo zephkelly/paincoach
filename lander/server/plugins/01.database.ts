@@ -1,4 +1,5 @@
-import { DatabaseService } from '~~/../shared/server/services/databaseService'
+import { DatabaseService } from '~~lib/server/services/databaseService'
+
 
 
 export default defineNitroPlugin(async (nitroApp) => {
