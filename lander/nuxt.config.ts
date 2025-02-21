@@ -34,12 +34,13 @@ export default defineNuxtConfig({
     ],
 
     extends: [
-        './../shared',
+        './../library',
     ],
-
     alias: {
-        '~lib': resolve(__dirname, '../shared/app'),
-        '~~lib': resolve(__dirname, '../shared'),
+        '~~lib': resolve(__dirname, '../library'),
+        '~lib/types': resolve(__dirname, '../library/shared/types'),
+        '~lib/schemas': resolve(__dirname, '../library/shared/schemas'),
+        '~lib/utils': resolve(__dirname, '../library/shared/utils'),
     },
 
     app: {
@@ -86,5 +87,9 @@ export default defineNuxtConfig({
                 },
             },
         },
+    },
+
+    typescript: {
+        strict: true
     },
 })

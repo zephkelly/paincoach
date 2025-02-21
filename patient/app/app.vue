@@ -1,5 +1,5 @@
 <template>
     <div>
-        <h1>Clinician</h1>
+        <h1>Patient</h1>
     </div>
 </template>

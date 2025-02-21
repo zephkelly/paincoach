@@ -10,8 +10,11 @@
         "dev:c": "pnpm --filter clinician dev",
         "install:c": "pnpm --filter clinician install",
 
-        "dev:s": "pnpm --filter shared dev",
-        "install:s": "pnpm --filter shared install",
+        "dev:p": "pnpm --filter patient dev",
+        "install:p": "pnpm --filter patient install",
+
+        "dev:lib": "pnpm --filter library dev",
+        "install:lib": "pnpm --filter library install",
 
         "i": "pnpm --recursive install"
     }
