@@ -1,13 +1,15 @@
 import { z } from 'zod';
+
 import { BaseUserSchema } from './base';
 
+import { type AdminUser } from '../../types/users/admin';
 
 
 export const AdminUserSchema = BaseUserSchema.extend({
     role: z.literal('admin'),
 })
 
-export function safeValidateAdminUser(data: any) {
+export function safeValidateAdminUser(data: AdminUser) {
     const parsedResult = AdminUserSchema.safeParse(data)
 
     if (!parsedResult.success) {

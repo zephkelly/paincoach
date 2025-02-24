@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { BaseUserSchema } from './base';
 
+import { type ClinicianUser } from '../../types/users/clinician';
 
 
 export const ClinicianUserSchema = BaseUserSchema.extend({
@@ -19,7 +20,7 @@ export const ClinicianUserSchema = BaseUserSchema.extend({
         .nullable()
 });
 
-export function safeValidateClinicianUser(data: any) {
+export function safeValidateClinicianUser(data: ClinicianUser) {
     const parsedResult = ClinicianUserSchema.safeParse(data)
 
     if (!parsedResult.success) {

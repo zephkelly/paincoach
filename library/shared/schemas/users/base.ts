@@ -1,11 +1,12 @@
 import { z } from 'zod';
 
 import { PHONE_PATTERN } from '../../constants/phone';
+import { version } from 'vue';
 
 
 
 export const UserRoleSchema = z.enum(['admin', 'clinician', 'patient'])
-const AccountStatus = z.enum(['active', 'inactive', 'pending'])
+export const AccountStatus = z.enum(['active', 'inactive', 'pending'])
 
 export const BaseUserSchema = z.object({
     id: z.string().uuid(),
@@ -13,10 +14,21 @@ export const BaseUserSchema = z.object({
     email: z.string()
         .email('Invalid email format')
         .max(255, 'Email must be less than 255 characters'),
+
+    verified: z.boolean().default(false),
     
     phone_number: z.string()
         .regex(PHONE_PATTERN, 'Invalid phone number format')
         .max(50, 'Phone number must be less than 50 characters')
+        .nullable(),
+
+    first_name: z.string()
+        .min(1, 'First name is required')
+        .max(255, 'First name must be less than 255 characters'),
+
+    last_name: z.string()
+        .min(1, 'Last name is required')
+        .max(255, 'Last name must be less than 255 characters')
         .nullable(),
     
     password_hash: z.string()
@@ -49,5 +61,7 @@ export const BaseUserSchema = z.object({
     
     created_at: z.date().default(() => new Date()),
     
-    updated_at: z.date().default(() => new Date())
+    updated_at: z.date().default(() => new Date()),
+
+    version: z.number().default(1)
 })

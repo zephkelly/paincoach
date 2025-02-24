@@ -1,5 +1,4 @@
 packages:
   - 'library'
-  - 'lander'
-  - 'clinician'
+  - 'main'
   - 'patient'

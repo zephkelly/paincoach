@@ -4,8 +4,11 @@ import { AdminUserSchema } from "./admin";
 import { ClinicianUserSchema } from "./clinician";
 import { PatientUserSchema } from "./patient";
 
+import { type User } from '../../types/users'
 
-export { UserRoleSchema } from './base'
+
+
+export { UserRoleSchema, AccountStatus } from './base'
 
 export const UserSchema = z.discriminatedUnion('role', [
     AdminUserSchema,
@@ -45,28 +48,6 @@ export const UserSchema = z.discriminatedUnion('role', [
     )
 
 
-export function safeValidateUser(data: any) {
-    const parsedResult = UserSchema.safeParse(data)
-
-    if (!parsedResult.success) {
-        throw new Error(parsedResult.error.errors[0].message)
-    }
-
-    return parsedResult.data
+export function validateUser(data: User) {
+    return UserSchema.safeParse(data).data
 }
-
-
-
-// CREATE TABLE users (
-//     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-//     email VARCHAR(255) UNIQUE NOT NULL,
-//     phone_number VARCHAR(50),
-//     password_hash VARCHAR(255) NOT NULL,
-//     role user_role NOT NULL,
-//     status account_status DEFAULT 'pending',
-//     data_sharing_enabled BOOLEAN DEFAULT FALSE,
-//     last_data_sharing_consent_date TIMESTAMP WITH TIME ZONE,
-//     data_sharing_revocation_date TIMESTAMP WITH TIME ZONE,
-//     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-//     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-// );

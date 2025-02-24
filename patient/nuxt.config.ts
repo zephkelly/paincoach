@@ -9,7 +9,13 @@ export default defineNuxtConfig({
         compatibilityVersion: 4
     },
 
-    modules: ['nuxt-auth-utils'],
+    modules: ['nuxt-auth-utils', '@vite-pwa/nuxt'],
+
+    pwa: {
+
+    },
+
+    ssr: false,
 
     extends: [
         './../library',

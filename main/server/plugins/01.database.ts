@@ -1,13 +1,142 @@
-import { DatabaseService } from '~~lib/server/services/databaseService'
+import { H3Event } from 'h3'
+import { DatabaseService } from '~~/server/services/databaseService'
 
 
-export default defineNitroPlugin(async (nitroApp) => {
+export default defineNitroPlugin(async (nitroApp: any) => {
     const databaseServiceInstance = DatabaseService.getInstance()
+
     try {
         await databaseServiceInstance.query('SELECT 1')
 
         console.log('DatabaseService: Connection established')
 
+        databaseServiceInstance.query(`
+            CREATE TABLE IF NOT EXISTS private.role (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                name TEXT NOT NULL UNIQUE,
+                description TEXT,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS private.permission (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                name TEXT NOT NULL UNIQUE,
+                description TEXT,
+                resource_type TEXT NOT NULL,
+                action TEXT NOT NULL,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS private.role_permission (
+                role_id UUID REFERENCES private.role(id) ON DELETE CASCADE,
+                permission_id UUID REFERENCES private.permission(id) ON DELETE CASCADE,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (role_id, permission_id)
+            );
+
+            -- Base users table
+            CREATE TABLE IF NOT EXISTS private.user (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                email TEXT NOT NULL UNIQUE,
+                verified BOOLEAN DEFAULT false,
+                phone_number TEXT,
+                first_name TEXT NOT NULL,
+                last_name TEXT,
+                password_hash TEXT NOT NULL,
+                role_id UUID REFERENCES private.role(id),
+                status TEXT DEFAULT 'pending',
+                data_sharing_enabled BOOLEAN DEFAULT false,
+                last_data_sharing_consent_date TIMESTAMPTZ,
+                last_data_sharing_revocation_date TIMESTAMPTZ,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                version INT DEFAULT 1
+            );
+
+            -- Role-specific profile tables with public/private data separation
+            CREATE TABLE IF NOT EXISTS private.admin_profile (
+                user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS private.clinician_profile (
+                user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
+                -- Public information (visible to admin and associated patients)
+                license_number VARCHAR(100) NOT NULL,
+                specialization VARCHAR(100),
+                practice_name TEXT,
+                -- Private information (visible only to admin)
+                private_data JSONB,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS private.patient_profile (
+                user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
+                -- Public information (visible to admin and assigned clinicians)
+                date_of_birth DATE NOT NULL,
+                emergency_contact_name TEXT,
+                emergency_contact_phone TEXT,
+                registration_code TEXT NOT NULL,
+                -- Private information (visible only to admin)
+                private_data JSONB,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+
+            -- Clinician-Patient relationship table
+            CREATE TABLE IF NOT EXISTS private.clinician_patient_relationship (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                clinician_id UUID REFERENCES private.clinician_profile(user_id) ON DELETE CASCADE,
+                patient_id UUID REFERENCES private.patient_profile(user_id) ON DELETE CASCADE,
+                status TEXT DEFAULT 'active',
+                start_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                end_date TIMESTAMPTZ,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(clinician_id, patient_id, status)
+            );
+
+            -- Medical records with privacy levels
+            CREATE TABLE IF NOT EXISTS private.medical_record (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                patient_id UUID REFERENCES private.patient_profile(user_id),
+                clinician_id UUID REFERENCES private.clinician_profile(user_id),
+                record_type VARCHAR(100) NOT NULL,
+                -- Metadata (visible to admin)
+                metadata JSONB NOT NULL,
+                -- Health data (visible only to patient and assigned clinician)
+                data JSONB NOT NULL,
+                privacy_level TEXT DEFAULT 'standard',
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_users_role_id') THEN
+                    CREATE INDEX idx_users_role_id ON private.user(role_id);
+                END IF;
+                
+                IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_medical_records_patient_id') THEN
+                    CREATE INDEX idx_medical_records_patient_id ON private.medical_record(patient_id);
+                END IF;
+                
+                IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_medical_records_clinician_id') THEN
+                    CREATE INDEX idx_medical_records_clinician_id ON private.medical_record(clinician_id);
+                END IF;
+                
+                IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_clinician_patient_active') THEN
+                    CREATE INDEX idx_clinician_patient_active ON private.clinician_patient_relationship(clinician_id, patient_id) 
+                    WHERE status = 'active';
+                END IF;
+            END $$;
+        `)
+
+        
         databaseServiceInstance.query(`
             INSERT INTO private.role (name, description)
             SELECT 'admin', 'System administrator with full access'
@@ -104,137 +233,11 @@ export default defineNitroPlugin(async (nitroApp) => {
                 GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA private TO app_user;
             END $$;
         `)
-
-        databaseServiceInstance.query(`
-            CREATE TABLE IF NOT EXISTS private.role (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                name VARCHAR(50) NOT NULL UNIQUE,
-                description TEXT,
-                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS private.permission (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                name VARCHAR(100) NOT NULL UNIQUE,
-                description TEXT,
-                resource_type VARCHAR(50) NOT NULL,
-                action VARCHAR(50) NOT NULL,
-                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS private.role_permission (
-                role_id UUID REFERENCES private.role(id) ON DELETE CASCADE,
-                permission_id UUID REFERENCES private.permission(id) ON DELETE CASCADE,
-                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (role_id, permission_id)
-            );
-
-            -- Base users table
-            CREATE TABLE IF NOT EXISTS private.user (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                email VARCHAR(255) NOT NULL UNIQUE,
-                phone_number VARCHAR(50),
-                password_hash VARCHAR(255) NOT NULL,
-                role_id UUID REFERENCES private.role(id),
-                status VARCHAR(50) DEFAULT 'pending',
-                data_sharing_enabled BOOLEAN DEFAULT false,
-                last_data_sharing_consent_date TIMESTAMPTZ,
-                last_data_sharing_revocation_date TIMESTAMPTZ,
-                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-            );
-
-            -- Role-specific profile tables with public/private data separation
-            CREATE TABLE IF NOT EXISTS private.admin_profile (
-                user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
-                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS private.clinician_profile (
-                user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
-                -- Public information (visible to admin and associated patients)
-                license_number VARCHAR(100) NOT NULL,
-                specialization VARCHAR(100),
-                practice_name VARCHAR(255),
-                -- Private information (visible only to admin)
-                private_data JSONB,
-                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-            );
-
-            CREATE TABLE IF NOT EXISTS private.patient_profile (
-                user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
-                -- Public information (visible to admin and assigned clinicians)
-                date_of_birth DATE NOT NULL,
-                emergency_contact_name VARCHAR(255),
-                emergency_contact_phone VARCHAR(50),
-                registration_code VARCHAR(50) NOT NULL,
-                -- Private information (visible only to admin)
-                private_data JSONB,
-                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-            );
-
-            -- Clinician-Patient relationship table
-            CREATE TABLE IF NOT EXISTS private.clinician_patient_relationship (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                clinician_id UUID REFERENCES private.clinician_profile(user_id) ON DELETE CASCADE,
-                patient_id UUID REFERENCES private.patient_profile(user_id) ON DELETE CASCADE,
-                status VARCHAR(50) DEFAULT 'active',
-                start_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                end_date TIMESTAMPTZ,
-                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(clinician_id, patient_id, status)
-            );
-
-            -- Medical records with privacy levels
-            CREATE TABLE IF NOT EXISTS private.medical_record (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                patient_id UUID REFERENCES private.patient_profile(user_id),
-                clinician_id UUID REFERENCES private.clinician_profile(user_id),
-                record_type VARCHAR(100) NOT NULL,
-                -- Metadata (visible to admin)
-                metadata JSONB NOT NULL,
-                -- Health data (visible only to patient and assigned clinician)
-                health_data JSONB NOT NULL,
-                privacy_level VARCHAR(50) DEFAULT 'standard',
-                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-            );
-
-            DO $$ 
-            BEGIN 
-                IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_users_role_id') THEN
-                    CREATE INDEX idx_users_role_id ON private.user(role_id);
-                END IF;
-                
-                IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_medical_records_patient_id') THEN
-                    CREATE INDEX idx_medical_records_patient_id ON private.medical_record(patient_id);
-                END IF;
-                
-                IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_medical_records_clinician_id') THEN
-                    CREATE INDEX idx_medical_records_clinician_id ON private.medical_record(clinician_id);
-                END IF;
-                
-                IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_clinician_patient_active') THEN
-                    CREATE INDEX idx_clinician_patient_active ON private.clinician_patient_relationship(clinician_id, patient_id) 
-                    WHERE status = 'active';
-                END IF;
-            END $$;
-        `)
     }
     catch (error) {
         console.error('DatabaseService: Failed to establish database connection:', error)
         throw error
     }
-
-    nitroApp.hooks.hook('request', (event) => {
-        event.context.database = databaseServiceInstance
-    })
 
     nitroApp.hooks.hook('close', async () => {
         await databaseServiceInstance.shutdown()

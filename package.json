@@ -4,11 +4,8 @@
     "version": "0.0.1",
     "main": "./nuxt.config.ts",
     "scripts": {
-        "dev:l": "pnpm --filter lander dev",
-        "install:l": "pnpm --filter lander install",
-
-        "dev:c": "pnpm --filter clinician dev",
-        "install:c": "pnpm --filter clinician install",
+        "dev": "pnpm --filter main dev",
+        "install": "pnpm --filter main install",
 
         "dev:p": "pnpm --filter patient dev",
         "install:p": "pnpm --filter patient install",

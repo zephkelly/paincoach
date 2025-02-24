@@ -1,13 +1,18 @@
 import { z } from 'zod';
 
-import { BaseUserSchema } from '../users/base';
+import { PainFactorsRecordSchema } from './factor';
+
+import { type User } from '../../types/users';
+import { type MedicalRecord } from '../../types/record';
 
 
 
 export const RecordPrivacyLevelSchema = z.enum(['standard', 'sensitive', 'restricted']);
 
 export const HealthDataSchema = z.object({
-
+    pain_factors: PainFactorsRecordSchema.optional(),
+    notes: z.string().optional(),
+    attachments: z.array(z.string()).optional()
 });
 
 export const MetadataSchema = z.object({
@@ -24,14 +29,14 @@ export const MedicalRecordSchema = z.object({
     clinician_id: z.string().uuid(),
     record_type: z.string().max(100),
     metadata: MetadataSchema,
-    health_data: HealthDataSchema,
+    data: HealthDataSchema,
     privacy_level: RecordPrivacyLevelSchema.default('standard'),
     created_at: z.date().default(() => new Date()),
     updated_at: z.date().default(() => new Date())
 });
 
 
-export function safeValidateMedicalRecord(data: any) {
+export function safeValidateMedicalRecord(data: MedicalRecord) {
     const parsedResult = MedicalRecordSchema.safeParse(data);
     if (!parsedResult.success) {
         throw new Error(parsedResult.error.errors[0].message);
@@ -40,7 +45,7 @@ export function safeValidateMedicalRecord(data: any) {
 }
 
 // Helper function to check data sharing rules
-export function validateDataSharingRules(data: z.infer<typeof BaseUserSchema>) {
+export function validateUserDataSharingRules(data: User) {
     if (data.last_data_sharing_revocation_date && !data.last_data_sharing_consent_date) {
         throw new Error('Consent date is required for revocation');
     }

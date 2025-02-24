@@ -1,5 +1,7 @@
 import { z } from 'zod';
+
 import { BaseUserSchema } from './base';
+import { type PatientUser } from '../../types/users/patient';
 
 
 
@@ -26,7 +28,7 @@ export const PatientUserSchema = BaseUserSchema.extend({
 });
 
 
-export function safeValidatePatientUser(data: any) {
+export function safeValidatePatientUser(data: PatientUser) {
     const parsedResult = PatientUserSchema.safeParse(data)
 
     if (!parsedResult.success) {

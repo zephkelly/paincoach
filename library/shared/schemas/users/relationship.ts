@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { PHONE_PATTERN } from '../../constants/phone';
+import { type ClinicianPatientRelationship } from '../../types/users/relationship';
 
 
 
@@ -27,7 +27,7 @@ export const ClinicianPatientRelationshipSchema = z.object({
     }
 );
 
-export function safeValidateRelationship(data: any) {
+export function safeValidateRelationship(data: ClinicianPatientRelationship) {
     const parsedResult = ClinicianPatientRelationshipSchema.safeParse(data);
     if (!parsedResult.success) {
         throw new Error(parsedResult.error.errors[0].message);
