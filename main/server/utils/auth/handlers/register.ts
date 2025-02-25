@@ -3,8 +3,8 @@ import { type UserSession } from '#auth-utils'
 
 import { validateUUID } from '~lib/schemas/primitives'
 
-import { createUser } from '~~/server/utils/user/database/createUser'
-import { getUserExists } from '~~/server/utils/user/database/getUser'
+import { createUser } from '../../user/database/create'
+import { getUserExists } from '../../user/database/get/exists'
 
 import { DatabaseService } from '~~/server/services/databaseService'
 import { UserRoleSchema } from '@@/shared/schemas/users'
@@ -17,14 +17,16 @@ export async function handleRegisterCredentials(
         email: string,
         password: string,
         confirm_password: string,
-        name: string
+        first_name: string,
+        last_name: string,
+        phone_number: string,
     }
 ) {
     const databaseServiceInstance = DatabaseService.getInstance()
 
-    const { email, name, password, confirm_password } = body
+    const { email, phone_number, first_name, last_name, password, confirm_password } = body
     
-    if (!password || !confirm_password || !email || !name) {
+    if (!password || !confirm_password || !email || !first_name || !last_name || !phone_number) {
         throw createError({
             statusCode: 400,
             statusMessage: 'Invalid or missing credentials'
@@ -52,10 +54,14 @@ export async function handleRegisterCredentials(
         const password_hash = await hashPassword(password)
 
         const newUser = await createUser(transaction,
-            'patient',
-            name,
-            email,
-            password_hash
+            'patient', 
+            {
+                email,
+                password_hash,
+                first_name,
+                last_name,
+                phone_number
+            }
         )
 
         const newValidatedUserId = validateUUID(newUser.id);

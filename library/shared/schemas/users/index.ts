@@ -48,6 +48,12 @@ export const UserSchema = z.discriminatedUnion('role', [
     )
 
 
-export function validateUser(data: User) {
-    return UserSchema.safeParse(data).data
+export function safeValidateUser(data: User) {
+    const parsedResult = UserSchema.safeParse(data)
+
+    if (!parsedResult.success) {
+        throw new Error(parsedResult.error.errors[0]?.message)
+    }
+
+    return parsedResult.data
 }
