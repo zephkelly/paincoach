@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { PHONE_PATTERN } from '../../constants/phone';
+import { PHONE_REGEX } from '../../constants/phone';
 import { version } from 'vue';
 
 
@@ -18,7 +18,7 @@ export const BaseUserSchema = z.object({
     verified: z.boolean().default(false),
     
     phone_number: z.string()
-        .regex(PHONE_PATTERN, 'Invalid phone number format')
+        .regex(PHONE_REGEX, 'Invalid phone number format')
         .max(50, 'Phone number must be less than 50 characters')
         .nullable(),
 

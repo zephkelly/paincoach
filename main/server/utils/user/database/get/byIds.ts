@@ -40,34 +40,35 @@ export async function getUsersByIds(
         const userRole = userData?.role as UserRole;
 
         let fullUser: User;
-            switch (userRole) {
-                case 'admin':
-                    fullUser = {
-                        ...userData,
-                        role: 'admin'
-                    } as AdminUser;
-                    break;
         
-                case 'clinician':
-                    fullUser = {
-                        ...userData,
-                        role: 'clinician'
-                    } as ClinicianUser;
-                    break;
-        
-                case 'patient':
-                    fullUser = {
-                        ...userData,
-                        role: 'patient'
-                    } as PatientUser;
-                    break;
-        
-                default:
-                    throw createError({
-                        statusCode: 500,
-                        statusMessage: `Invalid user role: ${userRole}`
-                    });
-            }
+        switch (userRole) {
+            case 'admin':
+                fullUser = {
+                    ...userData,
+                    role: 'admin'
+                } as AdminUser;
+                break;
+    
+            case 'clinician':
+                fullUser = {
+                    ...userData,
+                    role: 'clinician'
+                } as ClinicianUser;
+                break;
+    
+            case 'patient':
+                fullUser = {
+                    ...userData,
+                    role: 'patient'
+                } as PatientUser;
+                break;
+    
+            default:
+                throw createError({
+                    statusCode: 500,
+                    statusMessage: `Invalid user role: ${userRole}`
+                });
+        }
         
         return safeValidateUser(fullUser);
     });

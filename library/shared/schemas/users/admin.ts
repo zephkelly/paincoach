@@ -13,7 +13,7 @@ export function safeValidateAdminUser(data: AdminUser) {
     const parsedResult = AdminUserSchema.safeParse(data)
 
     if (!parsedResult.success) {
-        throw new Error(parsedResult.error.errors[0].message)
+        throw new Error(parsedResult.error.errors[0]?.message)
     }
 
     return parsedResult.data

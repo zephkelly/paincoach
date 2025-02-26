@@ -16,11 +16,6 @@ export const UserSchema = z.discriminatedUnion('role', [
     PatientUserSchema
 ]
     ).refine(
-        (data: any) => data.role === 'clinician',
-        {
-            message: 'Role must be clinician for this schema'
-        }
-    ).refine(
         (data) => {
             if (data.last_data_sharing_revocation_date && !data.last_data_sharing_consent_date) {
                 return false

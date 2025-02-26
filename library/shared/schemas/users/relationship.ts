@@ -30,7 +30,7 @@ export const ClinicianPatientRelationshipSchema = z.object({
 export function safeValidateRelationship(data: ClinicianPatientRelationship) {
     const parsedResult = ClinicianPatientRelationshipSchema.safeParse(data);
     if (!parsedResult.success) {
-        throw new Error(parsedResult.error.errors[0].message);
+        throw new Error(parsedResult.error.errors[0]?.message);
     }
     return parsedResult.data;
 }

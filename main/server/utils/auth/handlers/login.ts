@@ -4,7 +4,9 @@ import { type UserSession } from '#auth-utils'
 import { validateUUID } from '~lib/schemas/primitives'
 import { type User } from '~lib/types/users'
 
-import { getUser } from '~~/server/utils/user/database/getUser'
+import { getUser } from '~~/server/utils/user/database/get/byEmail'
+
+import { DatabaseService } from '~~/server/services/databaseService'
 
 
 export async function handleLoginCredentials(
@@ -23,8 +25,10 @@ export async function handleLoginCredentials(
         })
     }
 
+    const transaction = await DatabaseService.getInstance().createTransaction()
+
     try {
-        const user: User | undefined = await getUser(email);
+        const user: User | undefined = await getUser(transaction, email);
 
         if (!user) {
             throw createError({
@@ -65,12 +69,16 @@ export async function handleLoginCredentials(
         });
 
         setResponseStatus(event, 200, 'Ok')
+        transaction.commit();
+        
         return {
             statusCode: 200,
             statusMessage: 'Ok',
         }
     }
     catch (error: unknown) {
+        transaction.rollback();
+
         if (error instanceof H3Error) {
             throw error
         }

@@ -1,7 +1,7 @@
 import { type DBTransaction } from "~~/server/types/db";
 import { type User } from "~~lib/shared/types/users";
 import { getUserById } from "./byId";
-
+import { DatabaseService } from "~~/server/services/databaseService";
 
 /**
  * Gets a user by email with their role-specific profile data
@@ -11,8 +11,9 @@ import { getUserById } from "./byId";
  */
 export async function getUser(
     db: DBTransaction,
-    email: string
+    email: string,
 ): Promise<User | undefined> {
+
     try {
         if (!email) {
             throw createError({
