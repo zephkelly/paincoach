@@ -22,46 +22,11 @@
         <meta name="google" content="notranslate" />
         <meta name="google-site-verification" content="google-site-verification" />
     </Head> 
-    <input v-model="emailInput" placeholder="email" type="text">
-    <input v-model="passwordInput" placeholder="password" type="text">
-    <button @click.prevent="login()">Submit</button>
-    <button @click.prevent="test()">Test</button>
+    
     <NuxtLayout>
         <NuxtPage />
     </NuxtLayout>
 </template>
 
 <script lang="ts" setup>
-const emailInput = ref(null);
-const passwordInput = ref(null);
-
-async function login() {
-    if (!passwordInput.value) {
-        console.log('No password entered');
-        return;
-    }
-
-    const response = await $fetch('/api/v1/auth/login',
-        {
-            method: 'POST',
-           
-            body: {
-                email: emailInput.value,
-                password: passwordInput.value
-            }
-        }
-    )
-
-    console.log(response);
-}
-
-async function test() {
-    const response = await $fetch('/api/v1/auth',
-        {
-            method: 'GET'
-        }
-    )
-
-    console.log(response);
-}
 </script>

@@ -1,28 +1,29 @@
 <template>
     <main id="main-content landing" class="site-page">
         <ScrollToReveal centerAlign>
-            <hero class="hero main" aria-label="Main hero section"/>
+            <LanderHero class="hero main" aria-label="Main hero section"/>
         </ScrollToReveal>
         <Spacer class="spacer"/>
-        <How id="how-it-works" class="how"/>
+        <LanderHow id="how-it-works" class="how"/>
         <Spacer class="spacer"/>
         <ScrollToReveal>
-            <Quote class="quote"
+            <LanderQuote class="quote"
                 quote="People in pain want simple, actionable advice but are often left to drown in the complexity of modern pain sciences. I want to change that."
                 by="- Lachlan Townend (Founder)"
                 author="Lachlan Townend"
                 :src="profilePhoto" />
         </ScrollToReveal>
-        <AnimatedVideo class="animated-video"/>
-        <WaitingList class="waitlist" />
+        <LanderAnimatedVideo class="animated-video"/>
+        <LanderWaitingList class="waitlist" />
     </main>
 </template>
 
 <script lang="ts" setup>
-// import ScrollToReveal from '~~/layers/shared/components/scrollToReveal.vue';
-// import Spacer from '~~/layers/shared/components/spacer.vue';
-
 import profilePhoto from '~/assets/images/headshot-lachlan.webp';
+
+definePageMeta({
+    layout: 'lander',
+});
 </script>
 
 <style lang="scss" scoped>

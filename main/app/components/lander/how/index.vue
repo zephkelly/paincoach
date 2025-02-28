@@ -40,7 +40,7 @@
                     </ScrollToReveal>
                     <div class="wrapper body">
                         <div class="insights-container">
-                            <IphoneMockup tabindex="-1" halfScreen fullWidth :src="insightsDarkMockup" class="dark insight" loading="lazy" alt="Another closeup of the Insights page. Various diagrams and charts give an overview of a users pain and pain factors."/>
+                            <LanderIphoneMockup tabindex="-1" halfScreen fullWidth :src="insightsDarkMockup" class="dark insight" loading="lazy" alt="Another closeup of the Insights page. Various diagrams and charts give an overview of a users pain and pain factors."/>
                             <IphoneMockup tabindex="-1" halfScreen fullWidth :src="insightsLightMockup" class="light insight" loading="lazy" alt="Another closeup view of the Insights page. The graphics fade to white as they reach the top of the screen, revealing more detailed charts like 'Sleep quality over time'."/>
                         </div>
                     </div>

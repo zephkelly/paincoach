@@ -5,7 +5,6 @@
     "main": "./nuxt.config.ts",
     "scripts": {
         "dev": "pnpm --filter main dev",
-        "install": "pnpm --filter main install",
 
         "dev:p": "pnpm --filter patient dev",
         "install:p": "pnpm --filter patient install",

@@ -36,6 +36,7 @@ export default defineNuxtConfig({
     extends: [
         './../library',
     ],
+
     alias: {
         '~~lib': resolve(__dirname, '../library'),
         '~lib/types': resolve(__dirname, '../library/shared/types'),

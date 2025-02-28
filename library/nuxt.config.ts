@@ -20,6 +20,17 @@ export default defineNuxtConfig({
         '@': resolve(__dirname, './app'),
         '@@': resolve(__dirname, './')
     },
+
+    extends: [
+        './layers/ember'
+    ],
+
+    components: [
+        {
+            path: './layers/ember/app/components',
+            prefix: 'E'
+        }
+    ],
     
     runtimeConfig: {
         databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
