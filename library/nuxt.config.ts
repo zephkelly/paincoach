@@ -25,16 +25,9 @@ export default defineNuxtConfig({
         './layers/ember'
     ],
 
-    components: [
-        {
-            path: './layers/ember/app/components',
-            prefix: 'E'
-        }
-    ],
-    
     runtimeConfig: {
         databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
-        
+
         session: {
             name: 'paincoach-session',
             password: process.env.NUXT_SESSION_PASSWORD || '',
