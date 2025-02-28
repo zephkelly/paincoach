@@ -27,6 +27,10 @@ async function logoutUser() {
     
     return navigateTo('/app/login');
 }
+
+definePageMeta({
+    layout: 'app',
+});
 </script>
 
 <style lang="scss" scoped>

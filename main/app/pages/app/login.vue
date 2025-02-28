@@ -54,6 +54,10 @@ async function test() {
 
     console.log(response);
 }
+
+definePageMeta({
+    layout: 'app',
+});
 </script>
 
 <style lang="scss" scoped>

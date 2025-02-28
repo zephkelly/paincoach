@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import {
     PainFactorTypeSchema,
+    PainFactorRatingSchema,
+
     PainFactorsSchema,
     PainFactorsPartialSchema,
     PainFactorsRecordSchema,
@@ -10,6 +12,8 @@ import {
 
 
 export type PainFactorType = z.infer<typeof PainFactorTypeSchema>;
+
+export type PainFactorRating = z.infer<typeof PainFactorRatingSchema>;
 
 export type PainFactors = z.infer<typeof PainFactorsSchema>;
 export type PainFactorsPartial = z.infer<typeof PainFactorsPartialSchema>;
