@@ -9,11 +9,26 @@
 // Light
 :root {
     --text-color: #000000;
+    --text-1-color: #333333;
+    --text-2-color: #666666;
+
+    --background-color: #ffffff;
+    --background-1-color: #f9f9f9;
 }
 
 // Dark
 @media (prefers-color-scheme: dark) {
     :root {
         --text-color: #ffffff;
+        --text-1-color: #f0f0f0;
+        --text-2-color: #e0e0e0;
+        --text-3-color: #d0d0d0;
+
+        --background-color: #121212;
+        --background-1-color: #171717;
+        --background-2-color: #1d1d1d;
+        --background-3-color: #282828;
+
+        --border-color: #333333;
     }
 }

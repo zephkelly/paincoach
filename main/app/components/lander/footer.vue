@@ -25,7 +25,7 @@ const { scrollToTop } = useScroll()
 section {
     display: flex;
     justify-content: center;
-    background-color: var(--background-color);
+    background-color: var(--background);
 }
 
 footer {

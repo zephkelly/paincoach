@@ -46,13 +46,18 @@ async function login() {
 }
 
 async function test() {
-    const response = await $fetch('/api/v1/auth',
-        {
-            method: 'GET'
-        }
-    )
-
-    console.log(response);
+    try {
+        const response = await $fetch('/api/v1/auth',
+            {
+                method: 'GET'
+            }
+        )
+    
+        console.log(response);
+    }
+    catch (error: unknown) {
+        console.log('Error: Unauthorised');
+    }
 }
 
 definePageMeta({

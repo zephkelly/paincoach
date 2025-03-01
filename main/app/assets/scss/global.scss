@@ -21,6 +21,13 @@
 }
 
 @font-face {
+    font-family: 'Geist';
+    src: url('~~lib/app/assets/fonts/geist-900.woff2') format('woff2');
+    font-weight: 900;
+    font-display: swap;
+}
+
+@font-face {
     font-family: 'NotoSerif';
     src: url('~~lib/app/assets/fonts/notosans-600.woff2') format('woff2');
     font-weight: 600;
@@ -127,7 +134,7 @@
 
 // Light theme vars
 :root {
-    --background-color-overlay: var(--background-light-overlay);
+    --background-overlay: var(--background-light-overlay);
     
     --text-color-inactive: var(--text-light-inactive);
     --text-color-secondary: var(--text-light-secondary);
@@ -137,7 +144,7 @@
 
     --border: var(--border-light);
     
-    --background-color: var(--background-light);
+    --background: var(--background-light);
     --background: var(--background-light);
     --background-secondary: var(--background-secondary-light);
     --background-transparent: var(--background-transparent-light);
@@ -155,8 +162,8 @@
         --pain-1: #ffdaa1;
 
         --background: var(--background-dark);
-        --background-color: var(--background-dark);
-        --background-color-overlay: var(--background-dark-overlay);
+        --background: var(--background-dark);
+        --background-overlay: var(--background-dark-overlay);
         --background-secondary: var(--background-secondary-dark);
         --background-transparent: var(--background-transparent-dark);
         --panel: var(--panel-dark);
