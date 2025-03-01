@@ -13,7 +13,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'NotoSerif', serif;
+    font-family: var(--notoserif-font-stack);;
     line-height: 48px;
     font-weight: 900;
     letter-spacing: 1rem;

@@ -1,6 +1,8 @@
 <template>
     <header>
-        <img src="~/assets/images/logo-square.webp" alt="Logo" @click="handleProfileClick" />
+        <div class="logo-wrapper">
+            <img src="~/assets/images/logo-square.webp" alt="Logo" @click="handleProfileClick" />
+        </div>
     </header>
     <AppAccountOptionsModal />
 </template>
@@ -23,10 +25,25 @@ header {
     padding: 0.5rem 1rem;
     box-sizing: border-box;
 
-    img {
+    .logo-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         height: 100%;
+        width: auto;
+        aspect-ratio: 1/1;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        overflow: hidden;
+        border-radius: 50%;
+    }
+
+    img {
+        height: 120%;
+        width: auto;
+        aspect-ratio: 1/1;
         position: relative;
-        left: -4px;
     }
 }
 </style>

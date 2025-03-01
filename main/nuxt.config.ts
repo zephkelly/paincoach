@@ -29,7 +29,8 @@ export default defineNuxtConfig({
 
     css: [
         '~/assets/scss/animations.scss',
-        '~/assets/scss/reset.scss',
+        '~~lib/app/assets/scss/theme.scss',
+        '~~lib/app/assets/scss/reset.scss',
         '~/assets/scss/global.scss',
     ],
 

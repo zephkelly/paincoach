@@ -78,7 +78,9 @@ onUnmounted(() => {
 <!-- Un-Docked -->
 <style lang="scss" scoped>
 section {
-    position: sticky;
+    display: flex;
+    justify-content: center;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -92,6 +94,13 @@ section {
 
     * {
         box-sizing: border-box;
+    }
+
+    .container.section {
+        width: 100%;
+        max-width: 800px;
+        box-sizing: border-box;
+        padding: 0rem 1rem;
     }
 }
 

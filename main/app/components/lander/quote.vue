@@ -36,7 +36,7 @@ section {
         }
 
         p {
-            font-family: 'NotoSerif', serif;
+            font-family: var(--notoserif-font-stack);;
             
             &.quote {
                 font-size: 1.4rem;

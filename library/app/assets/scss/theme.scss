@@ -1,0 +1,19 @@
+// Global
+:root {
+    --system-font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --geist-font-stack: 'Geist', var(--system-font-stack);
+    --notoserif-font-stack: 'NotoSerif', var(--system-font-stack);
+    --inter-font-stack: 'Inter', var(--system-font-stack);
+}
+
+// Light
+:root {
+    --text-color: #000000;
+}
+
+// Dark
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: #ffffff;
+    }
+}

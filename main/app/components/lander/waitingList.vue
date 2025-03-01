@@ -146,7 +146,7 @@ section {
     min-height: 200px;
 
     @media (max-width: 768px) {
-        padding: 0rem 2rem;
+        padding: 0rem 0rem;
     }
 }
 

@@ -71,7 +71,7 @@ section {
     
     h2 {
         span {
-            font-family: 'NotoSerif', serif;
+            font-family: var(--notoserif-font-stack);;
             font-weight: 900;
             font-style: oblique 6deg;
         }
@@ -111,7 +111,7 @@ section {
             }
 
             h3 {
-                font-family: 'NotoSerif', 'Geist', serif;
+                font-family: 'NotoSerif', var(--geist-font-stack);;
                 padding-left: 3.2rem;
                 font-weight: 900;
                 
