@@ -1,43 +1,10 @@
 <template>
-    <div class="page">
-        <!-- <AuthState v-slot="{ loggedIn, user }">
-            <div class="authed" v-if="loggedIn">
-                <div class="admin" v-if="user?.user_role === 'admin'">
-                    <h1>Admin App</h1>
-                    <p>Welcome, {{ user?.name }}</p>
-
-                    <EButton @click="logoutUser()">
-                        Logout
-                    </EButton>
-                </div>
-            </div>
-        </AuthState> -->
-
-        <AppAuthenticator>
-            <template #loading>
-                <div class="loading-skeleton skeleton-component">
-                    <div class="skeleton-row">
-                        <div class="skeleton-avatar"></div>
-                        <div class="skeleton-text"></div>
-                    </div>
-                </div>
-            </template>
-
-            <template #shared>
-                <h1>Dashboard</h1>
-            </template>
-
-            <template #admin="{ user }">
-                <div class="admin">
-                    <p>Welcome, {{ user.value?.name }}</p>
-
-                    <EButton @click="logoutUser()">
-                        Logout
-                    </EButton>
-                </div>
-            </template>
-        </AppAuthenticator>
-    </div>
+    <Page class="dashboard">
+        <div class="dashboard-title">
+            <h1>Dashboard</h1>
+            <AppAccountRoleChip :userRole="userRole" />
+        </div>
+    </Page>
 </template>
 
 <script lang="ts" setup>
@@ -45,6 +12,11 @@ const {
     clear,
     fetch: refreshUserSession
 } = useUserSession();
+
+const {
+    userRole
+} = useAuth();
+
 
 async function logoutUser() {
     await clear();
@@ -69,10 +41,14 @@ body {
 </style>
 
 <style lang="scss" scoped>
-.page {
-    margin-top: 2rem;
-}
+.dashboard-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
 
+    gap: 1rem;
+}
 h1 {
     font-family: var(--geist-font-stack);
     font-size: 2rem;

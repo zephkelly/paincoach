@@ -1,9 +1,10 @@
 <template>
+    <slot
+        v-bind="bindings"
+        name="public"
+    />
+    
     <template v-if="ready">
-        <slot
-            v-bind="bindings"
-            name="shared"
-        />
         <template v-if="error">
             <slot
                 v-bind="{ error }"
@@ -31,16 +32,56 @@
                 v-bind="bindings"
                 name="default"
             />
+
             <slot
-                v-else
                 v-bind="bindings"
-                name="public"
+                name="shared"
             />
         </template>
     </template>
     <slot
         v-else
         name="loading"
+    />
+
+    <template v-if="actualReadyState">
+        <template v-if="error">
+            <slot
+                v-bind="{ error }"
+                name="errorActual"
+            />
+        </template>
+        <template v-else>
+            <slot
+                v-if="actualUserRole === 'admin'"
+                v-bind="bindings"
+                name="adminActual"
+            />
+            <slot
+                v-else-if="actualUserRole === 'clinician'"
+                v-bind="bindings"
+                name="clinicianActual"
+            />
+            <slot
+                v-else-if="actualUserRole === 'patient'"
+                v-bind="bindings"
+                name="patientActual"
+            />
+            <slot
+                v-else-if="loggedIn"
+                v-bind="bindings"
+                name="defaultActual"
+            />
+
+            <slot
+                v-bind="bindings"
+                name="sharedActual"
+            />
+        </template>
+    </template>
+    <slot
+        v-else
+        name="loadingActual"
     />
 </template>
 
@@ -69,6 +110,7 @@ interface AuthState {
 const state = useAuth()
 const {
     ready,
+    actualReadyState,
     isAdminUser,
     isClinicianUser,
     isPatientUser,
@@ -104,12 +146,26 @@ const bindings = {
 
 defineSlots<{
     admin(props: AuthState): any
+    adminActual(props: AuthState): any
+
     clinician(props: AuthState): any
+    clinicianActual(props: AuthState): any
+
     patient(props: AuthState): any
+    patientActual(props: AuthState): any
+
     default(props: AuthState): any
+    defaultActual(props: AuthState): any
+
     public(props: AuthState): any
+
     loading(): any
+    loadingActual(): any
+
     error(props: { error: boolean }): any
+    errorActual(props: { error: boolean }): any
+
     shared(props: AuthState): any
+    sharedActual(props: AuthState): any
 }>()
 </script>

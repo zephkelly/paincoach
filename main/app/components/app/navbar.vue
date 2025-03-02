@@ -9,18 +9,18 @@
         <div class="content-main">
             <AppAuthenticator>
                 <template #loading>
-                    <div class="unauthed">
-                        <AppAccountRoleChip :userRole="undefined" />
-                    </div>
+                    <AppAccountRoleChip :userRole="undefined" />
+                </template>
+                <template #shared="{ userRole }">
+                    <AppAccountRoleChip :userRole="userRole.value" />
                 </template>
 
-                <template #shared="{ userRole, user }">
-                    <AppAccountRoleChip :userRole="userRole.value" />
-
+                <template #sharedActual="{ userRole, user }">
                     <div class="admin" v-if="user.value && user.value.user_role === 'admin'">
                         <EButton @click="setMockRole('clinician')">View clinician</EButton>
                         <EButton @click="setMockRole('patient')">View patient</EButton>
                         <EButton @click="clearMockRole()">Clear View</EButton>
+                        <EButton @click="toggleMockLoading()">Toggle Load</EButton>
 
                     </div>
                 </template>
@@ -39,6 +39,8 @@ const {
 } = useAccountProfile();
 
 const {
+    toggleMockLoading,
+
     setMockRole,
     clearMockRole
 } = useAuth();
@@ -101,7 +103,7 @@ header {
         }
     }
 
-    .content-main, .authed, .admin {
+    .content-main, .authed {
         display: flex;
         height: 100%;
         align-items: center;
