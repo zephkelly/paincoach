@@ -12,13 +12,19 @@
 </template>
 
 <script setup lang="ts">
+
 type PageProps = {
     maxWidth?: number;
+    nopad?: boolean;
+    bottomMargin?: boolean;
 }
 
 const props = defineProps<PageProps>();
 
-const maxWidthStyle = props.maxWidth ? `max-width: ${props.maxWidth}px;` : 'auto';
+const maxWidthStyle = props.maxWidth ? `${props.maxWidth}px` : 'auto';
+const paddingStyle = props.nopad ? '0' : '0rem 1rem';
+
+const bottomMarginStyle = props.bottomMargin ? '4rem' : '0';
 </script>
 
 <style lang="scss" scoped>
@@ -27,6 +33,7 @@ const maxWidthStyle = props.maxWidth ? `max-width: ${props.maxWidth}px;` : 'auto
     justify-content: flex-start;
     flex-direction: column;
     align-items: center;
+    flex-grow: 1;
 }
 
 .page-content {
@@ -35,19 +42,20 @@ const maxWidthStyle = props.maxWidth ? `max-width: ${props.maxWidth}px;` : 'auto
     box-sizing: border-box;
     max-width: v-bind(maxWidthStyle);
     width: 100%;
-    padding: 0rem 1rem;
-    margin-top: 2rem;
-    margin-bottom: 4rem;
+    padding: v-bind(paddingStyle);
+    margin-top: 1.5rem;
+    margin-bottom: v-bind(bottomMarginStyle);
 }
 
 .page-header {
     display: flex;
     justify-content: flex-start;
     box-sizing: border-box;
+    margin-bottom: 2.5rem;
 
     :deep(h1) {
-        font-size: 3rem;
-        font-weight: 900;
+        font-size: 2.5rem;
+        font-weight: 600;
     }
 }
 

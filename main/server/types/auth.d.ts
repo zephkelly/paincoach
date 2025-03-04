@@ -26,6 +26,6 @@ declare module '#auth-utils' {
         logged_in_at: Date;
         version: number;
     }
-  }
+}
   
-  export {}
+export {}

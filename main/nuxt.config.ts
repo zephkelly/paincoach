@@ -27,15 +27,6 @@ export default defineNuxtConfig({
         }
     },
 
-    css: [
-        '~/assets/scss/animations.scss',
-        '~~lib/app/assets/scss/skeleton.scss',
-        '~~lib/app/assets/scss/transition.scss',
-        '~~lib/app/assets/scss/theme.scss',
-        '~~lib/app/assets/scss/reset.scss',
-        '~/assets/scss/global.scss',
-    ],
-
     extends: [
         './../library',
     ],
@@ -46,6 +37,15 @@ export default defineNuxtConfig({
         '~lib/schemas': resolve(__dirname, '../library/shared/schemas'),
         '~lib/utils': resolve(__dirname, '../library/shared/utils'),
     },
+
+    css: [
+        '~/assets/scss/animations.scss',
+        '~~lib/app/assets/scss/skeleton.scss',
+        '~~lib/app/assets/scss/transition.scss',
+        '~~lib/app/assets/scss/theme.scss',
+        '~~lib/app/assets/scss/reset.scss',
+        '~/assets/scss/global.scss',
+    ],
 
     app: {
         head: {

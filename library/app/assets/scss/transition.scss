@@ -3,11 +3,17 @@
   transition: opacity 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
+.fast-fade-enter-active,
+.fast-fade-leave-active {
+  transition: opacity 0.25s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.fast-fade-enter-from,
+.fast-fade-leave-to,
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
-
 
 
 .slide-fade-enter-active {

@@ -2,36 +2,37 @@
     <header>
         <div class="title">
             <div class="logo-wrapper">
-                <img src="~/assets/images/logo-square.webp" alt="Logo" @click="handleProfileClick" />
+                <img src="~/assets/images/logo-square.webp" alt="Logo" @click="toggleOpen" />
             </div>
             <div class="title-text">PAINCOACH</div>
         </div>
         <div class="content-main">
-            <AppAuthenticator>
-                <template #loading>
-                    <AppAccountRoleChip :userRole="undefined" />
-                </template>
-                <template #shared="{ userRole }">
+            <Authenticator>
+                <template #default="{ userRole }">
                     <AppAccountRoleChip :userRole="userRole.value" />
                 </template>
-
-                <template #sharedActual="{ userRole, user }">
-                    <div class="admin" v-if="user.value && user.value.user_role === 'admin'">
+                <template #adminActual>
+                    <div class="admin">
+                        <input type="text" v-model="userIDRef">
+                        <EButton @click="submitUserId">Submit user id</EButton>
                         <EButton @click="setMockRole('clinician')">View clinician</EButton>
                         <EButton @click="setMockRole('patient')">View patient</EButton>
-                        <EButton @click="clearMockRole()">Clear View</EButton>
                         <EButton @click="toggleMockLoading()">Toggle Load</EButton>
-
+                        <EButton @click="clearMocks()">Clear Mocks</EButton>
                     </div>
                 </template>
-            </AppAuthenticator>
+            </Authenticator>
         </div>
     </header>
     <AppAccountOptionsModal />
 </template>
 
 <script lang="ts" setup>
-import { AppAccountRoleChip } from '#components';
+const userIDRef = ref('');
+async function submitUserId() {
+    const userData = await $fetch(`/api/v1/auth/${userIDRef.value}`);
+    console.log(userData);
+}
 
 const {
     accountProfileModalOpen,
@@ -39,10 +40,13 @@ const {
 } = useAccountProfile();
 
 const {
-    toggleMockLoading,
+    toggleOpen
+} = useAppSidebar();
 
+const {
     setMockRole,
-    clearMockRole
+    clearMocks,
+    toggleMockLoading
 } = useAuth();
 
 const handleProfileClick = (event: MouseEvent) => {
@@ -53,6 +57,8 @@ const handleProfileClick = (event: MouseEvent) => {
 
 <style lang="scss" scoped>
 header {
+    top: 0;
+    position: sticky;
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -63,6 +69,7 @@ header {
     background-color: var(--background-2-color);
     border-bottom: 1px solid var(--border-color);
     font-family: var(--geist-font-stack);
+    z-index: 100;
     
     .title {
         display: flex;
@@ -113,7 +120,7 @@ header {
 
     .content-main {
         flex: 1;
-        justify-content: flex-start;
+        justify-content: space-between;
         gap: 1rem;
 
         .authed {

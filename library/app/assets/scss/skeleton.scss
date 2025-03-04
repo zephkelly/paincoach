@@ -22,6 +22,14 @@
         animation: skeleton-loading 1.5s infinite;
         z-index: 10;
     }
+
+    &.skeleton-component-text {
+        height: 14px;
+    }
+
+    &.skeleton-component-border-radius {
+        border-radius: 4px;
+    }
 }
 
 .skeleton-component-border {
@@ -51,6 +59,18 @@
         -webkit-mask-composite: xor;
         animation: skeleton-border-loading 2s infinite;
         pointer-events: none;
+    }
+}
+
+.skeleton-component-border-no-bottom {
+    &::after {
+        border-bottom: none;
+    }
+}
+
+.skeleton-component-border-no-top {
+    &::after {
+        border-top: none;
     }
 }
 

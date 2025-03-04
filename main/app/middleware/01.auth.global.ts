@@ -1,7 +1,3 @@
-import { type UserSession } from "#auth-utils";
-
-
-
 export default defineNuxtRouteMiddleware(async (to, from) => {
     const session = useUserSession().session.value;
     

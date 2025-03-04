@@ -1,7 +1,32 @@
 <template>
-    <div>
+    <div class="app-container">
         <AppNavbar />
-        <slot />
-        <AppFooter />
+        <div class="app-content-container">
+            <AppSidebar />
+            <slot />
+        </div>
+        <!-- <AppFooter /> -->
     </div>
 </template>
+
+<style lang="scss" scoped>
+.app-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 100dvh;
+}
+
+.app-content-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    width: 100%;
+    min-height: calc(100dvh - 58px);
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+</style>
