@@ -9,7 +9,7 @@ import {
 declare module '#auth-utils' {
     interface User {
         user_id: string;
-        email: string;
+        first_name: string;
         verified: boolean;
         user_role: UserRole;
     }

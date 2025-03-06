@@ -1,8 +1,8 @@
 <template>
-    <div class="app-container">
-        <AppNavbar />
-        <div class="app-content-container">
-            <AppSidebar />
+    <div class="dashboard-container">
+        <DashboardNavbar />
+        <div class="dashboard-content-container">
+            <DashboardSidebar />
             <slot />
         </div>
         <!-- <AppFooter /> -->
@@ -10,7 +10,7 @@
 </template>
 
 <style lang="scss" scoped>
-.app-container {
+.dashboard-container {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -18,7 +18,7 @@
     min-height: 100dvh;
 }
 
-.app-content-container {
+.dashboard-content-container {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;

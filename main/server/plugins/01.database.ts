@@ -41,7 +41,7 @@ export default defineNitroPlugin(async (nitroApp: any) => {
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 email TEXT NOT NULL UNIQUE,
                 verified BOOLEAN DEFAULT false,
-                phone_number TEXT,
+                phone_number TEXT UNIQUE,
                 first_name TEXT NOT NULL,
                 last_name TEXT,
                 password_hash TEXT NOT NULL,
@@ -65,11 +65,13 @@ export default defineNitroPlugin(async (nitroApp: any) => {
             CREATE TABLE IF NOT EXISTS private.clinician_profile (
                 user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
                 -- Public information (visible to admin and associated patients)
-                license_number VARCHAR(100) NOT NULL,
-                specialization VARCHAR(100),
+                ahprah_registration_number TEXT NOT NULL,
+                specialisation TEXT,
                 practice_name TEXT,
                 -- Private information (visible only to admin)
                 private_data JSONB,
+                business_address TEXT,
+                abn TEXT,
                 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
             );
@@ -77,9 +79,6 @@ export default defineNitroPlugin(async (nitroApp: any) => {
             CREATE TABLE IF NOT EXISTS private.patient_profile (
                 user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
                 -- Public information (visible to admin and assigned clinicians)
-                date_of_birth DATE NOT NULL,
-                emergency_contact_name TEXT,
-                emergency_contact_phone TEXT,
                 registration_code TEXT NOT NULL,
                 -- Private information (visible only to admin)
                 private_data JSONB,
@@ -111,6 +110,21 @@ export default defineNitroPlugin(async (nitroApp: any) => {
                 -- Health data (visible only to patient and assigned clinician)
                 data JSONB NOT NULL,
                 privacy_level TEXT DEFAULT 'standard',
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS private.mailing_list_subscription (
+                id SERIAL PRIMARY KEY,
+                email TEXT NOT NULL UNIQUE,
+                name TEXT,
+                subscription_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                unsubscription_date TIMESTAMPTZ,
+                is_active BOOLEAN DEFAULT TRUE,
+                unsubscribe_token TEXT UNIQUE,
+                source TEXT,
+                user_id UUID REFERENCES private.user(id) ON DELETE SET NULL,
+                preferences JSONB DEFAULT '{}',
                 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
             );
@@ -209,9 +223,6 @@ export default defineNitroPlugin(async (nitroApp: any) => {
                 c.user_id as clinician_id,
                 p.user_id as patient_id,
                 u.email as patient_email,
-                p.date_of_birth,
-                p.emergency_contact_name,
-                p.emergency_contact_phone,
                 cpr.start_date as relationship_start_date,
                 cpr.status as relationship_status
             FROM private.clinician_patient_relationship cpr

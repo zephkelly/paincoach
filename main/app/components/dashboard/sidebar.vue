@@ -3,7 +3,7 @@
         <div class="app-sidebar--content">
             <ul class="sidebar-items">
                 <li class="sidebar-item sub-menu-item dashboard-item">
-                    <NuxtLink to="/app" class="dashboard-button">
+                    <NuxtLink to="/dashboard" class="dashboard-button">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></g></svg>
                         <h3>Dashboard</h3>
                     </NuxtLink>
@@ -27,7 +27,23 @@
                             <ul class="sub-menu">
                                 <li class="sub-menu-item">
                                     <Transition name="fade">
-                                        <NuxtLink v-if="ready" :to="`/app/manage/user?type=${removeLastLetter(manageableUsersType)}&tab=1`" class="add-users-button">
+                                        <NuxtLink v-if="ready" :to="`/dashboard/manage/user?type=${removeLastLetter(manageableUsersType)}&tab=0`" class="add-users-button">
+                                            Your
+                                            <div class="user-type">
+                                                <transition name="fade">
+                                                    <span :key="manageableUsersType">{{ manageableUsersType }}</span>
+                                                </transition>
+                                            </div>
+                                        </NuxtLink>
+                                        <div v-else
+                                            class="loading-add-users skeleton-component skeleton-component-panel"
+                                            :style="{ width: 110 * (0.85 + Math.random() * 0.3) + 'px'}"
+                                        ></div>
+                                    </Transition>
+                                </li>
+                                <li class="sub-menu-item">
+                                    <Transition name="fade">
+                                        <NuxtLink v-if="ready" :to="`/dashboard/manage/user?type=${removeLastLetter(manageableUsersType)}&tab=1`" class="add-users-button">
                                             Add new
                                             <div class="user-type">
                                                 <transition name="fade">
@@ -100,13 +116,13 @@ section.app-sidebar {
     flex-direction: column;
     width: 0;
     top: 58px;
-    left: -20px;
     bottom: 0;
     overflow: hidden;
     background-color: var(--panel-color);
     border-right: 1px solid transparent;
     transition: width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
     width: 0px;
+    border-right: 0px;
     
     .app-sidebar--content {
         position: fixed;
@@ -123,6 +139,7 @@ section.app-sidebar {
     &.app-sidebar--open {
         width: 288px;
         border-color: var(--border-color);
+        border-right: 1px solid var(--border-2-color);
 
         .app-sidebar--content {
             width: 288px;
@@ -149,7 +166,6 @@ section.app-sidebar {
             height: 58px;
             margin-bottom: 2rem;
             transition: height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), margin-bottom 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
-            overflow: hidden;
 
             &.closed {
                 height: 0;

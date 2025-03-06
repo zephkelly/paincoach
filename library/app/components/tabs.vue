@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="tab-content">
-            <TransitionGroup name="fade" tag="div" class="content-transition-wrapper">
+            <TransitionGroup name="fast-fade" tag="div" class="content-transition-wrapper">
                 <div class="tab-item loading" v-if="!tabs">
                 </div>
                 <component
@@ -125,11 +125,6 @@ watch(() => props.defaultTabIndex, (newValue) => {
 
     &:first-child {
         border-top-left-radius: 0px;
-        // border-left: 1px solid var(--border-color);
-    }
-
-    &:not(:first-child):not(:last-child) {
-        border-left: 1px solid var(--border-color);
     }
 
     &:last-child {
@@ -178,10 +173,6 @@ watch(() => props.defaultTabIndex, (newValue) => {
     .content-transition-wrapper {
         position: relative;
         min-height: 100%;
-
-        .tab-item {
-            position: absolute;
-        }
     }
 }
 

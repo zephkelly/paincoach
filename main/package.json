@@ -10,6 +10,8 @@
         "postinstall": "nuxt prepare"
     },
     "dependencies": {
+        "@aws-sdk/client-ses": "^3.758.0",
+        "@aws-sdk/client-sqs": "^3.758.0",
         "@types/pg": "^8.11.11",
         "nuxt": "^3.15.4",
         "nuxt-auth-utils": "0.5.15",

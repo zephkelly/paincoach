@@ -22,7 +22,7 @@ async function logoutUser() {
     await clearSession();
     await fetchNewSession();
     
-    return navigateTo('/app/login');
+    return navigateTo('/dashboard/login');
 }
 
 definePageMeta({

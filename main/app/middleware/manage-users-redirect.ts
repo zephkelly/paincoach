@@ -14,24 +14,24 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
             const session = useUserSession().session.value;
 
             if (!session || !session.user) {
-                return navigateTo('/app/login');
+                return navigateTo('/dashboard/login');
             }
 
             if (validatedUserRole === 'admin' && session.user.user_role !== 'admin') {
-                return navigateTo('/app/manage/user' + tabIndexParam);
+                return navigateTo('/dashboard/manage/user' + tabIndexParam);
             }
             else if (validatedUserRole === 'clinician' && (session.user.user_role !== 'admin' && session.user.user_role !== 'clinician')) {
-                return navigateTo('/app/manage/user' + tabIndexParam);
+                return navigateTo('/dashboard/manage/user' + tabIndexParam);
             }
             else if (validatedUserRole === 'patient' && (session.user.user_role !== 'admin' && session.user.user_role !== 'clinician')) {
                 console.log(session.user.user_role)
-                return navigateTo('/app/manage/user' + tabIndexParam);
+                return navigateTo('/dashboard/manage/user' + tabIndexParam);
             }
 
-            return navigateTo(`/app/manage/user/${validatedUserRole}${tabIndexParam}`);
+            return navigateTo(`/dashboard/manage/user/${validatedUserRole}${tabIndexParam}`);
         }
         catch (error) {
-            return navigateTo('/app/manage/user');
+            return navigateTo('/dashboard/manage/user');
         }
     }
 });

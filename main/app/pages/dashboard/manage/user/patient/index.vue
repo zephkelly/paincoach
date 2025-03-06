@@ -1,18 +1,18 @@
 <template>
     <Page nopad>
         <template #header>
-            <div class="user-page-title">
+            <div class="user-patient-page-title">
                 <Transition name="fade">
                     <h1 v-if="ready && userRole !== 'patient'">Manage Patients</h1>
                     <div v-else
-                        class="user-page-title skeleton-component skeleton-component-panel skeleton-component-border-radius"
+                        class="user-patient-page-title skeleton-component skeleton-component-panel skeleton-component-border-radius"
                         :style="{ width: 350 * (0.85 + Math.random() * 0.15) + 'px'}"
                     ></div>
                 </Transition>
             </div>
         </template>
 
-        <div class="user-page-content">
+        <div class="user-patient-page-content">
             <Tabs :tabs="patientTabs" :loading="!ready || userRole === 'patient'" :defaultTabIndex="tabQuery" />
         </div>
     </Page>
@@ -26,7 +26,7 @@ const {
 
 watch(() => userRole.value, (role) => {
     if (role === 'patient') {
-        navigateTo('/app');
+        navigateTo('/dashboard');
     }
 });
 
@@ -48,6 +48,8 @@ const tabQuery = computed(() => {
     }
 });
 
+
+import AppUserManagerPatientNew from '~/components/dashboard/user/manager/patients/new.vue';
 const patientTabs = [
     {
         label: 'Your Patients',
@@ -56,7 +58,7 @@ const patientTabs = [
     },
     {
         label: 'Add New Patient',
-        component: undefined,
+        component: AppUserManagerPatientNew,
         headerWidth: 150
     },
 ]
@@ -67,23 +69,23 @@ definePageMeta({
 </script>
 
 <style lang="scss" scoped>
-.user-page-title {
+.user-patient-page-title {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     height: 40px;
     padding: 0rem 1rem;
 
-    h1, .user-page-title {
+    h1, .user-patient-page-title {
         position: absolute;
     }
 
-    .user-page-title {
+    .user-patient-page-title {
         height: 40px;
     }
 }
 
-.user-page-content {
+.user-patient-page-content {
     display: flex;
     flex-direction: column;
     position: relative;

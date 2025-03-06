@@ -8,12 +8,20 @@
   transition: opacity 0.25s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.page-fade-enter-from,
+.page-fade-leave-to,
 .fast-fade-enter-from,
 .fast-fade-leave-to,
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
+
 
 
 .slide-fade-enter-active {

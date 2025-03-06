@@ -24,6 +24,26 @@ export default defineNuxtConfig({
                 domain: 'localhost',
                 sameSite: 'lax'
             }
+        },
+
+        aws: {
+            region: process.env.AWS_REGION,
+            accountId: process.env.AWS_ACCOUNT_ID,
+
+            sqs: {
+                queueUrl: process.env.AWS_SQS_QUEUE_URL,
+                queueName: process.env.AWS_SQS_QUEUE_NAME,
+                accessKeyId: process.env.AWS_SQS_IAM_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SQS_IAM_SECRET_ACCESS_KEY,
+            },
+            ses: {
+                accessKeyId: process.env.AWS_SES_IAM_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SES_IAM_SECRET_ACCESS_KEY,
+
+                noreply: process.env.AWS_SES_NOREPLY_EMAIL,
+                updates: process.env.AWS_SES_UPDATES_EMAIL,
+                updatesDestination: process.env.AWS_SES_UPDATES_DESTINATION_EMAIL,
+            }
         }
     },
 
@@ -48,6 +68,8 @@ export default defineNuxtConfig({
     ],
 
     app: {
+        pageTransition: { name: 'page-fade', mode: 'out-in' },
+
         head: {
             meta: [
                 { charset: 'utf-8' },

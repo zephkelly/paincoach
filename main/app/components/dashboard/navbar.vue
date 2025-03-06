@@ -9,7 +9,7 @@
         <div class="content-main">
             <Authenticator>
                 <template #default="{ userRole }">
-                    <AppAccountRoleChip :userRole="userRole.value" />
+                    <DashboardAccountRoleChip :userRole="userRole.value" />
                 </template>
                 <template #adminActual>
                     <div class="admin">
@@ -24,7 +24,7 @@
             </Authenticator>
         </div>
     </header>
-    <AppAccountOptionsModal />
+    <DashboardAccountOptionsModal />
 </template>
 
 <script lang="ts" setup>

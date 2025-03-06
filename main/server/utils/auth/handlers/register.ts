@@ -82,8 +82,7 @@ export async function handleRegisterCredentials(
         const userSession: UserSession = {
             user: {
                 user_id: newValidatedUserId,
-                name: newUser.first_name,
-                email: newUser.email,
+                first_name: newUser.first_name,
                 verified: newUser.verified,
                 user_role: UserRoleSchema.Enum.patient,
             },

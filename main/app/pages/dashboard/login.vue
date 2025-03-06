@@ -38,7 +38,7 @@ async function login() {
         console.log('Logged in', response);
 
         await refreshUserSession();
-        return navigateTo('/app');
+        return navigateTo('/dashboard');
     }
     catch (error: unknown) {
         console.log('Error logging in');
