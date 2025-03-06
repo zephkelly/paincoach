@@ -14,7 +14,7 @@
             @keydown="handleKeyDown"
             arialLabel="Sign up for the waitlist now!"   
         >
-            View the Demo
+            Join the waitlist
         </button>
         <div class="landing-image">
             <div class="image-container">

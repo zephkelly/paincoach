@@ -3,7 +3,7 @@
         <div class="section container">
             <h2 class="clarity" tabindex="0">Find <span class="complex-shimmer" data-text="Clarity">Clarity</span>.</h2>
             <h2 tabindex="0">Join the waiting list now:</h2>
-            <p>Want to give the app a try? Sign-up below and we'll send you an exclusive link to our <span class="complex-shimmer" data-text="demo">demo</span>.</p>
+            <p>We're working hard to make <span class="complex-shimmer" data-text="Pain Coach">Pain Coach</span> a reality. To show your support and stay up to date on our progress, sign up below.</p>
             <form @submit.prevent="submitForm">
                 <div class="group">
                     <label for="potFName" class="hidden">&nbsp;</label>

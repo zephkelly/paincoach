@@ -1,21 +1,23 @@
 <template>
-    <main id="main-content landing" class="site-page">
-        <ScrollToReveal centerAlign>
-            <LanderHero class="hero main" aria-label="Main hero section"/>
-        </ScrollToReveal>
-        <Spacer class="spacer"/>
-        <LanderHow id="how-it-works" class="how"/>
-        <Spacer class="spacer"/>
-        <ScrollToReveal>
-            <LanderQuote class="quote"
-                quote="People in pain want simple, actionable advice but are often left to drown in the complexity of modern pain sciences. I want to change that."
-                by="- Lachlan Townend (Founder)"
-                author="Lachlan Townend"
-                :src="profilePhoto" />
-        </ScrollToReveal>
-        <LanderAnimatedVideo class="animated-video"/>
-        <LanderWaitingList class="waitlist" />
-    </main>
+    <Page :max-width="800">
+        <main id="main-content landing" class="site-page">
+            <ScrollToReveal centerAlign>
+                <LanderHero class="hero main" aria-label="Main hero section"/>
+            </ScrollToReveal>
+            <Spacer class="spacer"/>
+            <LanderHow id="how-it-works" class="how"/>
+            <Spacer class="spacer"/>
+            <ScrollToReveal>
+                <LanderQuote class="quote"
+                    quote="People in pain want simple, actionable advice but are often left to drown in the complexity of modern pain sciences. I want to change that."
+                    by="- Lachlan Townend (Founder)"
+                    author="Lachlan Townend"
+                    :src="profilePhoto" />
+            </ScrollToReveal>
+            <LanderAnimatedVideo class="animated-video"/>
+            <LanderWaitingList class="waitlist" />
+        </main>
+    </Page>
 </template>
 
 <script lang="ts" setup>
@@ -26,7 +28,14 @@ definePageMeta({
 });
 </script>
 
+<style>
+html{
+    background-color: var(--background);
+} 
+</style>
+
 <style lang="scss" scoped>
+
 main {
     padding-top: 12rem;
     text-rendering: optimizeLegibility;
@@ -76,7 +85,7 @@ main {
         
         .container.section {
             width: 100%;
-            max-width: 800px;
+            // max-width: 800px;
             box-sizing: border-box;
             padding: 0rem 1rem;
         }
