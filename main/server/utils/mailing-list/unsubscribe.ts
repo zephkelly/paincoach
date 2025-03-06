@@ -14,7 +14,7 @@ export function getEmailHash(email: string): string {
 /**
  * Generates a secure unsubscribe token based on email and timestamp
  */
-export function generateUnsubscribeToken(email: string): string {
+export function generateEmailToken(email: string): string {
     const timestamp = Date.now().toString()
     return crypto
       .createHash('sha256')

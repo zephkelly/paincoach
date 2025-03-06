@@ -14,11 +14,12 @@
                 <template #adminActual>
                     <div class="admin">
                         <input type="text" v-model="userIDRef">
-                        <EButton @click="submitUserId">Submit user id</EButton>
+                        <EButton @click="submitUserId">Maillist</EButton>
                         <EButton @click="setMockRole('clinician')">View clinician</EButton>
                         <EButton @click="setMockRole('patient')">View patient</EButton>
                         <EButton @click="toggleMockLoading()">Toggle Load</EButton>
                         <EButton @click="clearMocks()">Clear Mocks</EButton>
+                        <EButton @click="logout()">Clear Session</EButton>
                     </div>
                 </template>
             </Authenticator>
@@ -28,9 +29,16 @@
 </template>
 
 <script lang="ts" setup>
+import { EButton } from '#components';
+
 const userIDRef = ref('');
 async function submitUserId() {
-    const userData = await $fetch(`/api/v1/auth/${userIDRef.value}`);
+    const userData = await $fetch(`/api/v1/mailing-list`, {
+        method: 'POST',
+        body: {
+            email: userIDRef.value
+        }
+    });
     console.log(userData);
 }
 
@@ -46,13 +54,14 @@ const {
 const {
     setMockRole,
     clearMocks,
-    toggleMockLoading
+    toggleMockLoading,
+    clearSession
 } = useAuth();
 
-const handleProfileClick = (event: MouseEvent) => {
-    lastClickEvent.value = event;
-    accountProfileModalOpen.value = true;
-};
+async function logout() {
+    await clearSession();
+    navigateTo('/');
+}
 </script>
 
 <style lang="scss" scoped>

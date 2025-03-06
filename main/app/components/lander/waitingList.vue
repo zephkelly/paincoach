@@ -81,20 +81,13 @@ function validateEmail() {
     }
 }
 
-interface ISubscribeResponse {
-    statusCode: number;
-    statusText: string;
-    message: string;
-    data: {
-        success: boolean;
-    }
-}
 async function submitForm() {
     statusMessage.value = '';
     statusError.value = false;
 
     if (potFNameModel.value)
     {
+        console.log('Honeypot field filled out. Bot detected.');
         setTimeout(() => {
             statusError.value = false;
             statusMessage.value = "You've successfully joined the waiting list! If you don't receive an email from us, please check your spam folder."
@@ -109,24 +102,19 @@ async function submitForm() {
         statusMessage.value = ''
 
         try {
-            const response = await $fetch<ISubscribeResponse>('/api/subscribe', {
+            await $fetch('/api/v1/mailing-list', {
                 method: 'POST',
                 body: { email: emailModel.value }
             })
     
-            if (response.statusCode === 201) {
-                statusError.value = false
-                statusMessage.value = "You've successfully joined the waiting list! If you don't receive an email from us, please check your spam folder."
-                emailModel.value = ''
-            } else {
-                statusError.value = true
-                statusMessage.value = 'An error occurred! Please try again.'
-            }
+            statusError.value = false
+            statusMessage.value = "You've successfully joined the waiting list! Please check your spam folder for a confirmation email."
+            emailModel.value = ''
         }
         catch (error: any) {
             if (error.statusCode === 409) {
                 statusError.value = true
-                statusMessage.value = 'You are already subscribed! Check your inbox and spam folder for the link to your demo.'
+                statusMessage.value = 'You are already subscribed! Please check your inbox and spam folder.'
                 return;
             }
 

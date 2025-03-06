@@ -26,6 +26,13 @@ export default defineNuxtConfig({
             }
         },
 
+        mailchimp: {
+            dc: process.env.MAILCHIMP_DC,
+            listId: process.env.MAILCHIMP_LIST_ID,
+            apiKey: process.env.MAILCHIMP_API_KEY,
+            transactionalApiKey: process.env.MAILCHIMP_TRANSACTIONAL_API_KEY,
+        },
+
         aws: {
             region: process.env.AWS_REGION,
             accountId: process.env.AWS_ACCOUNT_ID,

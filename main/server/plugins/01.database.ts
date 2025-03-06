@@ -124,7 +124,6 @@ export default defineNitroPlugin(async (nitroApp: any) => {
                 unsubscribe_token TEXT UNIQUE,
                 source TEXT,
                 user_id UUID REFERENCES private.user(id) ON DELETE SET NULL,
-                preferences JSONB DEFAULT '{}',
                 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
             );
