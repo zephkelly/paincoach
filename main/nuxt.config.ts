@@ -24,14 +24,35 @@ export default defineNuxtConfig({
                 domain: 'localhost',
                 sameSite: 'lax'
             }
+        },
+
+        mailchimp: {
+            dc: process.env.MAILCHIMP_DC,
+            listId: process.env.MAILCHIMP_LIST_ID,
+            apiKey: process.env.MAILCHIMP_API_KEY,
+            transactionalApiKey: process.env.MAILCHIMP_TRANSACTIONAL_API_KEY,
+        },
+
+        aws: {
+            region: process.env.AWS_REGION,
+            accountId: process.env.AWS_ACCOUNT_ID,
+
+            sqs: {
+                queueUrl: process.env.AWS_SQS_QUEUE_URL,
+                queueName: process.env.AWS_SQS_QUEUE_NAME,
+                accessKeyId: process.env.AWS_SQS_IAM_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SQS_IAM_SECRET_ACCESS_KEY,
+            },
+            ses: {
+                accessKeyId: process.env.AWS_SES_IAM_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SES_IAM_SECRET_ACCESS_KEY,
+
+                noreply: process.env.AWS_SES_NOREPLY_EMAIL,
+                updates: process.env.AWS_SES_UPDATES_EMAIL,
+                updatesDestination: process.env.AWS_SES_UPDATES_DESTINATION_EMAIL,
+            }
         }
     },
-
-    css: [
-        '~/assets/scss/animations.scss',
-        '~/assets/scss/reset.scss',
-        '~/assets/scss/global.scss',
-    ],
 
     extends: [
         './../library',
@@ -43,7 +64,19 @@ export default defineNuxtConfig({
         '~lib/schemas': resolve(__dirname, '../library/shared/schemas'),
         '~lib/utils': resolve(__dirname, '../library/shared/utils'),
     },
+
+    css: [
+        '~/assets/scss/animations.scss',
+        '~~lib/app/assets/scss/skeleton.scss',
+        '~~lib/app/assets/scss/transition.scss',
+        '~~lib/app/assets/scss/theme.scss',
+        '~~lib/app/assets/scss/reset.scss',
+        '~/assets/scss/global.scss',
+    ],
+
     app: {
+        pageTransition: { name: 'page-fade', mode: 'out-in' },
+
         head: {
             meta: [
                 { charset: 'utf-8' },

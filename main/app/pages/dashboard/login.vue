@@ -38,7 +38,7 @@ async function login() {
         console.log('Logged in', response);
 
         await refreshUserSession();
-        return navigateTo('/app');
+        return navigateTo('/dashboard');
     }
     catch (error: unknown) {
         console.log('Error logging in');
@@ -46,13 +46,18 @@ async function login() {
 }
 
 async function test() {
-    const response = await $fetch('/api/v1/auth',
-        {
-            method: 'GET'
-        }
-    )
-
-    console.log(response);
+    try {
+        const response = await $fetch('/api/v1/auth',
+            {
+                method: 'GET'
+            }
+        )
+    
+        console.log(response);
+    }
+    catch (error: unknown) {
+        console.log('Error: Unauthorised');
+    }
 }
 
 definePageMeta({

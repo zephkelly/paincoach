@@ -1,24 +1,20 @@
-import { type UserSession } from "#auth-utils";
-
-
-
 export default defineNuxtRouteMiddleware(async (to, from) => {
-    const publicRoutes = ['/', '/app/login', '/app/register', '/app/forgot/password']
+    const session = useUserSession().session.value;
+    
+    const publicRoutes = ['/', '/dashboard/login', '/dashboard/register', '/dashboard/forgot/password']
     if (publicRoutes.includes(to.path)) {
-
-        if (to.path === '/app/login' || to.path === '/app/register') {
-            const session = useUserSession().session.value;
+        if (to.path === '/') {
             if (session && session.user) {
-                return navigateTo('/app')
+                return navigateTo('/dashboard')
             }
         }
 
-        return
+        return;
     }
 
-    const session = useUserSession().session.value;
-  
-    if (!session || !session.user) {
-      return navigateTo('/app/login')
+    if (to.path === '/dashboard') {
+        if (!session || !session.user) {
+            return navigateTo('/dashboard/login')
+        }
     }
 });

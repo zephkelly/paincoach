@@ -1,5 +1,5 @@
 import { H3Event } from 'h3'
-import { type UserSession } from '#auth-utils'
+import { type UserSession, type SecureSessionData } from '#auth-utils'
 
 import { validateUUID } from '~lib/schemas/primitives'
 
@@ -8,11 +8,13 @@ import { getUserExists } from '../../user/database/get/exists'
 
 import { DatabaseService } from '~~/server/services/databaseService'
 import { UserRoleSchema } from '@@/shared/schemas/users'
+import type { UserRole } from '@@/shared/types/users'
 
 
 
 export async function handleRegisterCredentials(
     event: H3Event,
+    desired_role: UserRole,
     body: {
         email: string,
         password: string,
@@ -20,8 +22,19 @@ export async function handleRegisterCredentials(
         first_name: string,
         last_name: string,
         phone_number: string,
+        [key: string]: any
     }
 ) {
+    const session = await getUserSession(event) as UserSession
+    const secureSession = session.secure as SecureSessionData
+
+    if (!secureSession) {
+        throw createError({
+            statusCode: 401,
+            statusMessage: 'Unauthorized'
+        })
+    }
+
     const databaseServiceInstance = DatabaseService.getInstance()
 
     const { email, phone_number, first_name, last_name, password, confirm_password } = body
@@ -40,8 +53,8 @@ export async function handleRegisterCredentials(
         })
     }
 
+    const transaction = await databaseServiceInstance.createTransaction()
     try {
-        const transaction = await databaseServiceInstance.createTransaction()
         const userExists = await getUserExists(transaction, email)
 
         if (userExists) {
@@ -56,12 +69,10 @@ export async function handleRegisterCredentials(
         const newUser = await createUser(transaction,
             'patient', 
             {
-                email,
-                password_hash,
-                first_name,
-                last_name,
-                phone_number
-            }
+                ...body,
+                password_hash: password_hash
+            },
+            secureSession.user_role
         )
 
         const newValidatedUserId = validateUUID(newUser.id);
@@ -71,8 +82,8 @@ export async function handleRegisterCredentials(
         const userSession: UserSession = {
             user: {
                 user_id: newValidatedUserId,
-                name: newUser.first_name,
-                email: newUser.email,
+                first_name: newUser.first_name,
+                verified: newUser.verified,
                 user_role: UserRoleSchema.Enum.patient,
             },
             secure: {
@@ -89,30 +100,6 @@ export async function handleRegisterCredentials(
         await replaceUserSession(event, userSession, {
             maxAge: 60 * 60 * 24 * 365
         })
-    
-        // try {
-        //     await authenticationServiceInstance.sendVerificationEmail(email);
-        // }
-        // catch (error) {
-        //     console.error('handleRegister: Error sending transactional email to user:', error)
-        // }
-
-        // try {
-        //     const config = await useRuntimeConfig()
-
-        //     await emailServiceInstance.sendEmail({
-        //         from: config.aws.ses.updates,
-        //         to: config.aws.ses.updatesDestination,
-        //         subject: 'New user registered!',
-        //         html: `
-        //             <h1>New user registered!</h1>
-        //             <p>(${newUser.name}) ${newUser.email}, has registered for an account.</p>
-        //         `
-        //     })
-        // }
-        // catch (error) {
-        //     console.error('handleRegister: Error sending email to updates:', error)
-        // }
 
         setResponseStatus(event, 201, 'Ok')
         return {
@@ -124,6 +111,8 @@ export async function handleRegisterCredentials(
         }
     }
     catch (error: any) {
+        await transaction.rollback()
+
         if (error.statusCode) {
             throw error
         }

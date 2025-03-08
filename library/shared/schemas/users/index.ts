@@ -8,7 +8,7 @@ import { type User } from '../../types/users'
 
 
 
-export { UserRoleSchema, AccountStatus } from './base'
+export { UserRoleSchema, AccountStatus, validateUserRole } from './base'
 
 export const UserSchema = z.discriminatedUnion('role', [
     AdminUserSchema,

@@ -1,7 +1,8 @@
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 
 import { PHONE_REGEX } from '../../constants/phone';
 import { version } from 'vue';
+import type { UserRole } from '@@/shared/types/users';
 
 
 
@@ -65,3 +66,26 @@ export const BaseUserSchema = z.object({
 
     version: z.number().default(1)
 })
+
+
+export function validateUserRole(role: string): UserRole {
+    try {
+        return UserRoleSchema.parse(role)
+    }
+    catch (error: unknown) {
+        if (error instanceof ZodError) {
+            throw error.errors
+        }
+
+        throw error
+    }
+}
+
+export function validateUserRoles(roles: string[]): boolean {
+    for (const role of roles) {
+        if (!UserRoleSchema.safeParse(role).success) {
+            return false
+        }
+    }
+    return true
+}

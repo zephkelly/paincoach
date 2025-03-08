@@ -21,13 +21,25 @@ const { scrollToTop } = useScroll()
 </script>
 
 <style lang="scss" scoped>
+
 section {
-    padding: 0rem 2rem;
+    display: flex;
+    justify-content: center;
+    background-color: var(--background);
 }
 
 footer {
     min-height: 48px;
-    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    font-family: var(--inter-font-stack);   
+
+}
+
+.section.container {
+    box-sizing: border-box;
+    padding: 0rem 1rem;
+    max-width: 800px;
+    width: 100%;
 }
 
 .footer-content {
@@ -42,6 +54,7 @@ footer {
 
 .trademark {
     opacity: 0.7;
+    color: var(--text-color);
 }
 
 .footer-content.right {
@@ -56,6 +69,7 @@ footer {
         top: 1px;
         width: 1.2rem;
         height: 1.2rem;
+        color: var(--text-color);
     }
 
     &:hover {

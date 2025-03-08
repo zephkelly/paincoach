@@ -5,9 +5,9 @@ import { UserRole } from "./users";
 declare module '#auth-utils' {
     interface User {
         user_id: string;
-        email: string;
-        name: string;
+        first_name: string;
         user_role: UserRole;
+        verified: boolean;
     }
 
     interface SecureSessionData {
@@ -26,6 +26,6 @@ declare module '#auth-utils' {
         logged_in_at: Date;
         version: number;
     }
-  }
+}
   
-  export {}
+export {}

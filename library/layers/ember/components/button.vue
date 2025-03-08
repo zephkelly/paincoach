@@ -6,7 +6,7 @@
 
 <style lang="scss" scoped>
 button {
-    border: 1px solid grey;
+    border: 1px solid var(--border-3-color);
     border-radius: 8px;
     padding: 0.5rem 1rem;
 }

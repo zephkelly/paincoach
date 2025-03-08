@@ -1,19 +1,14 @@
-import { type UserSession } from "#auth-utils";
-
-
-
 export default defineEventHandler(async (event) => {
     if (!getRequestURL(event).pathname.startsWith('/api')) {
         return
     }
-    if (getRequestURL(event).pathname.startsWith('/api/v1/auth') || getRequestURL(event).pathname.startsWith('/api/v1/webhooks')) {
+    if (getRequestURL(event).pathname.startsWith('/api/v1/auth') || getRequestURL(event).pathname.startsWith('/api/v1/webhooks') || getRequestURL(event).pathname.startsWith('/api/v1/mailing-list')) {
         return
     }
 
-    let session: UserSession | undefined = undefined
+    const session = await getUserSession(event)
 
     try {
-        session = await getUserSession(event)
 
         const user_exists = session !== undefined && session.secure !== undefined && session.user !== undefined
         if (user_exists === false) {

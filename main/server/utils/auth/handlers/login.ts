@@ -49,9 +49,9 @@ export async function handleLoginCredentials(
         const session: UserSession = {
             user: {
                 user_id: validatedUserId,
-                name: user.first_name,
+                first_name: user.first_name,
                 user_role: user.role,
-                email: user.email,
+                verified: user.verified,
             },
             secure: {
                 email: user.email,
