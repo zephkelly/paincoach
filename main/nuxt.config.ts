@@ -15,7 +15,7 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
-        
+
         // nuxt-auth-utils
         session: {
             name: 'paincoach-session',
@@ -43,7 +43,6 @@ export default defineNuxtConfig({
         '~lib/schemas': resolve(__dirname, '../library/shared/schemas'),
         '~lib/utils': resolve(__dirname, '../library/shared/utils'),
     },
-
     app: {
         head: {
             meta: [
