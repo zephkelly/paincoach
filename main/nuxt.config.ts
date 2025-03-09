@@ -15,6 +15,7 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
+        environmentDomain: process.env.ENVIRONMENT_DOMAIN,
 
         // nuxt-auth-utils
         session: {
@@ -49,7 +50,6 @@ export default defineNuxtConfig({
 
                 noreply: process.env.AWS_SES_NOREPLY_EMAIL,
                 updates: process.env.AWS_SES_UPDATES_EMAIL,
-                updatesDestination: process.env.AWS_SES_UPDATES_DESTINATION_EMAIL,
             }
         }
     },

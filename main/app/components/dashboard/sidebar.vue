@@ -27,7 +27,7 @@
                             <ul class="sub-menu">
                                 <li class="sub-menu-item">
                                     <Transition name="fade">
-                                        <NuxtLink v-if="ready" :to="`/dashboard/manage/user?type=${removeLastLetter(manageableUsersType)}&tab=0`" class="add-users-button">
+                                        <NuxtLink v-if="ready" :to="yourUsersLinkComputed" class="add-users-button">
                                             Your
                                             <div class="user-type">
                                                 <transition name="fade">
@@ -43,7 +43,7 @@
                                 </li>
                                 <li class="sub-menu-item">
                                     <Transition name="fade">
-                                        <NuxtLink v-if="ready" :to="`/dashboard/manage/user?type=${removeLastLetter(manageableUsersType)}&tab=1`" class="add-users-button">
+                                        <NuxtLink v-if="ready" :to="yourAddUsersLinkComputed" class="add-users-button">
                                             Add new
                                             <div class="user-type">
                                                 <transition name="fade">
@@ -87,6 +87,22 @@ const manageableUsersType = computed(() => {
         return 'users';
     } else if (userRole.value === 'clinician') {
         return 'patients';
+    }
+})
+
+const yourUsersLinkComputed = computed(() => {
+    if (userRole.value === 'admin') {
+        return `/dashboard/manage/user`;
+    } else if (userRole.value === 'clinician') {
+        return `/dashboard/manage/user/patient?tab=0`;
+    }
+})
+
+const yourAddUsersLinkComputed = computed(() => {
+    if (userRole.value === 'admin') {
+        return `/dashboard/manage/user/add`;
+    } else if (userRole.value === 'clinician') {
+        return `/dashboard/manage/user/patient?tab=1`;
     }
 })
 

@@ -1,6 +1,6 @@
 import { H3Event } from 'h3'
 import { type UserSession } from '#auth-utils'
-import type { User, UserRole } from '~~lib/shared/types/users'
+import type { DBUser, UserRole } from '~~lib/shared/types/users'
 import { validateUUID } from '~lib/schemas/primitives'
 import { DatabaseService } from '~~/server/services/databaseService'
 import { InvitationStatusSchema } from '@@/shared/schemas/users/invitation'
@@ -71,7 +71,7 @@ export async function handlePartialRegistration(
         // Update existing user with password and mark registration as complete
         const password_hash = await hashPassword(password)
 
-        const [updatedUser] = await transaction.query<User>(`
+        const [updatedUser] = await transaction.query<DBUser>(`
             UPDATE private.user
             SET 
                 password_hash = $1, 
@@ -117,6 +117,7 @@ export async function handlePartialRegistration(
                 first_name: updatedUser.first_name,
                 verified: updatedUser.verified,
                 user_role: userRole,
+                profile_url: updatedUser.profile_url || undefined,
             },
             secure: {
                 user_id: validatedUserId,

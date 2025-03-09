@@ -53,10 +53,13 @@ async function createTables(db: DatabaseService) {
         CREATE TABLE IF NOT EXISTS private.user (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             email TEXT NOT NULL UNIQUE,
+            last_email_bounced_date TIMESTAMPTZ,
             verified BOOLEAN DEFAULT false,
             phone_number TEXT UNIQUE,
+            title TEXT DEFAULT NULL,
             first_name TEXT NOT NULL,
             last_name TEXT,
+            profile_url TEXT,
             password_hash TEXT,
             role_id UUID REFERENCES private.role(id),
             status TEXT DEFAULT 'pending',
@@ -139,6 +142,20 @@ async function createTables(db: DatabaseService) {
             privacy_level TEXT DEFAULT 'standard',
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS private.email_feedback (
+            feedback_id SERIAL PRIMARY KEY,
+            email TEXT NOT NULL,
+            feedback_type TEXT NOT NULL,
+            sub_type TEXT NOT NULL,
+            timestamp TIMESTAMP NOT NULL,
+            diagnostic TEXT,
+            
+            CONSTRAINT fk_email
+                FOREIGN KEY (email)
+                REFERENCES private.user(email)
+                ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS private.mailing_list_subscription (

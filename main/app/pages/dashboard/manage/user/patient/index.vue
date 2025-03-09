@@ -1,5 +1,5 @@
 <template>
-    <Page nopad>
+    <Page padHeader>
         <template #header>
             <div class="user-patient-page-title">
                 <Transition name="fade">
@@ -25,10 +25,16 @@ const {
 } = useAuth();
 
 watch(() => userRole.value, (role) => {
+    const route = useRoute();
+
     if (role === 'patient') {
         navigateTo('/dashboard');
     }
-});
+
+    if (role === 'admin') {
+        navigateTo('/dashboard/manage/user');
+    }
+}, { immediate: true });
 
 const route = useRoute();
 const tabQuery = computed(() => {
@@ -89,7 +95,8 @@ definePageMeta({
     display: flex;
     flex-direction: column;
     position: relative;
+    width: 100%;
     min-height: calc(100dvh - 2rem - 52px - 40px - 38px);
-    background-color: var(--background-2-color);
+    background-color: var(--background-3-color);
 }
 </style>

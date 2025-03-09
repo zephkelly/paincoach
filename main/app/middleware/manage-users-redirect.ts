@@ -18,14 +18,14 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
             }
 
             if (validatedUserRole === 'admin' && session.user.user_role !== 'admin') {
-                return navigateTo('/dashboard/manage/user' + tabIndexParam);
+                return navigateTo('/dashboard');
             }
             else if (validatedUserRole === 'clinician' && (session.user.user_role !== 'admin' && session.user.user_role !== 'clinician')) {
-                return navigateTo('/dashboard/manage/user' + tabIndexParam);
+                return navigateTo('/dashboard/manage/user/patient' + tabIndexParam);
             }
             else if (validatedUserRole === 'patient' && (session.user.user_role !== 'admin' && session.user.user_role !== 'clinician')) {
                 console.log(session.user.user_role)
-                return navigateTo('/dashboard/manage/user' + tabIndexParam);
+                return navigateTo('/dashboard');
             }
 
             return navigateTo(`/dashboard/manage/user/${validatedUserRole}${tabIndexParam}`);

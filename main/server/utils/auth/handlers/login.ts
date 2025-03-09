@@ -44,8 +44,6 @@ export async function handleLoginCredentials(
             })
         }
 
-
-
         if (await verifyPassword(user.password_hash, password) === false) {
             throw createError({
                 statusCode: 401,
@@ -61,6 +59,7 @@ export async function handleLoginCredentials(
                 first_name: user.first_name,
                 user_role: user.role,
                 verified: user.verified,
+                profile_url: user.profile_url || undefined,
             },
             secure: {
                 email: user.email,

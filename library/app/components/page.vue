@@ -15,16 +15,19 @@
 
 type PageProps = {
     maxWidth?: number;
-    nopad?: boolean;
+    padBody?: boolean;
+    padHeader?: boolean;
     bottomMargin?: boolean;
 }
 
 const props = defineProps<PageProps>();
 
 const maxWidthStyle = props.maxWidth ? `${props.maxWidth}px` : 'auto';
-const paddingStyle = props.nopad ? '0' : '0rem 1rem';
+const paddingStyle = props.padBody ? '0rem 1rem' : '0rem';
 
 const bottomMarginStyle = props.bottomMargin ? '4rem' : '0';
+
+const headingPadding = props.padBody ? '0rem 0rem' : '0rem 1rem';
 </script>
 
 <style lang="scss" scoped>
@@ -52,6 +55,7 @@ const bottomMarginStyle = props.bottomMargin ? '4rem' : '0';
     justify-content: flex-start;
     box-sizing: border-box;
     margin-bottom: 2.5rem;
+    padding: v-bind(headingPadding);
 
     :deep(h1) {
         font-size: 2.5rem;
@@ -60,10 +64,12 @@ const bottomMarginStyle = props.bottomMargin ? '4rem' : '0';
 }
 
 .page-body {
+    display: flex;
     width: 100%;
     align-items: flex-start;
     justify-content: center;
     flex-direction: column;
     box-sizing: border-box;
+    position: relative;
 }
 </style>

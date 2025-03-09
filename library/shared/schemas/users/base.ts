@@ -8,13 +8,16 @@ import type { UserRole } from '@@/shared/types/users';
 
 export const UserRoleSchema = z.enum(['admin', 'clinician', 'patient'])
 export const AccountStatus = z.enum(['active', 'inactive', 'pending'])
+export const UserTitleSchema = z.enum(['Mr', 'Mrs', 'Ms', 'Miss', 'Dr', 'Prof'])
 
-export const BaseUserSchema = z.object({
+export const DBBaseUserSchema = z.object({
     id: z.string().uuid(),
 
     email: z.string()
         .email('Invalid email format')
         .max(255, 'Email must be less than 255 characters'),
+
+    last_email_bounced_date: z.date().nullable(),
 
     verified: z.boolean().default(false),
 
@@ -22,6 +25,8 @@ export const BaseUserSchema = z.object({
         .regex(PHONE_REGEX, 'Invalid phone number format')
         .max(50, 'Phone number must be less than 50 characters')
         .nullable(),
+
+    title: UserTitleSchema.nullable(),
 
     first_name: z.string()
         .min(1, 'First name is required')
@@ -32,12 +37,12 @@ export const BaseUserSchema = z.object({
         .max(255, 'Last name must be less than 255 characters')
         .nullable(),
 
+    profile_url: z.string().nullable(),
+
     password_hash: z.string()
         .min(1, 'Password hash is required')
         .max(255, 'Password hash must be less than 255 characters')
         .nullable(),
-
-    role: UserRoleSchema,
 
     role_id: z.string().uuid(),
 
@@ -70,6 +75,12 @@ export const BaseUserSchema = z.object({
     updated_at: z.date().default(() => new Date()),
 
     version: z.number().default(1)
+})
+
+export const BaseUserSchema = DBBaseUserSchema.omit({
+    role_id: true,
+}).extend({
+    role: UserRoleSchema,
 })
 
 

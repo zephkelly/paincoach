@@ -17,10 +17,4 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    setResponseStatus(event, 200);
-    return {
-        user_id: session.secure.user_id,
-        role: session.secure.user_role,
-        verified: session.secure.verified,
-    }
 });

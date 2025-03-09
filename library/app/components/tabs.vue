@@ -75,6 +75,9 @@
 </template>
   
 <script setup lang="ts">
+import { ref, watch, onMounted, nextTick } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
 interface TabItem {
     label: string;
     headerWidth: number;
@@ -91,6 +94,9 @@ const emit = defineEmits<{
     (e: 'tab-changed', index: number, tab: TabItem): void;
 }>();
 
+const route = useRoute();
+const router = useRouter();
+
 const activeTabIndex = ref(props.defaultTabIndex || 0);
 
 const setActiveTab = (index: number): void => {
@@ -100,6 +106,9 @@ const setActiveTab = (index: number): void => {
 
     if (index >= 0 && index < props.tabs.length) {
         activeTabIndex.value = index;
+
+        // Update URL query parameter
+        updateUrlQueryParam(index);
 
         const newTab = props.tabs[index];
 
@@ -111,12 +120,58 @@ const setActiveTab = (index: number): void => {
     }
     else if (index >= 0 && props.tabs.length === 0) {
         activeTabIndex.value = index;
+        // Update URL query parameter even for empty tabs
+        updateUrlQueryParam(index);
     }
 };
 
+// Function to update the URL query parameter
+const updateUrlQueryParam = (index: number): void => {
+    const query = { ...route.query, tab: index.toString() };
+    router.replace({ query });
+};
+
+// Watch for URL query parameter changes
+watch(() => route.query.tab, (newTabParam) => {
+    if (newTabParam !== undefined) {
+        const newIndex = parseInt(newTabParam as string, 10);
+        if (!isNaN(newIndex) && newIndex !== activeTabIndex.value) {
+            // Only update if it's a valid tab index
+            if (props.tabs && newIndex >= 0 && newIndex < props.tabs.length) {
+                activeTabIndex.value = newIndex;
+            }
+        }
+    }
+}, { immediate: true });
+
+// Watch for prop changes to defaultTabIndex
 watch(() => props.defaultTabIndex, (newValue) => {
-    if (newValue !== undefined) {
+    if (newValue !== undefined && route.query.tab === undefined) {
         setActiveTab(newValue);
+    }
+});
+
+// Initialize from URL on component mount
+onMounted(async () => {
+    // Wait for tabs to be available
+    await nextTick();
+    
+    // Check if there's a tab parameter in the URL
+    const tabParam = route.query.tab;
+    if (tabParam !== undefined) {
+        const tabIndex = parseInt(tabParam as string, 10);
+        if (!isNaN(tabIndex) && props.tabs && tabIndex >= 0 && tabIndex < props.tabs.length) {
+            setActiveTab(tabIndex);
+        } else {
+            // If invalid tab parameter, update URL to current active tab
+            updateUrlQueryParam(activeTabIndex.value);
+        }
+    } else if (props.defaultTabIndex !== undefined) {
+        // If no tab parameter but defaultTabIndex is provided, use it and update URL
+        setActiveTab(props.defaultTabIndex);
+    } else {
+        // If neither exists, ensure URL reflects the current active tab (0)
+        updateUrlQueryParam(activeTabIndex.value);
     }
 });
 </script>
@@ -160,7 +215,7 @@ watch(() => props.defaultTabIndex, (newValue) => {
 
     &:hover {
         button {
-            background-color: var(--background-3-color);
+            background-color: var(--background-4-color);
             color: var(--text-color);
         }
     }
@@ -196,10 +251,18 @@ watch(() => props.defaultTabIndex, (newValue) => {
     padding: 1rem;
     height: calc(100dvh - 6rem - 59px - 40px - 38px);
     overflow-y: auto;
+    position: relative;
+    background-color: var(--background-3-color);
 
     .content-transition-wrapper {
         position: relative;
         min-height: 100%;
+    }
+
+    .tab-item {
+        // position: absolute;
+        width: stretch;
+        height: auto;
     }
 }
 

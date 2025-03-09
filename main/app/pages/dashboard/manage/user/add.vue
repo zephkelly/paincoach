@@ -1,16 +1,19 @@
 <template>
     <Page padHeader>
         <template #header>
-            <h1>Manage Users</h1>
+            <h1>Add New Users</h1>
         </template>
 
-        <div class="user-page-content">
+        <div class="user-add-page-contentas">
             <Tabs :tabs="currentTabs" :loading="!ready" />
         </div>
     </Page>
 </template>
 
 <script lang="ts" setup>
+import DashboardManageUserAdminClinicianInvite from '~/components/dashboard/manage/user/admin/clinician/invite.vue';
+import DashboardManageUserAdminInvite from '~/components/dashboard/manage/user/admin/invite.vue';
+
 const {
     ready,
     userRole
@@ -26,10 +29,18 @@ watch(() => userRole.value, (role) => {
     }
 }, { immediate: true });
 
-const adminUserTabs = [{
-        label: 'Users',
-        component: undefined,
+const userTabs = [{
+        label: 'Clinicians',
+        component: DashboardManageUserAdminClinicianInvite,
         headerWidth: 90
+    }, {
+        label: 'Admins',
+        component: DashboardManageUserAdminInvite,
+        headerWidth: 80
+    }, {
+        label: 'Patients',
+        component: undefined,
+        headerWidth: 100
     }
 ]
 
@@ -38,7 +49,7 @@ const currentTabs = computed(() => {
 
     switch(role) {
         case 'admin':
-            return adminUserTabs;
+            return userTabs;
         case 'clinician':
             return []
         default:
@@ -53,12 +64,12 @@ definePageMeta({
 </script>
 
 <style lang="scss" scoped>
-.user-page-content {
+.user-add-page-content {
     display: flex;
     flex-direction: column;
     position: relative;
-    width: 100%;
     min-height: calc(100dvh - 2rem - 52px - 40px - 38px);
-    background-color: var(--background-2-color);
+    width: 100%;
+    background-color: var(--background-3-color);
 }
 </style>

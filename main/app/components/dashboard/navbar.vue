@@ -33,7 +33,7 @@ import { EButton } from '#components';
 
 const userIDRef = ref('');
 async function submitUserId() {
-    const userData = await $fetch(`/api/v1/mailing-list`, {
+    const userData = await $fetch(`/api/v1/email/test`, {
         method: 'POST',
         body: {
             email: userIDRef.value
@@ -75,7 +75,7 @@ header {
     height: 58px;
     padding: 0.5rem 1rem;
     box-sizing: border-box;
-    background-color: var(--background-2-color);
+    background-color: var(--background-3-color);
     border-bottom: 1px solid var(--border-color);
     font-family: var(--geist-font-stack);
     z-index: 100;

@@ -125,6 +125,7 @@ export async function handleFullRegistration(
                 first_name: newUser.first_name,
                 verified: newUser.verified,
                 user_role: desired_role,
+                profile_url: newUser.profile_url || undefined
             },
             secure: {
                 user_id: newValidatedUserId,

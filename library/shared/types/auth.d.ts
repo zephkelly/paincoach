@@ -12,6 +12,7 @@ declare module '#auth-utils' {
         first_name: string;
         verified: boolean;
         user_role: UserRole;
+        profile_url?: string;
     }
 
     interface SecureSessionData {
@@ -23,13 +24,13 @@ declare module '#auth-utils' {
 
     interface UserSession {
         user: User;
-        
+
         secure: SecureSessionData;
 
         verified: boolean;
         logged_in_at: Date;
         version: number;
     }
-  }
-  
-  export {}
+}
+
+export { }
