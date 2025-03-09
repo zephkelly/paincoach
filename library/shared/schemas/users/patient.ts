@@ -16,11 +16,6 @@ export const PatientUserPrivateDataSchema = z.object({
 
 export const PatientUserSchema = BaseUserSchema.extend({
     role: z.literal('patient'),
-    
-    registration_code: z.string()
-        .min(1, 'Registration code is required')
-        .max(50, 'Registration code must be less than 50 characters')
-        .nullable(),
 
     private_data: PatientUserPrivateDataSchema,
 });

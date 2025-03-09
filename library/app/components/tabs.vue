@@ -1,38 +1,62 @@
 <template>
     <div class="tabs-container">
         <div class="tabs-header" :class="{ 'loading': loading }">
-            <div class="tab-header" v-for="(tab, index) in tabs"
-                :class="{ 'active': activeTabIndex === tabs?.indexOf(tab) }"
-                :style="{ width: (loading) ? (tab.headerWidth * (0.85 + Math.random() * 0.3)) + 'px' : tab.headerWidth + 'px' }"
-            >
-                <template v-if="loading">
-                    <div
+            <template v-if="!tabs || tabs.length === 0">
+                <div
+                    class="tab-header" v-for="i in 3"
+                    :class="{ 'active': activeTabIndex === i - 1 }"
+                    :style="{ width: (loading) ? (90 * (0.85 + Math.random() * 0.3)) + 'px' : 90 + 'px' }"
+                >
+                    <div 
                         class="loading-header skeleton-component"
-                        :class="{ 'skeleton-component-panel': activeTabIndex === tabs?.indexOf(tab) }"
-                        @click="setActiveTab(tabs.indexOf(tab))"
+                        :class="{ 'skeleton-component-panel': activeTabIndex === i - 1 }"
+                        @click="setActiveTab(i - 1)"
                     >
                         <div 
                             class="loading-header-text skeleton-component"
-                            :class="{ 'skeleton-component-panel': activeTabIndex !== tabs?.indexOf(tab) }"
-                            :style="{ width: tab.headerWidth * (0.85 + Math.random() * 0.3) * 0.5 + 'px'}"
+                            :class="{ 'skeleton-component-panel': activeTabIndex !== i - 1 }"
+                            :style="{ width: 90 * (0.85 + Math.random() * 0.3) * 0.5 + 'px'}"
                             
                         ></div>
                     </div>
-                </template>
-                <template v-else>
-                    <button
-                        :key="tab.label"
-                        class="tab-button"
-                        @click="setActiveTab(tabs.indexOf(tab))"
-                    >
-                    {{ tab.label }}
-                    </button>
-                </template>
-            </div>
+                </div>
+            </template>
+            <template v-else>
+                <div class="tab-header" v-for="(tab, index) in tabs"
+                    :class="{ 'active': activeTabIndex === tabs?.indexOf(tab) }"
+                    :style="{ width: (loading) ? (tab.headerWidth * (0.85 + Math.random() * 0.3)) + 'px' : tab.headerWidth + 'px' }"
+                >
+                    <template v-if="loading">
+                        <div
+                            class="loading-header skeleton-component"
+                            :class="{ 'skeleton-component-panel': activeTabIndex === tabs?.indexOf(tab) }"
+                            @click="setActiveTab(tabs.indexOf(tab))"
+                        >
+                            <div 
+                                class="loading-header-text skeleton-component"
+                                :class="{ 'skeleton-component-panel': activeTabIndex !== tabs?.indexOf(tab) }"
+                                :style="{ width: tab.headerWidth * (0.85 + Math.random() * 0.3) * 0.5 + 'px'}"
+                                
+                            ></div>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <button
+                            :key="tab.label"
+                            class="tab-button"
+                            @click="setActiveTab(tabs.indexOf(tab))"
+                        >
+                        {{ tab.label }}
+                        </button>
+                    </template>
+                
+                </div>
+            </template>
         </div>
         <div class="tab-content">
             <TransitionGroup name="fast-fade" tag="div" class="content-transition-wrapper">
-                <div class="tab-item loading" v-if="!tabs">
+                <div class="tab-item loading" v-if="!tabs || loading">
+                    <div class="loading-header skeleton-component"></div>
                 </div>
                 <component
                     class="tab-item"
@@ -84,6 +108,9 @@ const setActiveTab = (index: number): void => {
         }
 
         emit('tab-changed', index, newTab);
+    }
+    else if (index >= 0 && props.tabs.length === 0) {
+        activeTabIndex.value = index;
     }
 };
 

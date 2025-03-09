@@ -1,19 +1,34 @@
+import { z } from 'zod';
+import { getSession } from '~~/server/utils/auth/session/getSession';
+import { BaseUserSchema } from '@@/shared/schemas/users/base';
+
 import { type SecureSessionData, type UserSession, type User } from '#auth-utils';
 import { DatabaseService } from '~~/server/services/databaseService';
 
-import { eventValidateSession } from '~~/server/utils/auth/middlewares/verify-session';
+import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
 import { getUserById } from '~~/server/utils/user/database/get/byId';
 
 
 
+const UserInformationResponseSchema = BaseUserSchema.pick({
+    id: true,
+    role: true,
+    email: true,
+    first_name: true,
+    verified: true
+})
+
+export type UserInformationResponse = z.infer<typeof UserInformationResponseSchema>;
+
 export default defineEventHandler({
     onRequest: [
-        (event) => eventValidateSession(event),
+        (event) => onRequestValidateSession(event),
     ],
     handler: async (event) => {
-        const session = await getUserSession(event) as UserSession;
-        const secureSession = session.secure as SecureSessionData;
-        const userSession = session.user as User;
+        const {
+            userSession,
+            secureSession
+        } = await getSession(event);
 
         if (secureSession.user_role !== 'admin') {
             throw createError({
@@ -31,13 +46,15 @@ export default defineEventHandler({
         }
         else if (user_id === secureSession.user_id) {
             setResponseStatus(event, 200);
-            return {
-                user_id: secureSession.user_id,
-                user_role: secureSession.user_role,
-                email: userSession.email,
-                name: userSession.name,
+            const userSecureSessionInformation: UserInformationResponse = {
+                id: secureSession.user_id,
+                role: secureSession.user_role,
+                email: secureSession.email,
+                first_name: userSession.first_name,
                 verified: secureSession.verified
             }
+
+            return userSecureSessionInformation;
         }
 
         const transaction = await DatabaseService.getInstance().createTransaction();
@@ -48,27 +65,22 @@ export default defineEventHandler({
                 user_id
             );
 
-            if (!user) {
-                throw createError({
-                    statusCode: 404,
-                    statusMessage: 'Not Found'
-                });
-            }
-
             setResponseStatus(event, 200);
-            return {
-                user_id: user_id,
-                user_role: user.role,
+            const fetchedUserInformation: UserInformationResponse = {
+                id: user.id,
+                role: user.role,
                 email: user.email,
-                name: user.first_name,
+                first_name: user.first_name,
                 verified: user.verified
             }
+
+            return fetchedUserInformation
         }
         catch (error: any) {
             if (import.meta.dev) {
                 console.error(error);
             }
-            
+
             throw createError({
                 statusCode: 500,
                 statusMessage: 'Internal Server Error',

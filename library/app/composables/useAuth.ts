@@ -3,13 +3,13 @@ import { type UserRole } from "@@/shared/types/users"
 export const useAuth = () => {
     //@ts-expect-error
     const { loggedIn, user, clear, ready, session, fetch } = useUserSession()
-    
+
     const mockLoading = useState<boolean>('mock-loading-state', () => false)
 
     const toggleMockLoading = () => {
         mockLoading.value = !mockLoading.value
     }
-    
+
     // Add mock loading functionality (only available for admins)
     const setMockLoading = (isLoading: boolean) => {
         if (actualUserRole.value === 'admin') {
@@ -17,23 +17,23 @@ export const useAuth = () => {
             mockLoading.value = isLoading
         }
     }
-    
+
     const clearMockLoading = () => {
         mockLoading.value = false
     }
-    
+
     const mockReadyState = computed(() => {
         if (actualUserRole.value === 'admin' && mockLoading.value) {
             return false
         }
         return ready.value
     })
-    
+
     const isMockingLoading = computed(() =>
         actualUserRole.value === 'admin' && mockLoading.value
     )
-    
-    
+
+
     // Replace mockUserId with mockUserData
     const mockUserData = useState<any | undefined>('mock-user-data', () => undefined)
 
@@ -46,7 +46,7 @@ export const useAuth = () => {
         if (isMockingLoading.value) {
             return undefined
         }
-        
+
         if (actualUserRole.value === 'admin' && mockUserData.value) {
             return mockUserData.value.user_id
         }
@@ -63,20 +63,15 @@ export const useAuth = () => {
             console.log('Fetching mock user data for', userId)
             try {
                 // Make API call to get user data
-                const { data, error } = await useFetch(`/api/v1/auth/${userId}`, {
+                const response = await $fetch(`/api/v1/auth/${userId}`, {
                     method: 'GET',
                     headers: useRequestHeaders(['cookie']),
                 })
-                
-                if (error.value) {
-                    console.error('Error fetching mock user data:', error.value)
-                    return
-                }
-                
-                if (data.value) {
+
+                if (response.data) {
                     console.log('Setting mock user data to', data.value)
                     mockUserData.value = data.value
-                    
+
                     if (isMockingLoading.value) {
                         mockLoading.value = false
                     }
@@ -99,12 +94,12 @@ export const useAuth = () => {
         if (!user || !user.value) return undefined
         return user.value.user_role
     })
-   
+
     const userRole = computed<UserRole | undefined>(() => {
         if (isMockingLoading.value) {
             return undefined
         }
-        
+
         if (actualUserRole.value === 'admin' && mockUserRole.value) {
             return mockUserRole.value
         }
@@ -115,13 +110,13 @@ export const useAuth = () => {
         if (!userRole.value) return undefined
         return userRole.value.charAt(0).toUpperCase() + userRole.value.slice(1)
     })
-   
+
     const isMockingRole = computed(() =>
         actualUserRole.value === 'admin' &&
         mockUserRole.value !== null &&
         mockUserRole.value !== actualUserRole.value
     )
-    
+
     const setMockRole = (role: UserRole | undefined) => {
         if (actualUserRole.value === 'admin') {
             console.log('Setting mock role to', role)
@@ -132,17 +127,17 @@ export const useAuth = () => {
             }
         }
     }
-   
+
     const clearMockRole = () => {
         mockUserRole.value = undefined
     }
 
-   
+
     const verified = computed(() => {
         if (!user || !user.value) return false
         return user.value.verified
     })
-   
+
     const isAdminUser = computed(() => userRole.value === 'admin')
     const isClinicianUser = computed(() => userRole.value === 'clinician')
     const isPatientUser = computed(() => userRole.value === 'patient')
@@ -156,7 +151,7 @@ export const useAuth = () => {
         clearMockLoading()
         clearMockUserData()
     }
-   
+
     return {
         ready: mockReadyState,
         loggedIn,

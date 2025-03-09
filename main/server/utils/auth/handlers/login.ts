@@ -17,7 +17,7 @@ export async function handleLoginCredentials(
     }
 ) {
     const { email, password } = body
-    
+
     if (!password || !email) {
         throw createError({
             statusCode: 400,
@@ -37,6 +37,15 @@ export async function handleLoginCredentials(
             })
         }
 
+        if (user.verified === false || user.status !== 'active' || user.password_hash === undefined || user.password_hash === null) {
+            throw createError({
+                statusCode: 403,
+                statusMessage: 'User has not completed registration'
+            })
+        }
+
+
+
         if (await verifyPassword(user.password_hash, password) === false) {
             throw createError({
                 statusCode: 401,
@@ -45,7 +54,7 @@ export async function handleLoginCredentials(
         }
 
         const validatedUserId = validateUUID(user.id);
-            
+
         const session: UserSession = {
             user: {
                 user_id: validatedUserId,
@@ -64,13 +73,13 @@ export async function handleLoginCredentials(
             version: user.version
         }
 
-        await replaceUserSession(event, session,  {
+        await replaceUserSession(event, session, {
             maxAge: 60 * 60 * 24 * 365 * 1, // 1 year
         });
 
         setResponseStatus(event, 200, 'Ok')
         transaction.commit();
-        
+
         return {
             statusCode: 200,
             statusMessage: 'Ok',
@@ -82,7 +91,7 @@ export async function handleLoginCredentials(
         if (error instanceof H3Error) {
             throw error
         }
-        
+
         console.error(error)
 
         throw createError({

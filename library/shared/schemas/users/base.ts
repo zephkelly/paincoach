@@ -11,13 +11,13 @@ export const AccountStatus = z.enum(['active', 'inactive', 'pending'])
 
 export const BaseUserSchema = z.object({
     id: z.string().uuid(),
-    
+
     email: z.string()
         .email('Invalid email format')
         .max(255, 'Email must be less than 255 characters'),
 
     verified: z.boolean().default(false),
-    
+
     phone_number: z.string()
         .regex(PHONE_REGEX, 'Invalid phone number format')
         .max(50, 'Phone number must be less than 50 characters')
@@ -31,17 +31,22 @@ export const BaseUserSchema = z.object({
         .min(1, 'Last name is required')
         .max(255, 'Last name must be less than 255 characters')
         .nullable(),
-    
+
     password_hash: z.string()
         .min(1, 'Password hash is required')
-        .max(255, 'Password hash must be less than 255 characters'),
-    
+        .max(255, 'Password hash must be less than 255 characters')
+        .nullable(),
+
     role: UserRoleSchema,
-    
+
+    role_id: z.string().uuid(),
+
     status: AccountStatus.default('pending'),
-    
+
+    registration_complete: z.boolean().default(false),
+
     data_sharing_enabled: z.boolean().default(false),
-    
+
     last_data_sharing_consent_date: z.date()
         .nullable()
         .refine((date) => {
@@ -50,18 +55,18 @@ export const BaseUserSchema = z.object({
             }
             return true
         }, 'Consent date cannot be in the future'),
-    
+
     last_data_sharing_revocation_date: z.date()
         .nullable()
         .refine((date) => {
-        if (date) {
-            return date <= new Date()
-        }
-        return true
+            if (date) {
+                return date <= new Date()
+            }
+            return true
         }, 'Revocation date cannot be in the future'),
-    
+
     created_at: z.date().default(() => new Date()),
-    
+
     updated_at: z.date().default(() => new Date()),
 
     version: z.number().default(1)

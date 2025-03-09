@@ -5,14 +5,18 @@
         </template>
 
         <div class="user-page-content">
-            <Tabs :tabs="patientTabs" :loading="!ready || userRole === 'patient'" />
+            <Tabs :tabs="currentTabs" :loading="!ready" />
         </div>
     </Page>
 </template>
 
 <script lang="ts" setup>
+import DashboardManageUserAdminClinicianInvite from '~/components/dashboard/manage/user/admin/clinician/invite.vue';
+import DashboardManageUserAdminInvite from '~/components/dashboard/manage/user/admin/invite.vue';
+
 const {
     ready,
+    actualUserRole,
     userRole
 } = useAuth();
 
@@ -22,7 +26,7 @@ watch(() => userRole.value, (role) => {
     }
 });
 
-const patientTabs = [
+const userTabs = [
     {
         label: 'Patients',
         component: undefined,
@@ -30,15 +34,28 @@ const patientTabs = [
     },
     {
         label: 'Clinicians',
-        component: undefined,
+        component: DashboardManageUserAdminClinicianInvite,
         headerWidth: 90
     },
     {
         label: 'Admins',
-        component: undefined,
+        component: DashboardManageUserAdminInvite,
         headerWidth: 80
     },
 ]
+
+const currentTabs = computed(() => {
+    const role = userRole.value;
+
+    switch(role) {
+        case 'admin':
+            return userTabs;
+        case 'clinician':
+            return []
+        default:
+            return []
+    }
+})
 
 definePageMeta({
     layout: 'app',

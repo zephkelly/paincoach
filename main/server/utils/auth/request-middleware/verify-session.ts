@@ -3,7 +3,7 @@ import { type H3Event } from 'h3';
 
 
 
-export async function eventValidateSession(event: H3Event) {
+export async function onRequestValidateSession(event: H3Event) {
     const session = await getUserSession(event) as UserSession;
 
     if (!session || !session.secure || !session.user) {

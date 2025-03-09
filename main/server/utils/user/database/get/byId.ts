@@ -1,11 +1,11 @@
 import { type DBTransaction } from '~~/server/types/db'
 
-import {type User, type UserRole } from '~~lib/shared/types/users'
+import { type User, type UserRole } from '~~lib/shared/types/users'
 import { type AdminUser } from "~~lib/shared/types/users/admin";
 import { type ClinicianUser } from "~~lib/shared/types/users/clinician";
 import { type PatientUser } from "~~lib/shared/types/users/patient";
 
-import { safeValidateUser } from "~~lib/shared/schemas/users";
+import { validateUser } from "~~lib/shared/schemas/users";
 
 
 /**
@@ -15,7 +15,7 @@ import { safeValidateUser } from "~~lib/shared/schemas/users";
  * @returns User with role-specific data or undefined if not found
  */
 export async function getUserById(
-    db: DBTransaction, 
+    db: DBTransaction,
     userId: string
 ): Promise<User> {
     // Single query with conditional JOINs
@@ -25,14 +25,9 @@ export async function getUserById(
             r.name as role,
             -- Admin fields (none)
             -- Clinician fields
-            cp.license_number,
-            cp.specialization,
-            cp.practice_name,
-            -- Patient fields
-            pp.date_of_birth,
-            pp.emergency_contact_name,
-            pp.emergency_contact_phone,
-            pp.registration_code
+            cp.ahprah_registration_number,
+            cp.specialisation,
+            cp.practice_name
         FROM private.user u
         JOIN private.role r ON u.role_id = r.id
         LEFT JOIN private.admin_profile ap ON u.id = ap.user_id AND r.name = 'admin'
@@ -82,5 +77,5 @@ export async function getUserById(
             });
     }
 
-    return safeValidateUser(fullUser);
+    return validateUser(fullUser);
 }
