@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { onRequestAdminOrClinician } from '~~/server/utils/auth/request-middleware/admin-clinician';
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
+import { onRequestAdminOrClinician } from '~~/server/utils/auth/request-middleware/admin-clinician';
 
 import { getSession } from '~~/server/utils/auth/session/getSession';
 

@@ -54,6 +54,8 @@ export default defineNuxtConfig({
         }
     },
 
+
+
     extends: [
         './../library',
     ],
@@ -71,6 +73,9 @@ export default defineNuxtConfig({
         '~~lib/app/assets/scss/transition.scss',
         '~~lib/app/assets/scss/theme.scss',
         '~~lib/app/assets/scss/reset.scss',
+
+        '~~lib/app/assets/scss/globals/index.scss',
+
         '~/assets/scss/global.scss',
     ],
 
@@ -120,6 +125,12 @@ export default defineNuxtConfig({
                 },
             },
         },
+    },
+
+    routeRules: {
+        '/dashboard/**': {
+            ssr: false
+        }
     },
 
     typescript: {

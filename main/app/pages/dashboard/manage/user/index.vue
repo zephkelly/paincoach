@@ -1,35 +1,46 @@
 <template>
-    <Page padHeader>
+    <PageTabs :tabs="currentTabs" :loading="!ready">
         <template #header>
-            <h1>Manage Users</h1>
+            <h1 class="title">Your users</h1>
         </template>
 
-        <div class="user-page-content">
-            <Tabs :tabs="currentTabs" :loading="!ready" />
-        </div>
-    </Page>
+        <template #default>
+            <div class="user-page-content">
+                <component :is="tab.component" v-for="(tab, index) in currentTabs" :key="index" />
+            </div>
+        </template>
+    </PageTabs>
 </template>
 
 <script lang="ts" setup>
+import DashboardUserOverview from '~/components/dashboard/user/overview.vue';
+
 const {
     ready,
     userRole
 } = useAuth();
+
+const {
+    state,
+    fetch
+} = await useUsers();
+
+fetch();
 
 watch(() => userRole.value, (role) => {
     if (role === 'patient') {
         navigateTo('/dashboard');
     }
 
-    if (role === 'clinician') {
-        navigateTo('/dashboard/manage/user/patient');
-    }
+    // if (role === 'clinician') {
+    //     navigateTo('/dashboard/manage/user/patient');
+    // }
 }, { immediate: true });
 
 const adminUserTabs = [{
-        label: 'Users',
-        component: undefined,
-        headerWidth: 90
+        label: 'Overview',
+        component: DashboardUserOverview,
+        headerWidth: 100
     }
 ]
 

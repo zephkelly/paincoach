@@ -1,18 +1,15 @@
 <template>
-    <Page padHeader>
+    <PageTabs :tabs="currentTabs" :loading="!ready">
         <template #header>
-            <h1>Add New Users</h1>
+            <h1>Add new users</h1>
         </template>
-
-        <div class="user-add-page-contentas">
-            <Tabs :tabs="currentTabs" :loading="!ready" />
-        </div>
-    </Page>
+    </PageTabs>
 </template>
 
 <script lang="ts" setup>
-import DashboardManageUserAdminClinicianInvite from '~/components/dashboard/manage/user/admin/clinician/invite.vue';
-import DashboardManageUserAdminInvite from '~/components/dashboard/manage/user/admin/invite.vue';
+import DashboardUserClinicianInvite from '~/components/dashboard/user/clinician/invite.vue';
+import DashboardUserPatientInvite from '~/components/dashboard/user/patient/invite.vue';
+import DashboardUserAdminInvite from '~/components/dashboard/user/admin/invite.vue';
 
 const {
     ready,
@@ -31,15 +28,15 @@ watch(() => userRole.value, (role) => {
 
 const userTabs = [{
         label: 'Clinicians',
-        component: DashboardManageUserAdminClinicianInvite,
+        component: DashboardUserClinicianInvite,
         headerWidth: 90
     }, {
         label: 'Admins',
-        component: DashboardManageUserAdminInvite,
+        component: DashboardUserAdminInvite,
         headerWidth: 80
     }, {
         label: 'Patients',
-        component: undefined,
+        component: DashboardUserPatientInvite,
         headerWidth: 100
     }
 ]

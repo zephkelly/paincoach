@@ -74,7 +74,8 @@
 
 <script lang="ts" setup>
 const {
-    isAppSidebarOpen
+    isAppSidebarOpen,
+    toggleOpen
 } = useAppSidebar();
 
 const {
@@ -106,23 +107,15 @@ const yourAddUsersLinkComputed = computed(() => {
     }
 })
 
-// const addNewUserType = computed(() => {
-//     if (userRole.value === 'admin') {
-//         return 'user';
-//     } else if (userRole.value === 'clinician') {
-//         return 'user/patient';
-//     }
-// })
-
-function removeLastLetter(string?: string) {
-    if (!string) return '';
-    return string.slice(0, -1);
-}
-
 function capitaliseFirstLetter(string?: string) {
     if (!string) return '';
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+const route = useRoute();
+watch(() => route.path, () => {
+    toggleOpen();
+})
 </script>
 
 <style lang="scss" scoped>

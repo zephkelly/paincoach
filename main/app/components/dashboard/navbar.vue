@@ -12,7 +12,9 @@
                     <DashboardAccountRoleChip :userRole="userRole.value" />
                 </template>
                 <template #adminActual>
-                    <div class="admin">
+                    <EButton @click="adminTogglesOpen = !adminTogglesOpen">Open</EButton>
+                    <div class="admin" v-show="adminTogglesOpen">
+                        <EButton @click="test()">Test</EButton>
                         <input type="text" v-model="userIDRef">
                         <EButton @click="submitUserId">Maillist</EButton>
                         <EButton @click="setMockRole('clinician')">View clinician</EButton>
@@ -31,6 +33,8 @@
 <script lang="ts" setup>
 import { EButton } from '#components';
 
+const adminTogglesOpen = ref(false);
+
 const userIDRef = ref('');
 async function submitUserId() {
     const userData = await $fetch(`/api/v1/email/test`, {
@@ -40,6 +44,16 @@ async function submitUserId() {
         }
     });
     console.log(userData);
+}
+
+async function test() {
+    try {
+        const response = await $fetch('/api/v1/user?roles=all&page=0&limit=10');
+        console.log(response);
+    }
+    catch(error) {
+        console.error(error);
+    }
 }
 
 const {

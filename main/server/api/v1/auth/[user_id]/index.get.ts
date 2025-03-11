@@ -1,24 +1,15 @@
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { getSession } from '~~/server/utils/auth/session/getSession';
-import { BaseUserSchema } from '@@/shared/schemas/users/base';
 
-import { type SecureSessionData, type UserSession, type User } from '#auth-utils';
+import { type MinimalUserInfo } from '~~lib/shared/types/users/minimal'
+import { validateMinimalUserInfo } from '@@/shared/schemas/users/minimal';
+
 import { DatabaseService } from '~~/server/services/databaseService';
 
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
-import { getUserById } from '~~/server/utils/user/database/get/byId';
+import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 
-
-const UserInformationResponseSchema = BaseUserSchema.pick({
-    id: true,
-    role: true,
-    email: true,
-    first_name: true,
-    verified: true
-})
-
-export type UserInformationResponse = z.infer<typeof UserInformationResponseSchema>;
 
 export default defineEventHandler({
     onRequest: [
@@ -46,7 +37,7 @@ export default defineEventHandler({
         }
         else if (user_id === secureSession.user_id) {
             setResponseStatus(event, 200);
-            const userSecureSessionInformation: UserInformationResponse = {
+            const userSecureSessionInformation: MinimalUserInfo = {
                 id: secureSession.user_id,
                 role: secureSession.user_role,
                 email: secureSession.email,
@@ -60,13 +51,29 @@ export default defineEventHandler({
         const transaction = await DatabaseService.getInstance().createTransaction();
 
         try {
-            const user = await getUserById(
-                transaction,
-                user_id
-            );
+            const userResult = await transaction.query<MinimalUserInfo>(`
+                SELECT 
+                    u.id,
+                    u.email,
+                    u.first_name,
+                    u.verified,
+                    r.name as role,
+                FROM private.user u
+                JOIN private.role r ON u.role_id = r.id
+                WHERE u.id = $1
+            `, [user_id]);
+
+            if (userResult.length === 0) {
+                throw createError({
+                    statusCode: 404,
+                    statusMessage: 'User not found'
+                });
+            }
+
+            const user = validateMinimalUserInfo(userResult[0])
 
             setResponseStatus(event, 200);
-            const fetchedUserInformation: UserInformationResponse = {
+            const fetchedUserInformation: MinimalUserInfo = {
                 id: user.id,
                 role: user.role,
                 email: user.email,
@@ -76,9 +83,13 @@ export default defineEventHandler({
 
             return fetchedUserInformation
         }
-        catch (error: any) {
+        catch (error: unknown) {
             if (import.meta.dev) {
                 console.error(error);
+            }
+
+            if (error instanceof ZodError) {
+                throw createZodValidationError(error);
             }
 
             throw createError({

@@ -1,5 +1,5 @@
 import { z, ZodError } from 'zod';
-import { createZodValidationError } from '~~/shared/utils/zod/error';
+import { createZodValidationError } from '~~lib/shared/utils/zod/error';
 import { UserRoleSchema } from '~~lib/shared/schemas/users/base'
 import { PatientUserPrivateDataSchema } from '~~lib/shared/schemas/users/patient'
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
