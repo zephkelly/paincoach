@@ -29,6 +29,11 @@ export function extractZodErrors(error: ZodError, includeFirstErrorOnly = false)
 export function createZodValidationError(error: ZodError, includeFirstErrorOnly = false) {
     const fieldErrors = extractZodErrors(error, includeFirstErrorOnly);
 
+    if (import.meta.client) {
+        console.log('Validation errors:', error);
+        throw new Error('Validation failed');
+    }
+
     if (import.meta.dev) {
         return createError({
             statusCode: 400,
@@ -42,7 +47,6 @@ export function createZodValidationError(error: ZodError, includeFirstErrorOnly 
             statusCode: 500,
             statusMessage: 'Bad Request',
             message: 'Internal server validation failed, contact administrator.',
-            data: { errors: fieldErrors }
         });
     }
 }

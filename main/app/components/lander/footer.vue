@@ -38,7 +38,7 @@ footer {
 .section.container {
     box-sizing: border-box;
     padding: 0rem 1rem;
-    max-width: 800px;
+    max-width: 1000px;
     width: 100%;
 }
 

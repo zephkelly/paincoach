@@ -1,5 +1,5 @@
 <template>
-    <Page :max-width="800">
+    <Page :max-width="1000">
         <main id="main-content landing" class="site-page">
             <ScrollToReveal centerAlign>
                 <LanderHero class="hero main" aria-label="Main hero section"/>

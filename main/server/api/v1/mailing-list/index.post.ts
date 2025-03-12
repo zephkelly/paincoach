@@ -76,6 +76,8 @@ export default defineEventHandler(async (event) => {
                 }
             }
         })
+
+        
        
         // Send amazon ses transactional email
         await transaction.commit()

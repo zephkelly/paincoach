@@ -130,7 +130,6 @@ async function submitForm() {
 
 <style lang="scss" scoped>
 section {
-    padding: 0rem 1rem;
     min-height: 200px;
 
     @media (max-width: 768px) {

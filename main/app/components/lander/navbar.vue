@@ -98,7 +98,7 @@ section {
 
     .container.section {
         width: 100%;
-        max-width: 800px;
+        max-width: 1000px;
         box-sizing: border-box;
         padding: 0rem 1rem;
     }
@@ -206,7 +206,7 @@ section.docked {
 
     .image-container {
         img {
-            left: -12px;
+            left: -16px;
             width: 300px;
             top: 3rem;
 
