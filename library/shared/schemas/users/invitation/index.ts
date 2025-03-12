@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import { createZodValidationError } from '@@/shared/utils/zod/error';
+
+import { UserInvitePartialSchema } from './request';
+import type { UserInvitation } from '@@/shared/types/users/invitation';
 
 
 
@@ -17,5 +21,18 @@ export const UserInvitationSchema = z.object({
     expires_at: z.date(),
     status: InvitationStatusSchema,
     created_at: z.date(),
-    updated_at: z.date()
+    updated_at: z.date(),
+
+    registration_data: UserInvitePartialSchema.optional(),
 });
+
+
+export function validateUserInvitation(data: UserInvitation) {
+    const parsedResult = UserInvitationSchema.safeParse(data)
+
+    if (!parsedResult.success) {
+        throw createZodValidationError(parsedResult.error)
+    }
+
+    return parsedResult.data
+}

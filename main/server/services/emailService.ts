@@ -289,7 +289,7 @@ export class EmailService {
         const ENVIRONMENT_DOMAIN = config.environmentDomain;
         const NOREPLY_EMAIL = config.aws.ses.noreply;
 
-        const registrationUrl = `${ENVIRONMENT_DOMAIN}/register/invite/${inviteToken}`;
+        const registrationUrl = `${ENVIRONMENT_DOMAIN}/r/register/invite/${inviteToken}`;
 
         let content = '';
         if (inviteeName) {
@@ -339,7 +339,7 @@ export class EmailService {
         const ENVIRONMENT_DOMAIN = config.environmentDomain;
         const NOREPLY_EMAIL = config.aws.ses.noreply;
 
-        const registrationUrl = `${ENVIRONMENT_DOMAIN}/register/invite/${inviteToken}`;
+        const registrationUrl = `${ENVIRONMENT_DOMAIN}/r/register/invite/${inviteToken}`;
 
         let content = '';
         if (inviteeName) {
@@ -389,7 +389,7 @@ export class EmailService {
         const ENVIRONMENT_DOMAIN = config.environmentDomain;
         const NOREPLY_EMAIL = config.aws.ses.noreply;
 
-        const registrationUrl = `${ENVIRONMENT_DOMAIN}/register/invite/${inviteToken}`;
+        const registrationUrl = `${ENVIRONMENT_DOMAIN}/r/register/invite/${inviteToken}`;
 
         let content = '';
         if (inviteeName) {

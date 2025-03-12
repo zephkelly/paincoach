@@ -10,7 +10,7 @@ import { EmailService } from '~~/server/services/emailService';
 
 export async function createAdminInvitation(transaction: DBTransaction, adminData: InviteUserRequest, secureSession: SecureSessionData, userData: User) {
     let adminId: string | undefined = undefined;
-    
+
     if (adminData.mock) {
         if (secureSession.user_role !== 'admin') {
             throw createError({
@@ -45,7 +45,7 @@ export async function createAdminInvitation(transaction: DBTransaction, adminDat
             adminId = adminData.mock.id;
         }
     }
-    else {  
+    else {
         if (secureSession.user_role !== 'admin') {
             throw createError({
                 statusCode: 403,
@@ -76,10 +76,18 @@ export async function createAdminInvitation(transaction: DBTransaction, adminDat
         // Create invitation
         const invitationResult = await transaction.query(`
             INSERT INTO private.user_invitation (
-                email, phone_number, user_id, invitation_token, 
-                invited_by, role_id, registration_type, expires_at, status
+                email,
+                phone_number,
+                user_id,
+                invitation_token, 
+                invited_by, 
+                role_id,
+                registration_type,
+                expires_at,
+                registration_data,
+                status
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, 'pending'
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending'
             ) RETURNING id
         `, [
             adminData.user.email,
@@ -89,7 +97,8 @@ export async function createAdminInvitation(transaction: DBTransaction, adminDat
             adminId, // Current admin's ID as the inviter
             adminRoleId,
             registrationType,
-            expiresAt
+            expiresAt,
+            adminData.user,
         ]);
 
         const invitationId = invitationResult[0].id;

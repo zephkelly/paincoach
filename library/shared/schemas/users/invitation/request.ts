@@ -20,6 +20,10 @@ const AdminInviteSchema = BaseUserFieldsSchema.extend({
     role: z.literal('admin'),
 });
 
+const AdminInvitePartialSchema = AdminInviteSchema.partial().extend({
+    role: z.literal('admin')
+})
+
 const ClinicianInviteSchema = BaseUserFieldsSchema.extend({
     role: z.literal('clinician'),
     ahprah_registration_number: z.string(),
@@ -29,17 +33,27 @@ const ClinicianInviteSchema = BaseUserFieldsSchema.extend({
     abn: z.string().optional(),
 });
 
+const ClinicianInvitePartialSchema = ClinicianInviteSchema.partial().extend({
+    role: z.literal('clinician'),
+})
+
+
 const PatientInviteSchema = BaseUserFieldsSchema.extend({
     role: z.literal('patient'),
 });
 
-//add a refine to make sure the confirm email matches the email
+const PatientInvitePartialSchema = PatientInviteSchema.partial().extend({
+    role: z.literal('patient'),
+})
+
+
+export const UserInviteSchema = z.discriminatedUnion('role', [AdminInviteSchema, ClinicianInviteSchema, PatientInviteSchema]);
+
+export const UserInvitePartialSchema = z.discriminatedUnion('role', [AdminInvitePartialSchema, ClinicianInvitePartialSchema, PatientInvitePartialSchema]);
+
+
 export const InviteUserRequestSchema = z.object({
-    user: z.discriminatedUnion('role', [
-        AdminInviteSchema,
-        ClinicianInviteSchema,
-        PatientInviteSchema,
-    ]),
+    user: UserInviteSchema,
     mock: MockUserDataSchema.partial().optional(),
 }).refine((data) => {
     return data.user.email === data.user?.confirm_email;

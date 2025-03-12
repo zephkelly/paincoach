@@ -1,6 +1,9 @@
 import { z } from 'zod';
-import { InviteUserRequestSchema } from '@@/shared/schemas/users/invitation/request';
+import { InviteUserRequestSchema, UserInviteSchema, UserInvitePartialSchema } from '@@/shared/schemas/users/invitation/request';
 
 
 
 export type InviteUserRequest = z.infer<typeof InviteUserRequestSchema>;
+
+export type UserInvite = z.infer<typeof UserInviteSchema>;
+export type UserInvitePartial = z.infer<typeof UserInvitePartialSchema>;

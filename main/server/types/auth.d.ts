@@ -1,4 +1,5 @@
 import { UserRole } from "./users";
+import { UserInvitePartial } from '~~lib/shared/schemas/users/invitation/request'
 
 
 
@@ -27,6 +28,13 @@ declare module '#auth-utils' {
         logged_in_at: Date;
         version: number;
     }
+
+    interface IncompleteUserSession {
+        registration_data: UserInvitePartial;
+
+        logged_in_at: Date;
+    }
+
 }
 
 export { }
