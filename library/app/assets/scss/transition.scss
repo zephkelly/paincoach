@@ -23,6 +23,43 @@
 }
 
 
+// Used in tabs tab-items
+.fast-fade-page-enter-active,
+.fast-fade-page-leave-active {
+  transition: opacity 0.25s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.fast-fade-page-enter-from,
+.fast-fade-page-leave-to {
+  opacity: 0;
+}
+
+/* Make outgoing page absolutely positioned to prevent layout shifting */
+.fast-fade-page-leave-active {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+/* Optional: Add a z-index to ensure the outgoing page is below the incoming page */
+.fast-fade-page-leave-active {
+  z-index: 1;
+}
+
+.fast-fade-page-enter-active {
+  z-index: 2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fast-fade-page-enter-active,
+  .fast-fade-page-leave-active {
+    transition-duration: 0.2s; /* Slightly faster on mobile */
+  }
+}
+
+
 
 .slide-fade-enter-active {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);

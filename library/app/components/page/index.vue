@@ -12,13 +12,7 @@
 </template>
 
 <script setup lang="ts">
-
-type PageProps = {
-    maxWidth?: number;
-    padBody?: boolean;
-    padHeader?: boolean;
-    bottomMargin?: boolean;
-}
+import { type PageProps } from '@/types/page';
 
 const props = defineProps<PageProps>();
 
@@ -58,8 +52,8 @@ const headingPadding = props.padBody ? '0rem 0rem' : '0rem 1rem';
     padding: v-bind(headingPadding);
 
     :deep(h1) {
-        font-size: 2.5rem;
-        font-weight: 600;
+        font-size: 2.4rem;
+        font-weight: 500;
     }
 }
 

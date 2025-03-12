@@ -37,7 +37,7 @@ const adminTogglesOpen = ref(false);
 
 const userIDRef = ref('');
 async function submitUserId() {
-    const userData = await $fetch(`/api/v1/email/test`, {
+    const userData = await $fetch(`/api/v1/mailing-list`, {
         method: 'POST',
         body: {
             email: userIDRef.value
@@ -90,7 +90,7 @@ header {
     padding: 0.5rem 1rem;
     box-sizing: border-box;
     background-color: var(--background-3-color);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-5-color);
     font-family: var(--geist-font-stack);
     z-index: 100;
     
@@ -115,7 +115,7 @@ header {
             cursor: pointer;
             overflow: hidden;
             border-radius: 50%;
-            border: 2px solid var(--border-color);
+            border: 2px solid var(--border-5-color);
             background-color: var(--background-color);
 
             img {

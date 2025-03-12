@@ -1,5 +1,5 @@
 <template>
-    <PageTabs :tabs="patientTabs" :loading="!ready || userRole === 'patient'" :defaultTabIndex="tabQuery">
+    <PageTabs :tabs="patientTabs" :loading="userRole === 'patient'">
         <template #header>
             <div class="user-patient-page-title">
                 <Transition name="fade">
@@ -27,35 +27,18 @@ watch(() => userRole.value, (role) => {
         navigateTo('/dashboard');
     }
 
-    // if (role === 'admin') {
-    //     navigateTo('/dashboard/manage/user');
-    // }
-}, { immediate: true });
-
-const route = useRoute();
-const tabQuery = computed(() => {
-    if (route.query.tab) {
-        const tabindex = parseInt(route.query.tab as unknown as string);
-
-        navigateTo({
-            path: route.path,
-            query: {
-                ...route.query,
-                tab: undefined
-            },
-            replace: true
-        });
-
-        return tabindex;
+    if (role === 'admin') {
+        navigateTo('/dashboard/manage/user');
     }
-});
+}, { immediate: true });
 
 
 import DashboardUserPatientInvite from '~/components/dashboard/user/patient/invite.vue';
+import DashboardUserPatientOverview from '~/components/dashboard/user/patient/overview.vue';
 const patientTabs = [
     {
         label: 'Your Patients',
-        component: undefined,
+        component: DashboardUserPatientOverview,
         headerWidth: 120
     },
     {

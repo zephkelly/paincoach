@@ -139,7 +139,7 @@ defineProps<ChipProps>();
 }
 
 .chip-main:not(.loading-skeleton) {
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-5-color);
     background-color: var(--background-3-color);
 }
 </style>

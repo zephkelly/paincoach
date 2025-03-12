@@ -1,7 +1,7 @@
 <template>
     <form class="form" @submit.prevent="submitForm">
         <div class="form__header">
-            <h2 class="form__title">Add New Admin</h2>
+            <h2 class="form__title">Add New Patient</h2>
         </div>
         <div class="form__body">
             <div class="form__group">

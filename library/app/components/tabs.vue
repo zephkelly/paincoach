@@ -54,7 +54,7 @@
             </template>
         </div>
         <div class="tab-content">
-            <TransitionGroup name="fast-fade" tag="div" class="content-transition-wrapper">
+            <TransitionGroup name="fast-fade-page" tag="div" class="content-transition-wrapper">
                 <div class="tab-item loading" v-if="!tabs || loading">
                     <div class="loading-header skeleton-component"></div>
                 </div>
@@ -75,14 +75,7 @@
 </template>
   
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-
-interface TabItem {
-    label: string;
-    headerWidth: number;
-    component?: any;
-}
+import { type TabItem } from '@/types/tab/item';
 
 const props = defineProps<{
     loading: boolean;
@@ -187,7 +180,7 @@ onMounted(async () => {
 
 .tabs-header {
     display: flex;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-5-color);
     height: 38px;
     background-color: var(--background-color);
 }
@@ -200,7 +193,7 @@ onMounted(async () => {
     transition: all 0.3s ease;
     overflow: hidden;
     color: var(--text-color);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-5-color);
     border-bottom: none;
     border-left: none;
     transition: width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
@@ -249,8 +242,8 @@ onMounted(async () => {
 
 .tab-content {
     padding: 1rem;
-    height: calc(100dvh - 6rem - 59px - 40px - 38px);
-    overflow-y: auto;
+    min-height: calc(100dvh - 6.2rem - 54px - 40px - 38px);
+    // overflow-y: auto;
     position: relative;
     background-color: var(--background-3-color);
 
@@ -260,7 +253,6 @@ onMounted(async () => {
     }
 
     .tab-item {
-        // position: absolute;
         width: stretch;
         height: auto;
     }

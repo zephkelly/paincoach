@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import DashboardUserOverview from '~/components/dashboard/user/overview.vue';
+import DashboardUserOverview from '~/components/dashboard/user/overview/index.vue';
 
 const {
     ready,
@@ -32,9 +32,9 @@ watch(() => userRole.value, (role) => {
         navigateTo('/dashboard');
     }
 
-    // if (role === 'clinician') {
-    //     navigateTo('/dashboard/manage/user/patient');
-    // }
+    if (role === 'clinician') {
+        navigateTo('/dashboard/manage/user/patient');
+    }
 }, { immediate: true });
 
 const adminUserTabs = [{

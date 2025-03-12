@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { createZodValidationError } from '@@/shared/utils/zod/error';
 
-import { AdminUserSchema } from "./admin";
-import { ClinicianUserSchema } from "./clinician";
-import { PatientUserSchema } from "./patient";
+import { DBAdminUserSchema, AdminUserSchema } from "./admin";
+import { DBClinicianUserSchema, ClinicianUserSchema } from "./clinician";
+import { DBPatientUserSchema, PatientUserSchema } from "./patient";
 
 import { type User } from '../../types/users'
 
@@ -10,10 +11,10 @@ import { type User } from '../../types/users'
 
 export { UserRoleSchema, AccountStatus, validateUserRole } from './base'
 
-export const UserSchema = z.discriminatedUnion('role', [
-    AdminUserSchema,
-    ClinicianUserSchema,
-    PatientUserSchema
+export const DBUserSchema = z.discriminatedUnion('role', [
+    DBAdminUserSchema,
+    DBClinicianUserSchema,
+    DBPatientUserSchema
 ]
 ).refine(
     (data) => {
@@ -42,12 +43,28 @@ export const UserSchema = z.discriminatedUnion('role', [
     }
 )
 
+export const UserSchema = z.discriminatedUnion('role', [
+    AdminUserSchema,
+    ClinicianUserSchema,
+    PatientUserSchema
+]);
+
 
 export function validateUser(data: User) {
     const parsedResult = UserSchema.safeParse(data)
 
     if (!parsedResult.success) {
-        throw new Error(parsedResult.error.errors[0]?.message)
+        throw createZodValidationError(parsedResult.error)
+    }
+
+    return parsedResult.data
+}
+
+export function validateUsers(data: User[]) {
+    const parsedResult = UserSchema.array().safeParse(data)
+
+    if (!parsedResult.success) {
+        throw createZodValidationError(parsedResult.error)
     }
 
     return parsedResult.data

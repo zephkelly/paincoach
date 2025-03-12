@@ -1,9 +1,12 @@
 import { z } from 'zod';
 
-import { BaseUserSchema } from './base';
+import { BaseDBUserSchema, BaseUserSchema } from './base';
 
 import { type AdminUser } from '../../types/users/admin';
 
+export const DBAdminUserSchema = BaseDBUserSchema.extend({
+    role: z.literal('admin'),
+})
 
 export const AdminUserSchema = BaseUserSchema.extend({
     role: z.literal('admin'),

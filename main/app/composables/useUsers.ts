@@ -1,5 +1,5 @@
 import type { AdminUser, ClinicianUser, PatientUser } from '@@/shared/types/users';
-import { type AdminUserGetResponse } from '~~/server/api/v1/user/index.get';
+import { type AdminUserGetResponse } from '~~/server/api/v1/user/info/index.get';
 
 export const useUsers = async () => {
     const state = useState<{
@@ -30,13 +30,13 @@ export const useUsers = async () => {
             let fetchedUsers = undefined;
 
             if (isMockingUserData || isMockingRole) {
-                fetchedUsers = await $fetch<AdminUserGetResponse>('/api/v1/user?roles=all&page=0&limit=10', {
+                fetchedUsers = await $fetch<AdminUserGetResponse>('/api/v1/user/info?roles=all&page=0&limit=10', {
                     method: 'POST',
                     body: mockUserAPIData.value
                 });
             }
             else {
-                fetchedUsers = await $fetch<AdminUserGetResponse>('/api/v1/user?roles=all&page=0&limit=10');
+                fetchedUsers = await $fetch<AdminUserGetResponse>('/api/v1/user/info?roles=all&page=0&limit=10');
             }
 
             state.value.adminUsers = fetchedUsers.users.admin;
@@ -49,8 +49,7 @@ export const useUsers = async () => {
         }
     }
 
-    watch(() => userRole.value, (newRole) => {
-        console.log(newRole)
+    watch(() => userRole.value, (oldRole, newRole) => {
         console.log('Mock user role changed, fetching users');
         fetch();
     });

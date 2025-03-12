@@ -1,7 +1,6 @@
 import { z, ZodError } from 'zod';
 
 import { PHONE_REGEX } from '../../constants/phone';
-import { version } from 'vue';
 import type { UserRole } from '@@/shared/types/users';
 
 
@@ -10,21 +9,21 @@ export const UserRoleSchema = z.enum(['admin', 'clinician', 'patient'])
 export const AccountStatus = z.enum(['active', 'inactive', 'pending'])
 export const UserTitleSchema = z.enum(['Mr', 'Mrs', 'Ms', 'Miss', 'Dr', 'Prof'])
 
-export const DBBaseUserSchema = z.object({
+export const BaseDBUserSchema = z.object({
     id: z.string().uuid(),
 
     email: z.string()
         .email('Invalid email format')
         .max(255, 'Email must be less than 255 characters'),
 
-    last_email_bounced_date: z.date().nullable(),
+    last_email_bounced_date: z.date().nullable().optional(),
 
-    verified: z.boolean().default(false),
+    verified: z.boolean(),
 
     phone_number: z.string()
         .regex(PHONE_REGEX, 'Invalid phone number format')
         .max(50, 'Phone number must be less than 50 characters')
-        .nullable(),
+        .nullable().optional(),
 
     title: UserTitleSchema.nullable(),
 
@@ -37,20 +36,20 @@ export const DBBaseUserSchema = z.object({
         .max(255, 'Last name must be less than 255 characters')
         .nullable(),
 
-    profile_url: z.string().nullable(),
+    profile_url: z.string().nullable().optional(),
 
     password_hash: z.string()
         .min(1, 'Password hash is required')
         .max(255, 'Password hash must be less than 255 characters')
         .nullable(),
 
-    role_id: z.string().uuid(),
+    role: UserRoleSchema,
 
     status: AccountStatus.default('pending'),
 
-    registration_complete: z.boolean().default(false),
+    registration_complete: z.boolean(),
 
-    data_sharing_enabled: z.boolean().default(false),
+    data_sharing_enabled: z.boolean(),
 
     last_data_sharing_consent_date: z.date()
         .nullable()
@@ -70,19 +69,23 @@ export const DBBaseUserSchema = z.object({
             return true
         }, 'Revocation date cannot be in the future'),
 
-    created_at: z.date().default(() => new Date()),
+    created_at: z.date(),
 
-    updated_at: z.date().default(() => new Date()),
+    updated_at: z.date(),
 
-    version: z.number().default(1)
+    version: z.number()
 })
 
-export const BaseUserSchema = DBBaseUserSchema.omit({
-    role_id: true,
-}).extend({
-    role: UserRoleSchema,
+export const BaseUserSchema = BaseDBUserSchema.omit({
+    verified: true,
+    password_hash: true,
+    registration_complete: true,
+    data_sharing_enabled: true,
+    last_data_sharing_consent_date: true,
+    last_data_sharing_revocation_date: true,
+    updated_at: true,
+    version: true
 })
-
 
 export function validateUserRole(role: string): UserRole {
     try {

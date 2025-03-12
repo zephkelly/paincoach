@@ -1,15 +1,30 @@
 <template>
     <div class="clinician-users-overview">
-
+        <DashboardUserOverviewList :users="clinicianUsers" :title="title" :loading="!ready" :showRole="showRole" listRole="clinician"> >
+            <template #icon>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor"><path d="M20 22v-3c0-2.828 0-4.243-.879-5.121C18.243 13 16.828 13 14 13l-2 2l-2-2c-2.828 0-4.243 0-5.121.879C4 14.757 4 16.172 4 19v3m12-9v5.5"/><path d="M8.5 13v4m0 0a2 2 0 0 1 2 2v1m-2-3a2 2 0 0 0-2 2v1m9-13.5v-1a3.5 3.5 0 1 0-7 0v1a3.5 3.5 0 1 0 7 0m1.25 12.75a.75.75 0 1 1-1.5 0a.75.75 0 0 1 1.5 0"/></g></svg>
+            </template>
+        </DashboardUserOverviewList>
     </div>
 </template>
 
 <script lang="ts" setup>
+import type { MinimalUserInfo } from '@@/shared/types/users/minimal';
 import { type ClinicianUser } from '~~lib/shared/types/users/clinician'
 
 type Props = {
-    users: ClinicianUser[];
+    users?: ClinicianUser[];
+    showRole?: boolean;
+    title?: string;
 }
 
 const props = defineProps<Props>();
+
+const {
+    ready,
+} = useAuth();
+
+const {
+    clinicianUsers
+} = await useUsers();
 </script>

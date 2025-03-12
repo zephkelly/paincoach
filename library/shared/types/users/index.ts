@@ -10,6 +10,8 @@ export type UserRole = z.infer<typeof UserRoleSchema>;
 
 export type User = ClinicianUser | PatientUser | AdminUser;
 
+export type { ClinicianUser, PatientUser, AdminUser };
+
 export type DBUser = Exclude<User, 'role'> & { role_id: string };
 
 export { isAdminUser } from './admin';

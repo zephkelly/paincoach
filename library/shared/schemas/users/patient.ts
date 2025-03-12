@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { createZodValidationError } from '@@/shared/utils/zod/error';
 
-import { BaseUserSchema } from './base';
+import { BaseDBUserSchema, BaseUserSchema } from './base';
 import { type PatientUser } from '../../types/users/patient';
 
 
@@ -14,6 +15,12 @@ export const PatientUserPrivateDataSchema = z.object({
         }, 'Date of birth cannot be in the future'),
 });
 
+export const DBPatientUserSchema = BaseDBUserSchema.extend({
+    role: z.literal('patient'),
+
+    private_data: PatientUserPrivateDataSchema,
+});
+
 export const PatientUserSchema = BaseUserSchema.extend({
     role: z.literal('patient'),
 
@@ -21,11 +28,21 @@ export const PatientUserSchema = BaseUserSchema.extend({
 });
 
 
-export function safeValidatePatientUser(data: PatientUser) {
+export function validatePatientUser(data: PatientUser) {
     const parsedResult = PatientUserSchema.safeParse(data)
 
     if (!parsedResult.success) {
-        throw new Error(parsedResult.error.errors[0]?.message)
+        throw createZodValidationError(parsedResult.error)
+    }
+
+    return parsedResult.data
+}
+
+export function validatePatientUsers(data: PatientUser[]) {
+    const parsedResult = PatientUserSchema.array().safeParse(data)
+
+    if (!parsedResult.success) {
+        throw createZodValidationError(parsedResult.error)
     }
 
     return parsedResult.data

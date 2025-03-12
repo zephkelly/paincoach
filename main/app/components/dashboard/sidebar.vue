@@ -147,8 +147,8 @@ section.app-sidebar {
 
     &.app-sidebar--open {
         width: 288px;
-        border-color: var(--border-color);
-        border-right: 1px solid var(--border-2-color);
+        border-color: var(--border-5-color);
+        border-right: 1px solid var(--border-7-color);
 
         .app-sidebar--content {
             width: 288px;
@@ -294,7 +294,7 @@ section.app-sidebar {
 
     &:hover {
         background-color: var(--background-3-color);
-        border-color: var(--border-color);
+        border-color: var(--border-5-color);
         padding: 0rem 0.5rem;
     }
 

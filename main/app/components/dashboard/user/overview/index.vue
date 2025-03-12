@@ -8,17 +8,21 @@
         </div>
 
         <div class="content">
-            <div class="users-wrapper">
-                <DashboardUserAdminOverview :users="[]" />
-
-
+            <div class="users-wrapper flex-col">
+                <DashboardUserAdminOverview :users="adminUsers" showRole title="Admins" />
+                <DashboardUserClinicianOverview :users="clinicianUsers" showRole title="Clinicians" />
+                <DashboardUserPatientOverview :users="patientUsers" showRole title="Patients" />
             </div>
         </div>
     </section>
 </template>
 
 <script lang="ts" setup>
-
+const {
+    adminUsers,
+    clinicianUsers,
+    patientUsers
+} = await useUsers();
 </script>
 
 <style lang="scss" scoped>
@@ -37,5 +41,9 @@
         width: 1.25rem;
         height: 1.25rem;
     }
+}
+
+.users-wrapper {
+    gap: 2rem;
 }
 </style>
