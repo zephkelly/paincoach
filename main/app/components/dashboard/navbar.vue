@@ -69,12 +69,19 @@ const {
     setMockRole,
     clearMocks,
     toggleMockLoading,
-    clearSession
+    clearSession,
 } = useAuth();
 
+
 async function logout() {
-    await clearSession();
-    navigateTo('/');
+    try {
+        await $fetch('/api/v1/auth/logout');
+        await clearSession();
+        navigateTo('/dashboard/login');
+    }
+    catch(error) {
+        console.error(error);
+    }
 }
 </script>
 

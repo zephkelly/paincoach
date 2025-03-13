@@ -102,16 +102,17 @@ async function createTables(db: DatabaseService) {
         );
 
         CREATE TABLE IF NOT EXISTS private.user_invitation (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
             email TEXT NOT NULL,
             phone_number TEXT,
             user_id UUID REFERENCES private.user(id) ON DELETE CASCADE,
             invitation_token TEXT NOT NULL UNIQUE,
-            invited_by UUID REFERENCES private.user(id),
+            invited_by UUID REFERENCES private.user(id) NOT NULL,
             role_id UUID REFERENCES private.role(id) NOT NULL,
             registration_type TEXT NOT NULL DEFAULT 'partial', -- 'partial' or 'full'
+            registration_data JSONB,
             expires_at TIMESTAMPTZ NOT NULL,
-            status TEXT DEFAULT 'pending', -- pending, completed, expired
+            status TEXT DEFAULT 'pending', -- pending, opened, completed, expired
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );

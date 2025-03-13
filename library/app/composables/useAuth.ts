@@ -37,8 +37,7 @@ export const useAuth = () => {
     )
 
 
-    // Replace mockUserId with mockUserData
-    const mockUserData = useState<MinimalUserInfo | undefined>('mock-user-data', () => undefined)
+    const mockUserData = useState<{ id: string, role: UserRole } | undefined>('mock-user-id', () => undefined)
 
     const actualUserId = computed<string | undefined>(() => {
         if (!user || !user.value) return undefined
@@ -56,9 +55,8 @@ export const useAuth = () => {
         return actualUserId.value
     })
 
-    const isMockingUserData = computed(() =>
-        actualUserRole.value === 'admin' &&
-        mockUserData.value !== undefined
+    const isMockingUser = computed(() => 
+        actualUserRole.value === 'admin' && (mockUserData.value !== undefined || isMockingRole.value)
     )
 
     const setMockUserData = async (userId: string | undefined) => {
@@ -71,13 +69,17 @@ export const useAuth = () => {
 
                 if (response) {
                     console.log('Setting mock user data to', response)
-                    mockUserData.value = response
+                    mockUserData.value = {
+                        id: response.id,
+                        role: response.role,
+                    }
 
                     if (isMockingLoading.value) {
                         mockLoading.value = false
                     }
                 }
-            } catch (err) {
+            }
+            catch (err) {
                 console.error('Exception when fetching mock user data:', err)
             }
         }
@@ -114,13 +116,13 @@ export const useAuth = () => {
 
     const isMockingRole = computed(() =>
         actualUserRole.value === 'admin' &&
-        mockUserRole.value !== null &&
+        mockUserRole.value !== undefined &&
         mockUserRole.value !== actualUserRole.value
     )
 
     const setMockRole = (role: UserRole | undefined) => {
         if (actualUserRole.value === 'admin') {
-            console.log('Setting mock role to', role)
+            clearMockUserData()
             mockUserRole.value = role
 
             if (isMockingLoading.value) {
@@ -142,18 +144,31 @@ export const useAuth = () => {
     const isAdminUser = computed(() => userRole.value === 'admin')
     const isClinicianUser = computed(() => userRole.value === 'clinician')
     const isPatientUser = computed(() => userRole.value === 'patient')
+    const isIncompleteUser = computed(() => !user.value || 'registration_data' in user.value)
 
     const error = computed(() =>
         loggedIn.value && !user.value || loggedIn.value && !session.value
     )
 
     const mockUserAPIData = computed(() => {
-        return {
-            mock: {
-                id: userId.value,
-                role: userRole.value
+        if (isMockingUser.value && mockUserData.value) {
+            return {
+                mock: {
+                    id: mockUserData.value.id,
+                    role: mockUserData.value.role
+                }
             }
         }
+
+        if (isMockingRole.value) {
+            return {
+                mock: {
+                    role: mockUserRole.value
+                }
+            }
+        }
+
+        return undefined
     })
 
     const clearMocks = () => {
@@ -177,6 +192,7 @@ export const useAuth = () => {
         isAdminUser,
         isClinicianUser,
         isPatientUser,
+        isIncompleteUser,
         isMockingRole,
         setMockRole,
         clearMockRole,
@@ -193,7 +209,7 @@ export const useAuth = () => {
         clearMocks,
 
         // Replace mockUserId related functions with mockUserData
-        isMockingUserData,
+        isMockingUser,
         setMockUserData,
         clearMockUserData,
         userId,

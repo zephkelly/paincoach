@@ -37,12 +37,13 @@ html{
 <style lang="scss" scoped>
 
 main {
-    padding-top: 12rem;
+    padding-top: clamp(6rem, 7vw, 13rem);
     text-rendering: optimizeLegibility;
     font-family: var(--geist-font-stack);
     color: var(--text-color);
     background-color: var(--background);
     scrollbar-color: auto;
+    width: 100%;
 
     :deep() {
         section {

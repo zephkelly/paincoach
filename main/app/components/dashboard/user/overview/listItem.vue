@@ -1,6 +1,6 @@
 <template>
     <li class="user-info-list-item" :class="{ role: showRole }">
-        <NuxtLink class="link-wrapper flex-row" :to="`/dashboard/user/${props.userInfo?.id}`">
+        <NuxtLink class="link-wrapper flex-row" :to="`/dashboard/user/id/${props.userInfo?.id}`">
             <div class="user-info-list-item-profile" :class="{ placeholder: props.userInfo && !props.userInfo.profile_url}">
                 <DashboardUserProfileImage :id="props.userInfo?.id" :firstName="props.userInfo?.first_name" :profileUrl="props.userInfo?.profile_url" :loading="loading" />
             </div>

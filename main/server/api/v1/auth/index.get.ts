@@ -1,12 +1,14 @@
 import { type UserSession } from '#auth-utils';
 
 export default defineEventHandler(async (event) => {
-    const session = await getUserSession(event) as UserSession;
+    const session = await getUserSession(event);
+
+    console.log(session);
 
     if (!session || !session.secure || !session.user) {
         throw createError({
             statusCode: 401,
-            statusMessage: 'Unauthorized'
+            statusMessage: 'Unauthorised'
         });
     }
 

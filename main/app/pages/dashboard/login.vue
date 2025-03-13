@@ -14,8 +14,20 @@ const emailInput = ref(null);
 const passwordInput = ref(null);
 
 const {
-    fetch: refreshUserSession
+    fetchNewSession
+} = useAuth();
+
+const {
+    fetch,
+    loggedIn,
+    user
 } = useUserSession();
+
+async function fetchSession() {
+    await fetch();
+    console.log(user.value)
+    console.log(loggedIn.value)
+};
 
 async function login() {
     if (!passwordInput.value) {
@@ -37,7 +49,7 @@ async function login() {
 
         console.log('Logged in', response);
 
-        await refreshUserSession();
+        await fetchNewSession();
         return navigateTo('/dashboard');
     }
     catch (error: unknown) {

@@ -182,7 +182,16 @@ export async function createUser(
         }
         
         // 3. Use the optimized getUserById to fetch the complete user
-        return await getUserById(transaction, userId);
+        const user = await getUserById(transaction, userId);
+
+        if (!user) {
+            throw createError({
+                statusCode: 500,
+                statusMessage: 'Failed to create user'
+            });
+        }
+
+        return user;
     }
     catch (error: any) {
         // Error handling

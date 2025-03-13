@@ -1,7 +1,7 @@
 import { H3Error } from 'h3';
 import type { PaginationParams } from '@@/shared/types/api';
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
-import { getSession } from '~~/server/utils/auth/session/getSession';
+import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
 import type { DBTransaction } from '~~/server/types/db';
@@ -36,7 +36,7 @@ export default defineEventHandler({
     handler: async (event) => {
         const {
             secureSession
-        } = await getSession(event);
+        } = await getPainCoachSession(event);
 
         const userRole = secureSession.user_role;
 

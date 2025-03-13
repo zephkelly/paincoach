@@ -4,7 +4,7 @@ import { UserRoleSchema } from '~~lib/shared/schemas/users/base'
 import { PatientUserPrivateDataSchema } from '~~lib/shared/schemas/users/patient'
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
 
-import { getSession } from '~~/server/utils/auth/session/getSession';
+import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 
 
@@ -70,7 +70,7 @@ export default defineEventHandler({
             session,
             userSession,
             secureSession
-        } = await getSession(event);
+        } = await getPainCoachSession(event);
 
         const body = await readBody<UserRegisterRequest>(event);
 

@@ -1,9 +1,9 @@
 import { H3Error } from 'h3';
 
-import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
+import { onRequestValidateUserSession } from '~~/server/utils/auth/request-middleware/verify-session';
 import { onRequestAdminOrClinician } from '~~/server/utils/auth/request-middleware/admin-clinician';
 
-import { getSession } from '~~/server/utils/auth/session/getSession';
+import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { type InviteUserRequest } from '@@/shared/types/users/invitation/request';
 import { validateInviteUserRequest } from '@@/shared/schemas/users/invitation/request';
@@ -16,14 +16,14 @@ import { createAdminInvitation } from '~~/server/utils/auth/handlers/invite/admi
 
 export default defineEventHandler({
     onRequest: [
-        (event) => onRequestValidateSession(event),
+        (event) => onRequestValidateUserSession(event),
         (event) => onRequestAdminOrClinician(event),
     ],
     handler: async (event) => {
         const {
             userSession,
             secureSession
-        } = await getSession(event);
+        } = await getPainCoachSession(event);
 
         const body = await readBody<InviteUserRequest>(event);
 

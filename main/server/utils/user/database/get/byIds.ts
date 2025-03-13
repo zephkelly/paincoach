@@ -4,7 +4,7 @@ import { type User, type UserRole } from "~~lib/shared/types/users";
 import { type AdminUser } from "~~lib/shared/types/users/admin";
 import { type ClinicianUser } from "~~lib/shared/types/users/clinician";
 import { type PatientUser } from "~~lib/shared/types/users/patient";
-import { safeValidateUser } from "~~lib/shared/schemas/users";
+import { validateUser } from "~~lib/shared/schemas/users";
 
 
 
@@ -70,6 +70,6 @@ export async function getUsersByIds(
                 });
         }
         
-        return safeValidateUser(fullUser);
+        return validateUser(fullUser);
     });
 }

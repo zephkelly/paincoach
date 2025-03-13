@@ -30,6 +30,11 @@
                     name="patient"
                 />
                 <slot
+                    v-else-if="isIncompleteUser"
+                    v-bind="bindings"
+                    name="incomplete"
+                />
+                <slot
                     v-else-if="loggedIn"
                     v-bind="bindings"
                     name="namedDefault"
@@ -101,6 +106,7 @@ interface AuthState {
     isAdminUser: ComputedRef<boolean>
     isClinicianUser: ComputedRef<boolean>
     isPatientUser: ComputedRef<boolean>
+    isIncompleteUser: ComputedRef<boolean>
     loggedIn: ComputedRef<boolean>
     session: Ref<UserSession | null>
     error: ComputedRef<boolean>
@@ -119,6 +125,7 @@ const {
     isAdminUser,
     isClinicianUser,
     isPatientUser,
+    isIncompleteUser,
     loggedIn,
     session,
     error,
@@ -134,6 +141,7 @@ const bindings = {
     isAdminUser,
     isClinicianUser,
     isPatientUser,
+    isIncompleteUser,
     loggedIn,
     error,
     session,
@@ -155,6 +163,8 @@ defineSlots<{
 
     patient(props: AuthState): any
     patientActual(props: AuthState): any
+
+    incomplete(props: AuthState): any
 
     namedDefault(props: AuthState): any
     defaultActual(props: AuthState): any

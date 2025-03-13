@@ -127,11 +127,14 @@ export default defineNuxtConfig({
         },
     },
 
-    routeRules: {
-        '/dashboard/**': {
-            ssr: false
-        }
-    },
+    // routeRules: {
+    //     '/dashboard/**': {
+    //         ssr: false
+    //     },
+    //     '/dashboard/user/invite': {
+    //         ssr: true
+    //     }
+    // },
 
     typescript: {
         strict: true

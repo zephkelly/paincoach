@@ -1,17 +1,14 @@
-import { UserRole } from "./users";
+import { UserRole } from "./shared/types/users";
+import { UserInvitePartial } from '@@/shared/schemas/users/invitation/request'
 
-import {
-    SessionSecureDataObject,
-    SessionUserObject,
-    SessionUserSessionObject,
-} from "~~/shared/types/users/session";
+
 
 declare module '#auth-utils' {
     interface User {
         user_id: string;
         first_name: string;
-        verified: boolean;
         user_role: UserRole;
+        verified: boolean;
         profile_url?: string;
     }
 
@@ -22,14 +19,19 @@ declare module '#auth-utils' {
         user_role: UserRole;
     }
 
-    interface UserSession {
-        user: User;
+    interface IncompleteUser {
+        registration_data: UserInvitePartial;
+    }
 
-        secure: SecureSessionData;
+    interface UserSession {
+        user: User | IncompleteUser;
+
+        secure: SecureSessionData | { invitation_token: string };
 
         verified: boolean;
         logged_in_at: Date;
         version: number;
+        id: string; // session id
     }
 }
 

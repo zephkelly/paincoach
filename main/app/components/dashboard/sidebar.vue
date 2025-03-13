@@ -75,7 +75,7 @@
 <script lang="ts" setup>
 const {
     isAppSidebarOpen,
-    toggleOpen
+    setOpen
 } = useAppSidebar();
 
 const {
@@ -114,7 +114,7 @@ function capitaliseFirstLetter(string?: string) {
 
 const route = useRoute();
 watch(() => route.path, () => {
-    toggleOpen();
+    setOpen(false);
 })
 </script>
 

@@ -1,25 +1,25 @@
 import { z, ZodError } from 'zod';
-import { getSession } from '~~/server/utils/auth/session/getSession';
+import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { type MinimalUserInfo } from '~~lib/shared/types/users/minimal'
 import { validateMinimalUserInfo } from '@@/shared/schemas/users/minimal';
 
 import { DatabaseService } from '~~/server/services/databaseService';
 
-import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
+import { onRequestValidateUserSession } from '~~/server/utils/auth/request-middleware/verify-session';
 import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 
 
 export default defineEventHandler({
     onRequest: [
-        (event) => onRequestValidateSession(event),
+        (event) => onRequestValidateUserSession(event),
     ],
     handler: async (event) => {
         const {
             userSession,
             secureSession
-        } = await getSession(event);
+        } = await getPainCoachSession(event);
 
         if (secureSession.user_role !== 'admin') {
             throw createError({
@@ -42,6 +42,7 @@ export default defineEventHandler({
                 role: secureSession.user_role,
                 email: secureSession.email,
                 first_name: userSession.first_name,
+                last_name: '',
                 verified: secureSession.verified
             }
 
@@ -78,6 +79,7 @@ export default defineEventHandler({
                 role: user.role,
                 email: user.email,
                 first_name: user.first_name,
+                last_name: user.last_name,
                 verified: user.verified
             }
 

@@ -1,14 +1,12 @@
 import { H3Error } from 'h3';
 import type { PaginationParams } from '@@/shared/types/api';
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
-import { getSession } from '~~/server/utils/auth/session/getSession';
+import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
-import type { DBTransaction } from '~~/server/types/db';
 import type { User, PatientUser, ClinicianUser, AdminUser } from '~~lib/shared/types/users';
 import { type UserRole } from '~~lib/shared/types/users';
 import { validateUsers } from '~~lib/shared/schemas/users';
-import { validatePatientUsers } from '~~lib/shared/schemas/users/patient';
 
 import { getAllUsers } from '~~/server/utils/user/database/get/all';
 import { getAdminUsersClinicianPatients } from '~~/server/utils/user/patients/database/get/clinicianPatients'
@@ -36,7 +34,7 @@ export default defineEventHandler({
     handler: async (event) => {
         const {
             secureSession
-        } = await getSession(event);
+        } = await getPainCoachSession(event);
 
         const userRole = secureSession.user_role;
 

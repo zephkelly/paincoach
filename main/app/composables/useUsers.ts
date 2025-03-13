@@ -14,8 +14,7 @@ export const useUsers = async () => {
 
     const {
         userRole,
-        isMockingUserData,
-        isMockingRole,
+        isMockingUser,
         mockUserAPIData
     } = useAuth();
 
@@ -29,7 +28,9 @@ export const useUsers = async () => {
         try {
             let fetchedUsers = undefined;
 
-            if (isMockingUserData || isMockingRole) {
+            console.log(isMockingUser.value)
+
+            if (isMockingUser.value) {
                 fetchedUsers = await $fetch<AdminUserGetResponse>('/api/v1/user/info?roles=all&page=0&limit=10', {
                     method: 'POST',
                     body: mockUserAPIData.value
