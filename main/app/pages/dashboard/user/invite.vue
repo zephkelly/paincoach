@@ -38,14 +38,12 @@
 
                         <div class="incomplete-content" v-if="status === 'success'">
                             <div class="registration-type-message" v-if="!isNotCompleted">
-                                <p v-if="isFullyCompleted">* Your information has been entered on your behalf, please verify it is correct before continuing</p>
-                                <p v-else-if="isPartiallyCompleted">* Some information has been entered on your behalf, please verify it is correct before continuing</p>
+                                <p>* Some information has been entered on your behalf, please verify it is correct before continuing</p>
                             </div>
 
-                            <div class="inviter-details flex-row">
+                            <form class="inviter-details flex-row">
                                 <!-- <DashboardAccountRoleChip :userRole="invitationData?.role_name" /> -->
-
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -62,14 +60,23 @@ const {
     fetchNewSession,
 } = useAuth();
 
-const { data: invitationData, status } = await useFetch<UserInvitation>('/api/v1/auth/invite');
+const {
+    state: registerState
+} = useRegister();
+
+const { data: invitationData, status, error } = await useFetch<UserInvitation>('/api/v1/auth/invite');
 
 watch(status, (newStatus) => {
     if (newStatus === 'success') {
         console.log(invitationData.value);
+        //@ts-expect-error
+        registerState.value = invitationData.value?.registration_data;
+        registerState.value.role = invitationData.value?.role_name;
+        registerState.value.invitation_token = invitationData.value?.invitation_token;
+        registerState.value.id = invitationData.value?.user_id
     }
     else if (newStatus === 'error') {
-        console.error('Error fetching invitation data');
+        console.error('Error fetching invitation data', error.value);
     }
 }, { immediate: true });
 
@@ -221,7 +228,7 @@ definePageMeta({
         // font-style: italic;
         color: var(--text-5-color);
         opacity: 0.6;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0rem;
     }
 }
 </style>

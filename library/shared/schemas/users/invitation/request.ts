@@ -6,7 +6,7 @@ import { MockUserDataSchema } from '@@/shared/schemas/users/mock';
 
 
 
-const BaseUserFieldsSchema = BaseDBUserSchema.pick({
+export const BaseUserInviteSchema = BaseDBUserSchema.pick({
     email: true,
     phone_number: true,
     first_name: true,
@@ -16,7 +16,7 @@ const BaseUserFieldsSchema = BaseDBUserSchema.pick({
     confirm_email: z.string().email(),
 });
 
-const AdminInviteSchema = BaseUserFieldsSchema.extend({
+const AdminInviteSchema = BaseUserInviteSchema.extend({
     role: z.literal('admin'),
 });
 
@@ -24,7 +24,7 @@ const AdminInvitePartialSchema = AdminInviteSchema.partial().extend({
     role: z.literal('admin')
 })
 
-const ClinicianInviteSchema = BaseUserFieldsSchema.extend({
+const ClinicianInviteSchema = BaseUserInviteSchema.extend({
     role: z.literal('clinician'),
     ahprah_registration_number: z.string(),
     specialisation: z.string().optional(),
@@ -38,7 +38,7 @@ const ClinicianInvitePartialSchema = ClinicianInviteSchema.partial().extend({
 })
 
 
-const PatientInviteSchema = BaseUserFieldsSchema.extend({
+const PatientInviteSchema = BaseUserInviteSchema.extend({
     role: z.literal('patient'),
 });
 

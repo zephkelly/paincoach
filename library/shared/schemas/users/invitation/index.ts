@@ -11,6 +11,7 @@ import { BigIntIDSchema } from '@@/shared/schemas/primitives';
 
 
 export const RegistrationTypeSchema = z.enum(['partial', 'full']);
+export const InvitationRoleSchema = z.enum(['admin', 'clinician', 'patient']);
 export const InvitationStatusSchema = z.enum(['pending', 'opened', 'completed', 'expired']);
 
 // refine id make sure that it is converted to a number
@@ -34,7 +35,6 @@ export const DBUserInvitationSchema = z.object({
 
 export const UserInvitationSchema = DBUserInvitationSchema.omit({
     id: true,
-    user_id: true,
     linked_user_id: true,
     invited_by: true,
     role_id: true,
@@ -42,7 +42,7 @@ export const UserInvitationSchema = DBUserInvitationSchema.omit({
     created_at: true,
     updated_at: true,
 }).extend({
-    role_name: UserRoleSchema,
+    role_name: InvitationRoleSchema,
     inviter_name: z.string(),
     inviter_profile_url: z.string().url().nullable(),
     inviter_role_name: UserRoleSchema,

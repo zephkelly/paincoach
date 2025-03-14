@@ -7,7 +7,6 @@ import type { UserRole } from '@@/shared/types/users';
 
 export const UserRoleSchema = z.enum(['super_admin', 'admin', 'clinician', 'patient', 'incomplete_user'])
 export const AccountStatus = z.enum(['active', 'inactive', 'pending'])
-export const UserTitleSchema = z.enum(['Mr', 'Mrs', 'Ms', 'Miss', 'Dr', 'Prof'])
 
 export const BaseDBUserSchema = z.object({
     id: z.string().uuid(),
@@ -24,8 +23,6 @@ export const BaseDBUserSchema = z.object({
         .regex(PHONE_REGEX, 'Invalid phone number format')
         .max(50, 'Phone number must be less than 50 characters')
         .nullable().optional(),
-
-    title: UserTitleSchema.nullable(),
 
     first_name: z.string()
         .min(1, 'First name is required')

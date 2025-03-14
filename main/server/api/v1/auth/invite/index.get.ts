@@ -44,7 +44,7 @@ export default defineEventHandler({
 
             invitation_token = token;
         }
-   
+
         if (!invitation_token) {
             throw createError({
                 statusCode: 400,
@@ -53,7 +53,7 @@ export default defineEventHandler({
         }
 
         const transaction = await DatabaseService.getInstance().createTransaction();
-        
+
         try {
             if (isClinicianRole) {
                 const clinicianInvitation = await transaction.query<{ exists: boolean }>(`
@@ -71,9 +71,10 @@ export default defineEventHandler({
                     });
                 }
             }
-        
+
             const invitation = await transaction.query<UserInvitation>(`
                 SELECT 
+                    ui.user_id,
                     ui.email,
                     ui.phone_number,
                     r.name as role_name,
@@ -100,7 +101,7 @@ export default defineEventHandler({
             }
 
             const validatedInvitation = validateUserInvitation(invitation[0]);
-            
+
             transaction.commit();
 
             return validatedInvitation;
@@ -112,7 +113,7 @@ export default defineEventHandler({
                 throw error;
             }
 
-            console.error('GET: /api/v1/auth/invite: ', error);
+            console.error('GET: /api/v1/auth/invite:', error);
 
             throw createError({
                 statusCode: 500,

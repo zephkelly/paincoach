@@ -10,14 +10,14 @@ export function extractZodErrors(error: ZodError, includeFirstErrorOnly = false)
     const formattedError = error.format();
     const fieldErrors: Record<string, string | string[]> = {};
 
-    const errorObject = Object.entries(formattedError)[0]
+    const errorObject = Object.entries(formattedError)[1]
     //@ts-expect-error
-    const firstObject = errorObject[1]
+    const firstObject = errorObject[0]
+    //@ts-expect-error
+    const firstObjectError = errorObject[1]._errors[0]
+    const errorString = firstObject + ': ' + firstObjectError
 
-    return {
-        ...firstObject,
-        _errors: undefined
-    }
+    return [errorString]
 }
 
 /**
@@ -29,8 +29,9 @@ export function extractZodErrors(error: ZodError, includeFirstErrorOnly = false)
 export function createZodValidationError(error: ZodError, includeFirstErrorOnly = false) {
     const fieldErrors = extractZodErrors(error, includeFirstErrorOnly);
 
+    console.log('Validation errors:', fieldErrors);
+
     if (import.meta.client) {
-        console.log('Validation errors:', error);
         throw new Error('Validation failed');
     }
 
@@ -42,6 +43,7 @@ export function createZodValidationError(error: ZodError, includeFirstErrorOnly 
             data: { errors: fieldErrors }
         });
     }
+
     else {
         return createError({
             statusCode: 500,

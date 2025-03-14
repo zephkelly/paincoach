@@ -6,10 +6,12 @@ import { type AdminUser } from '../../types/users/admin';
 
 export const DBAdminUserSchema = BaseDBUserSchema.extend({
     role: z.literal('admin'),
+    super_admin: z.boolean(),
 })
 
 export const AdminUserSchema = BaseUserSchema.extend({
     role: z.literal('admin'),
+    super_admin: z.boolean(),
 })
 
 export function safeValidateAdminUser(data: AdminUser) {

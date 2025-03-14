@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { PatientUserSchema } from "../../schemas/users/patient";
+import { DBPatientUserSchema, PatientUserSchema } from "../../schemas/users/patient";
 
 
 
+export type DBPatientUser = z.infer<typeof DBPatientUserSchema>;
 export type PatientUser = z.infer<typeof PatientUserSchema>;
 
 export function isPatientUser(user: any): user is PatientUser {

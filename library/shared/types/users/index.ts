@@ -1,18 +1,24 @@
 import type { z } from 'zod';
 import { UserRoleSchema } from '@@/shared/schemas/users';
-import type { ClinicianUser } from '../users/clinician';
-import type { PatientUser } from '../users/patient';
-import type { AdminUser } from './admin';
+import type { DBClinicianUser, ClinicianUser } from '../users/clinician';
+import type { DBPatientUser, PatientUser } from '../users/patient';
+import type { DBAdminUser, AdminUser } from './admin';
 
 
 
 export type UserRole = z.infer<typeof UserRoleSchema>;
 
 export type User = ClinicianUser | PatientUser | AdminUser;
+export type DBUser = DBClinicianUser | DBPatientUser | DBAdminUser;
 
-export type { ClinicianUser, PatientUser, AdminUser };
-
-export type DBUser = Exclude<User, 'role'> & { role_id: string };
+export type {
+    DBClinicianUser,
+    ClinicianUser,
+    DBPatientUser,
+    PatientUser,
+    DBAdminUser,
+    AdminUser
+};
 
 export { isAdminUser, isSuperAdminUser } from './admin';
 export { isClinicianUser } from '../users/clinician';
