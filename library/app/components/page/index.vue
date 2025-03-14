@@ -40,7 +40,7 @@ onUpdated(checkHeaderContent);
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
-    margin-top: clamp(2.5rem, 4vw, 4rem);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
 }
 
 .page-content {

@@ -31,13 +31,17 @@
                     </div>
                     <div class="inner-wrapper">
                         <div class="form-header">
-                            <p>Welcome to Pain Coach</p>
                             <h1>Complete your registration</h1>
+                            <p class="welcome">Welcome to Pain Coach{{ (usersFirstName) ? `, ${usersFirstName}` : undefined }}</p>
                         </div>
 
 
                         <div class="incomplete-content" v-if="status === 'success'">
-                        
+                            <div class="registration-type-message" v-if="!isNotCompleted">
+                                <p v-if="isFullyCompleted">* Your information has been entered on your behalf, please verify it is correct before continuing</p>
+                                <p v-else-if="isPartiallyCompleted">* Some information has been entered on your behalf, please verify it is correct before continuing</p>
+                            </div>
+
                             <div class="inviter-details flex-row">
                                 <!-- <DashboardAccountRoleChip :userRole="invitationData?.role_name" /> -->
 
@@ -69,6 +73,42 @@ watch(status, (newStatus) => {
     }
 }, { immediate: true });
 
+const usersFirstName = computed(() => {
+    if (invitationData.value?.registration_data?.first_name) {
+        return invitationData.value?.registration_data?.first_name;
+    }
+    else {
+        return undefined;
+    }
+})
+
+const isPartiallyCompleted = computed(() => {
+    if (invitationData.value?.registration_type) {
+        return true;
+    }
+    else {
+        return false;
+    }
+});
+
+const isFullyCompleted = computed(() => {
+    if (invitationData.value?.registration_data) {
+        return true;
+    }
+    else {
+        return false;
+    }
+});
+
+const isNotCompleted = computed(() => {
+    if (!isPartiallyCompleted.value && !isFullyCompleted.value) {
+        return true;
+    }
+    else {
+        return false;
+    }
+});
+
 onMounted(async () => {
     if (import.meta.server) return;
     await fetchNewSession();
@@ -92,6 +132,8 @@ definePageMeta({
 
 .invitation-information {
     width: 100%;
+    box-sizing: border-box;
+    max-width: 1200px;
     height: 32px;
     align-items: center;
     align-content: flex-start;
@@ -100,6 +142,10 @@ definePageMeta({
     font-family: var(--serif-font-stack);
     color: var(--text-5-color);
     gap: 0.25rem;
+
+    // .welcome {
+    //     margin-right: 0.5rem;
+    // }
 
     .invitation-text {
         opacity: 0.6;
@@ -139,6 +185,7 @@ definePageMeta({
     border: 1px solid var(--border-4-color);
     border-radius: 0.5rem;
     padding: 2rem 1rem;
+    padding-top: 2.5rem;
 }
 
 .form-header {
@@ -151,7 +198,8 @@ definePageMeta({
         font-family: var(--serif-font-stack);
         font-style: italic;
         color: var(--text-5-color);
-        opacity: 0.8;
+        opacity: 0.6;
+        
     }
 
     h1 {
@@ -159,11 +207,21 @@ definePageMeta({
         font-weight: 500;
         text-align: center;
         font-family: var(--notoserif-font-stack);
+        line-height: 3.5rem;
     }
 
 }
 
 .incomplete-content {
-    
+    margin-top: 4rem;
+
+    .registration-type-message {
+        font-size: 1rem;
+        font-family: var(--serif-font-stack);
+        // font-style: italic;
+        color: var(--text-5-color);
+        opacity: 0.6;
+        margin-bottom: 1.5rem;
+    }
 }
 </style>
