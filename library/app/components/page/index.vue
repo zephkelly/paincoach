@@ -1,7 +1,7 @@
 <template>
     <div class="page-container">
         <div class="page-content">
-            <div class="page-header">
+            <div class="page-header" :class="{ 'has-content': hasHeaderContent }">
                 <slot name="header"/>
             </div>
             <div class="page-body">
@@ -13,15 +13,24 @@
 
 <script setup lang="ts">
 import { type PageProps } from '@/types/page';
+import { useSlots, ref, onMounted, onUpdated } from 'vue';
 
 const props = defineProps<PageProps>();
+const slots = useSlots();
+const hasHeaderContent = ref(false);
 
 const maxWidthStyle = props.maxWidth ? `${props.maxWidth}px` : 'auto';
 const paddingStyle = props.padBody ? '0rem 1rem' : '0rem';
-
 const bottomMarginStyle = props.bottomMargin ? '4rem' : '0';
+const headingPadding = props.padHeader ? '0rem 0rem' : '0rem 1rem';
 
-const headingPadding = props.padBody ? '0rem 0rem' : '0rem 1rem';
+// Check if header slot has content
+const checkHeaderContent = () => {
+    hasHeaderContent.value = !!slots.header && slots.header().length > 0;
+};
+
+onMounted(checkHeaderContent);
+onUpdated(checkHeaderContent);
 </script>
 
 <style lang="scss" scoped>
@@ -31,6 +40,7 @@ const headingPadding = props.padBody ? '0rem 0rem' : '0rem 1rem';
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
+    margin-top: clamp(2.5rem, 4vw, 4rem);
 }
 
 .page-content {
@@ -40,7 +50,7 @@ const headingPadding = props.padBody ? '0rem 0rem' : '0rem 1rem';
     max-width: v-bind(maxWidthStyle);
     width: 100%;
     padding: v-bind(paddingStyle);
-    margin-top: 1.5rem;
+    // margin-top: 1.5rem;
     margin-bottom: v-bind(bottomMarginStyle);
 }
 
@@ -48,9 +58,13 @@ const headingPadding = props.padBody ? '0rem 0rem' : '0rem 1rem';
     display: flex;
     justify-content: flex-start;
     box-sizing: border-box;
-    margin-bottom: 2.5rem;
     padding: v-bind(headingPadding);
-
+    margin-bottom: 0; /* Default to no margin */
+    
+    &.has-content {
+        margin-bottom: 2.5rem; /* Only apply margin when content exists */
+    }
+    
     :deep(h1) {
         font-size: 2.4rem;
         font-weight: 500;

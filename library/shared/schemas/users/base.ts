@@ -5,7 +5,7 @@ import type { UserRole } from '@@/shared/types/users';
 
 
 
-export const UserRoleSchema = z.enum(['admin', 'clinician', 'patient'])
+export const UserRoleSchema = z.enum(['super_admin', 'admin', 'clinician', 'patient', 'incomplete_user'])
 export const AccountStatus = z.enum(['active', 'inactive', 'pending'])
 export const UserTitleSchema = z.enum(['Mr', 'Mrs', 'Ms', 'Miss', 'Dr', 'Prof'])
 

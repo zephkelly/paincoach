@@ -14,6 +14,6 @@ export type { ClinicianUser, PatientUser, AdminUser };
 
 export type DBUser = Exclude<User, 'role'> & { role_id: string };
 
-export { isAdminUser } from './admin';
+export { isAdminUser, isSuperAdminUser } from './admin';
 export { isClinicianUser } from '../users/clinician';
 export { isPatientUser } from '../users/patient';

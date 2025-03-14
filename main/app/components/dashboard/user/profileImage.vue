@@ -151,10 +151,11 @@ onMounted(() => {
 <style scoped>
 .avatar-container {
   position: relative;
-  width: 100%;
-  height: 100%;
   border-radius: 100%;
   overflow: hidden;
+  font-size: 1rem;
+  font-weight: 500;
+  aspect-ratio: 1 / 1;
 }
 
 .avatar-skeleton {
@@ -195,8 +196,7 @@ onMounted(() => {
   align-items: center;
   height: 100%;
   width: 100%;
-  font-size: 1rem;
-  font-weight: 500;
+  aspect-ratio: 1 / 1;
   border-radius: 100%;
   text-transform: uppercase;
 }

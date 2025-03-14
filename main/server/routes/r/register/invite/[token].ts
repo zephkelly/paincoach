@@ -1,10 +1,7 @@
 import { H3Error } from "h3";
 import { DatabaseService } from "~~/server/services/databaseService";
 
-import { validateUserInvitation } from '~~lib/shared/schemas/users/invitation'
-
-import { replaceIncompleteUserSession } from "~~/server/utils/auth/session/replace";
-// import type { IncompleteUserSession } from "#auth-utils";
+import { validateDBUserInvitation } from '~~lib/shared/schemas/users/invitation'
 
 
 
@@ -73,7 +70,7 @@ export default defineEventHandler(async (event) => {
             });
         }
 
-        const validatedInvitation = validateUserInvitation(invitation);
+        const validatedInvitation = validateDBUserInvitation(invitation);
 
         if (validatedInvitation.status === 'opened') {
             const incompleteSession = await getUserSession(event);
@@ -106,16 +103,26 @@ export default defineEventHandler(async (event) => {
                 WHERE id = $1
             `, [validatedInvitation.id]);
 
-            const temporarySession = await replaceIncompleteUserSession(event, {
+            const temporarySession = await replaceUserSession(event, {
                 secure: {
-                    //@ts-expect-error
-                    invitation_token: token
+                    user_id: validatedInvitation.user_id,
+                    user_role: 'incomplete_user',
+                    email: validatedInvitation.email,
+                    verified: false,
+
+                    invitation_token: token,
                 },
                 user: {
-                    //@ts-expect-error
-                    registration_data: validatedInvitation.registration_data || {}
+                    user_id: validatedInvitation.user_id,
+                    first_name: validatedInvitation.registration_data?.first_name || '',
+                    verified: false,
+                    user_role: 'incomplete_user',
+
                 },
-                logged_in_at: new Date()
+                registration_data: validatedInvitation.registration_data || {},
+                logged_in_at: new Date(),
+                verified: false,
+                version: 1,
             }, {
                 maxAge: 1000 * 60 * 60 * 24 * 7
             });

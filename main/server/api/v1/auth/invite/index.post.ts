@@ -1,7 +1,7 @@
 import { H3Error } from 'h3';
 
-import { onRequestValidateUserSession } from '~~/server/utils/auth/request-middleware/verify-session';
-import { onRequestAdminOrClinician } from '~~/server/utils/auth/request-middleware/admin-clinician';
+import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
+import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/validate-role';
 
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
@@ -16,8 +16,8 @@ import { createAdminInvitation } from '~~/server/utils/auth/handlers/invite/admi
 
 export default defineEventHandler({
     onRequest: [
-        (event) => onRequestValidateUserSession(event),
-        (event) => onRequestAdminOrClinician(event),
+        (event) => onRequestValidateSession(event),
+        (event) => onRequestValidateRole(event, ['clinician', 'admin', 'super_admin']),
     ],
     handler: async (event) => {
         const {

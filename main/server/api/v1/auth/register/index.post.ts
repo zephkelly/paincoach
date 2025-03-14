@@ -2,7 +2,7 @@ import { z, ZodError } from 'zod';
 import { createZodValidationError } from '~~lib/shared/utils/zod/error';
 import { UserRoleSchema } from '~~lib/shared/schemas/users/base'
 import { PatientUserPrivateDataSchema } from '~~lib/shared/schemas/users/patient'
-import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
+import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
 
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
@@ -82,7 +82,6 @@ export default defineEventHandler({
         catch (error: unknown) {
             console.error('POST: /api/v1/auth/register:')
             if (error instanceof ZodError) {
-                console.log('Validation Error:')
                 throw createZodValidationError(error);
             }
         }

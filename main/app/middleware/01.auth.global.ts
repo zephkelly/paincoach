@@ -5,7 +5,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     if (publicRoutes.includes(to.path)) {
         if (to.path === '/') {
             if (session.value && session.value.user) {
-                return navigateTo('/dashboard')
+                if (session.value.registration_data) {
+                    return navigateTo('/dashboard/user/invite')
+                }
+                else {
+                    return navigateTo('/dashboard')
+                }
             }
         }
 
@@ -13,8 +18,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }
 
     if (to.path.includes('/dashboard')) {
-        if (!session.value || !session.value.user) {
+        if (!session.value || !session.value.user && to.path !== '/dashboard/login') {
             return navigateTo('/dashboard/login')
+        }
+
+        if (session.value.registration_data && to.path !== '/dashboard/user/invite') {
+            return navigateTo('/dashboard/user/invite')
         }
     }
 });

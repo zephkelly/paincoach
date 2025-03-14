@@ -1,4 +1,4 @@
-import { onRequestValidateSession } from "~~/server/utils/auth/request-middleware/verify-session";
+import { onRequestValidateSession } from "~~/server/utils/auth/request-middleware/validate-session";
 
 
 

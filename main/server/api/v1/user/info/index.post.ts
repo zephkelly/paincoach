@@ -1,6 +1,6 @@
 import { H3Error } from 'h3';
 import type { PaginationParams } from '@@/shared/types/api';
-import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/verify-session';
+import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';

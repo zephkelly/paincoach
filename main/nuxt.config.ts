@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 import { resolve } from 'path'
 
 
@@ -54,8 +53,6 @@ export default defineNuxtConfig({
         }
     },
 
-
-
     extends: [
         './../library',
     ],
@@ -85,29 +82,34 @@ export default defineNuxtConfig({
         head: {
             meta: [
                 { charset: 'utf-8' },
-                // @ts-ignore
+                // @ts-expect-error
                 { description: 'Pain Coach - Your personalised pain and lifestyle assistant. Find your clarity.' },
                 {
+                    //@ts-expect-error
                     hid: 'og:image',
                     property: 'og:image',
                     content: 'https://www.paincoach.online/images/og-image.png',
                 },
                 {
+                    // @ts-expect-error
                     hid: 'og:url',
                     property: 'og:url',
                     content: 'https://www.paincoach.online',
                 },
                 {
+                    // @ts-expect-error
                     hid: 'og:title',
                     property: 'og:title',
                     content: 'Pain Coach - Find your Clarity',
                 },
                 {
+                    // @ts-expect-error
                     hid: 'og:description',
                     property: 'og:description',
                     content: 'Your personalised pain and lifestyle assistant.',
                 },
                 {
+                    // @ts-expect-error
                     hid: 'og:type',
                     property: 'og:type',
                     content: 'website',

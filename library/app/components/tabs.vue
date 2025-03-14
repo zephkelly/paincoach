@@ -5,7 +5,7 @@
                 <div
                     class="tab-header" v-for="i in 3"
                     :class="{ 'active': activeTabIndex === i - 1 }"
-                    :style="{ width: (loading) ? (90 * (0.85 + Math.random() * 0.3)) + 'px' : 90 + 'px' }"
+                    :style="{ width: (loading) ? getFixedWidth(i) + 'px' : 90 + 'px' }"
                 >
                     <div 
                         class="loading-header skeleton-component"
@@ -15,8 +15,7 @@
                         <div 
                             class="loading-header-text skeleton-component"
                             :class="{ 'skeleton-component-panel': activeTabIndex !== i - 1 }"
-                            :style="{ width: 90 * (0.85 + Math.random() * 0.3) * 0.5 + 'px'}"
-                            
+                            :style="{ width: 90 * getFixedWidth(i) * 0.6 + 'px'}"
                         ></div>
                     </div>
                 </div>
@@ -24,7 +23,7 @@
             <template v-else>
                 <div class="tab-header" v-for="(tab, index) in tabs"
                     :class="{ 'active': activeTabIndex === tabs?.indexOf(tab) }"
-                    :style="{ width: (loading) ? (tab.headerWidth * (0.85 + Math.random() * 0.3)) + 'px' : tab.headerWidth + 'px' }"
+                    :style="{ width: (loading) ? (tab.headerWidth * getFixedWidth(index)) + 'px' : tab.headerWidth + 'px' }"
                 >
                     <template v-if="loading">
                         <div
@@ -35,8 +34,7 @@
                             <div 
                                 class="loading-header-text skeleton-component"
                                 :class="{ 'skeleton-component-panel': activeTabIndex !== tabs?.indexOf(tab) }"
-                                :style="{ width: tab.headerWidth * (0.85 + Math.random() * 0.3) * 0.5 + 'px'}"
-                                
+                                :style="{ width: tab.headerWidth * getFixedWidth(index) * 0.6 + 'px'}"
                             ></div>
                         </div>
                     </template>
@@ -91,6 +89,38 @@ const route = useRoute();
 const router = useRouter();
 
 const activeTabIndex = ref(props.defaultTabIndex || 0);
+
+// Pre-defined fixed values for widths to ensure consistency between server and client
+// These are static and will be the same on both server and client
+const fixedWidths: Record<number, number> = {
+    0: 0.9,  // index 0 -> 90% width
+    1: 0.87, // index 1 -> 95% width
+    2: 0.85, // index 2 -> 85% width
+    3: 0.92, // and so on...
+    4: 0.88,
+    5: 0.93,
+    6: 0.87,
+    7: 0.94,
+    8: 0.89,
+    9: 0.91,
+    10: 0.86,
+    11: 0.92,
+    12: 0.88,
+    13: 0.90,
+    14: 0.87,
+    15: 0.93,
+    16: 0.89,
+    17: 0.91,
+    18: 0.86,
+    19: 0.94
+};
+
+// Function to get the fixed width for an index
+const getFixedWidth = (index: number): number => {
+    // Use modulo to handle any index, even if it's larger than our predefined set
+    const normalizedIndex = index % 20;
+    return fixedWidths[normalizedIndex] || 0.9; // Fallback to 0.9 if not found
+};
 
 const setActiveTab = (index: number): void => {
     if (!props.tabs) {

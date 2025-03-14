@@ -6,14 +6,14 @@ import { validateMinimalUserInfo } from '@@/shared/schemas/users/minimal';
 
 import { DatabaseService } from '~~/server/services/databaseService';
 
-import { onRequestValidateUserSession } from '~~/server/utils/auth/request-middleware/verify-session';
+import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
 import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 
 
 export default defineEventHandler({
     onRequest: [
-        (event) => onRequestValidateUserSession(event),
+        (event) => onRequestValidateSession(event),
     ],
     handler: async (event) => {
         const {

@@ -1,5 +1,5 @@
 import { UserRole } from "~~lib/shared/types/users";
-import { UserInvitePartial } from '~~lib/shared/schemas/users/invitation/request'
+import { UserInvitePartial } from '@@/shared/schemas/users/invitation/request'
 
 
 
@@ -11,22 +11,22 @@ declare module '#auth-utils' {
         verified: boolean;
         profile_url?: string;
     }
-
+    
     interface SecureSessionData {
         user_id: string;
         email: string;
         verified: boolean;
         user_role: UserRole;
+        
+        invitation_token?: string;
     }
-
-    interface IncompleteUser {
-        registration_data: UserInvitePartial;
-    }
-
+    
     interface UserSession {
-        user: User | IncompleteUser;
+        user: User;
+        
+        secure: SecureSessionData;
 
-        secure: SecureSessionData | { invitation_token: string };
+        registration_data?: UserInvitePartial;
 
         verified: boolean;
         logged_in_at: Date;

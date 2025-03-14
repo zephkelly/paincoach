@@ -47,7 +47,7 @@
 <script lang="ts" setup>
 import { H3Error } from 'h3'
 import { type InviteUserRequest } from '~~lib/shared/types/users/invitation/request';
-import { validateInviteUserRequest } from '~~lib/shared/schemas/users/invitation/request';
+import { validateInviteUserRequest } from '@@/shared/schemas/users/invitation/request';
 
 const {
     mockUserAPIData

@@ -92,7 +92,7 @@ export async function createAdminInvitation(transaction: DBTransaction, adminDat
         `, [
             adminData.user.email,
             adminData.user.phone_number || null,
-            null, // No user ID yet, will be created when they register
+            crypto.randomUUID(),
             invitationToken,
             adminId, // Current admin's ID as the inviter
             adminRoleId,
