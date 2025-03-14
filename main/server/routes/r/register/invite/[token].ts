@@ -103,6 +103,8 @@ export default defineEventHandler(async (event) => {
                 WHERE id = $1
             `, [validatedInvitation.id]);
 
+            await clearUserSession(event);
+
             const temporarySession = await replaceUserSession(event, {
                 secure: {
                     user_id: validatedInvitation.user_id,
