@@ -141,9 +141,7 @@ export const useAuth = () => {
         return user.value.verified
     })
 
-    const isSuperAdminUser = computed(() => userRole.value === 'super_admin')
     const isAdminUser = computed(() => userRole.value === 'admin')
-    const isAdmin = computed(() => isAdminUser.value || isSuperAdminUser.value)
     const isClinicianUser = computed(() => userRole.value === 'clinician')
     const isPatientUser = computed(() => userRole.value === 'patient')
     const isIncompleteUser = computed(() => userRole.value === 'incomplete_user')
@@ -191,8 +189,6 @@ export const useAuth = () => {
         error,
         clearSession: clear,
         fetchNewSession: fetch,
-        isAdmin,
-        isSuperAdminUser,
         isAdminUser,
         isClinicianUser,
         isPatientUser,

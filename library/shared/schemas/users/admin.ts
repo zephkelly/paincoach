@@ -4,15 +4,17 @@ import { BaseDBUserSchema, BaseUserSchema } from './base';
 
 import { type AdminUser } from '../../types/users/admin';
 
-export const DBAdminUserSchema = BaseDBUserSchema.extend({
+
+
+export const DBAdminUserFieldsSchema = z.object({
     role: z.literal('admin'),
-    super_admin: z.boolean(),
+    owner: z.boolean(),
 })
 
-export const AdminUserSchema = BaseUserSchema.extend({
-    role: z.literal('admin'),
-    super_admin: z.boolean(),
-})
+export const DBAdminUserSchema = BaseDBUserSchema.merge(DBAdminUserFieldsSchema);
+
+export const AdminUserSchema = BaseUserSchema.merge(DBAdminUserFieldsSchema);
+
 
 export function safeValidateAdminUser(data: AdminUser) {
     const parsedResult = AdminUserSchema.safeParse(data)

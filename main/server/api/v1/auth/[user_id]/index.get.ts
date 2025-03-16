@@ -1,19 +1,24 @@
 import { z, ZodError } from 'zod';
-import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
+import { createZodValidationError } from '@@/shared/utils/zod/error';
 
-import { type MinimalUserInfo } from '~~lib/shared/types/users/minimal'
-import { validateMinimalUserInfo } from '@@/shared/schemas/users/minimal';
+import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
+import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/validate-role';
+import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
 
-import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
-import { createZodValidationError } from '@@/shared/utils/zod/error';
+import { validateUUID } from '@@/shared/schemas/primitives';
+import { validateUserStatus } from '@@/shared/schemas/users/base';
+import { validateBaseDBMinimalUser } from '@@/shared/schemas/users/minimal';
+
+import { type BaseDBMininmalUser } from '~~lib/shared/types/users/minimal'
 
 
 
 export default defineEventHandler({
     onRequest: [
         (event) => onRequestValidateSession(event),
+        (event) => onRequestValidateRole(event, ['admin'])
     ],
     handler: async (event) => {
         const {
@@ -21,66 +26,89 @@ export default defineEventHandler({
             secureSession
         } = await getPainCoachSession(event);
 
-        if (secureSession.user_role !== 'admin') {
-            throw createError({
-                statusCode: 403,
-                statusMessage: 'Forbidden'
-            });
-        }
-
-        const user_id = getRouterParam(event, 'user_id');
-        if (!user_id) {
-            throw createError({
-                statusCode: 400,
-                statusMessage: 'Bad Request'
-            });
-        }
-        else if (user_id === secureSession.user_id) {
-            setResponseStatus(event, 200);
-            const userSecureSessionInformation: MinimalUserInfo = {
-                id: secureSession.user_id,
-                role: secureSession.user_role,
-                email: secureSession.email,
-                first_name: userSession.first_name,
-                last_name: '',
-                verified: secureSession.verified
-            }
-
-            return userSecureSessionInformation;
-        }
-
-        const transaction = await DatabaseService.getInstance().createTransaction();
+        const transaction = await DatabaseService.getInstance().createTransaction()
 
         try {
-            const userResult = await transaction.query<MinimalUserInfo>(`
+            const user_id = getRouterParam(event, 'user_id');
+        
+            if (!user_id) {
+                throw createError({
+                    statusCode: 400,
+                    statusMessage: 'Bad Request'
+                });
+            }
+
+            const validatedUserId = validateUUID(user_id);
+
+            if (validatedUserId === secureSession.user_id) {
+                const requestingUsersAdditionalInfo = await transaction.query<{
+                    last_name: string | null,
+                    status: string,
+                    created_at: Date
+                }>(`
+                    SELECT 
+                        u.last_name,
+                        u.status,
+                        u.created_at,
+                    FROM private.user u
+                    WHERE u.id = $1
+                `, [validatedUserId]);
+
+                if (requestingUsersAdditionalInfo.length === 0 || !requestingUsersAdditionalInfo[0]) {
+                    throw createError({
+                        statusCode: 404,
+                        statusMessage: 'User not found'
+                    });
+                }
+                
+                const userSecureSessionInformation: BaseDBMininmalUser = {
+                    id: secureSession.user_id,
+                    role: secureSession.user_role,
+                    email: secureSession.email,
+                    first_name: userSession.first_name,
+                    profile_url: userSession.profile_url,
+                    last_name: requestingUsersAdditionalInfo[0].last_name,
+                    status: validateUserStatus(requestingUsersAdditionalInfo[0].status),
+                    created_at: new Date(requestingUsersAdditionalInfo[0].created_at)
+                }
+
+                return userSecureSessionInformation;
+            }
+
+            const userResult = await transaction.query<BaseDBMininmalUser>(`
                 SELECT 
                     u.id,
                     u.email,
                     u.first_name,
-                    u.verified,
+                    u.last_name,
+                    u.profile_url,
+                    u.status,
+                    u.created_at,
                     r.name as role,
                 FROM private.user u
                 JOIN private.role r ON u.role_id = r.id
                 WHERE u.id = $1
-            `, [user_id]);
+            `, [validatedUserId]);
 
-            if (userResult.length === 0) {
+            if (userResult.length === 0 || !userResult[0]) {
                 throw createError({
                     statusCode: 404,
                     statusMessage: 'User not found'
                 });
             }
 
-            const user = validateMinimalUserInfo(userResult[0])
+            const user = validateBaseDBMinimalUser(userResult[0])
 
             setResponseStatus(event, 200);
-            const fetchedUserInformation: MinimalUserInfo = {
+            const fetchedUserInformation: BaseDBMininmalUser = {
                 id: user.id,
                 role: user.role,
                 email: user.email,
                 first_name: user.first_name,
                 last_name: user.last_name,
-                verified: user.verified
+                profile_url: user.profile_url,
+                status: user.status,
+                created_at: user.created_at
             }
 
             return fetchedUserInformation

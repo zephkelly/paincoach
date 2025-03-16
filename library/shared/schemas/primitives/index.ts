@@ -1,21 +1,25 @@
 import { z } from 'zod';
+import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 
 
 export const UUIDSchema = z.string().uuid();
 
-export function validateUUID(value: string) {
-    try {
-        return UUIDSchema.parse(value);
-    } catch (error: any) {
-        return error.errors;
-    }
-}
-
 export const BigIntIDSchema = z.union([
     z.string().regex(/^\d+$/, "ID must be a valid number string"),
     z.number().int().positive()
-  ]).transform((val) => {
-    // Always return a number
+]).transform((val) => {
     return typeof val === 'string' ? parseInt(val, 10) : val;
 });
+
+
+
+export function validateUUID(value: string) {
+    const parsedResult = UUIDSchema.safeParse(value);
+
+    if (!parsedResult.success) {
+        throw createZodValidationError(parsedResult.error);
+    }
+
+    return parsedResult.data;
+}

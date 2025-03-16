@@ -1,20 +1,25 @@
 <template>
     <div v-if="userRole !== 'incomplete_user'" class="chip" :class="{
         admin: userRole === 'admin',
-        super_admin: userRole === 'super_admin',
         clinician: userRole === 'clinician',
         patient: userRole === 'patient',
         skeleton: userRole === undefined,
-        'has-default-slot': hasDefaultSlot
-    }">
+        'has-default-slot': hasDefaultSlot,
+        'owner': userRole === 'admin' && owner,
         
-        <div class="chip-main" :class="{ 'loading-skeleton skeleton-component skeleton-component-panel skeleton-component-border': userRole === undefined }">
+    }">
+    
+        <div class="chip-main" :class="{ 
+            'loading-skeleton skeleton-component skeleton-component-panel skeleton-component-border': userRole === undefined,
+            'owner-shimmer': userRole === 'admin' && owner,
+            'paneled': paneled === true
+        }">
             <TransitionGroup name="fade" tag="div" class="transition-wrapper">
-                <template v-if="userRole === 'super_admin'">
-                    <div class="chip-content-wrapper admin" :class="{ 'has-slot': hasDefaultSlot }">
+                <template v-if="userRole === 'admin' && owner">
+                    <div class="chip-content-wrapper owner" :class="{ 'has-slot': hasDefaultSlot }">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
                         <slot v-if="hasDefaultSlot" name="default"></slot>
-                        <p v-else class="role-name">Super Admin</p>
+                        <p v-else class="role-name">Owner</p>
                     </div>
                 </template>
                 <template v-else-if="userRole === 'admin'">
@@ -40,16 +45,17 @@
                 </template>
             </TransitionGroup>
         </div>
-
     </div>
 </template>
 
 <script setup lang="ts">
-import type { UserRole } from '~~lib/shared/types/users';
+import type { UserRole } from '@@/shared/types/users';
 import { useSlots, computed } from 'vue';
 
 interface ChipProps {
     userRole: UserRole | undefined;
+    owner?: boolean;
+    paneled?: boolean;
 }
 
 defineProps<ChipProps>();
@@ -59,6 +65,17 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
 </script>
 
 <style scoped lang="scss">
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    50% {
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
 .chip {
     position: relative;
     height: 28px;
@@ -69,7 +86,7 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
         min-width: 90px;
     }
 
-    &.admin {
+    &.admin, &.owner {
         width: 76px;
         min-width: 76px;
     }
@@ -102,7 +119,15 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
             }
         }
     }
+    
+    &.owner {
+        .chip-content-wrapper {
+            position: relative;
+        }
+
+    }
 }
+
 .chip-transition-wrapper {
     display: flex;
     height: 100%;
@@ -127,6 +152,69 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
     position: relative;
     overflow: hidden;
 
+    &.owner-shimmer {
+        background: linear-gradient(
+            90deg, 
+            var(--background-3-color) 0%, 
+            #212121 25%, 
+            var(--background-2-color) 50%, 
+            #1e1e1e 80%, 
+            var(--background-3-color) 100%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 8s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
+        z-index: 1;
+
+        &.paneled {
+            background: linear-gradient(
+                90deg, 
+                var(--background-4-color) 0%, 
+                #292929 25%, 
+                var(--background-4-color) 50%, 
+                #272727 80%, 
+                var(--background-4-color) 100%
+            );
+
+            background-size: 200% 100%;
+            animation: shimmer 7s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
+        
+            &::before {
+                background-image: linear-gradient(
+                    180deg,
+                    rgba(170, 170, 170, 0.1) 0%,
+                    rgba(212, 212, 212, 0.099) 50%,
+                    rgba(167, 167, 167, 0.13) 100%
+                );
+            }
+        }
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid transparent;
+            border-radius: inherit;
+            background-image: linear-gradient(
+                180deg,
+                rgba(170, 170, 170, 0.163) 0%,
+                rgba(212, 212, 212, 0.126) 50%,
+                rgba(167, 167, 167, 0.157) 100%
+            );
+            background-size: 200% 100%;
+            background-clip: border-box;
+            -webkit-background-clip: border-box;
+            mask: linear-gradient(#bcbcbc 0 0) content-box, linear-gradient(#d7d7d7 0 0);
+            -webkit-mask: linear-gradient(#bfbfbf 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            animation: skeleton-border-loading 2s infinite;
+            pointer-events: none;
+        }
+    }
+
     .transition-wrapper {
         display: flex;
         align-items: center;
@@ -141,6 +229,7 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
         align-items: center;
         gap: 0.25rem;
         position: absolute;
+        margin-left: -2px;
 
         &.admin {
             svg {
@@ -159,6 +248,7 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
                 height: 0.85rem;
             }
         }
+
         
         &.has-default-slot {
             gap: 0.5rem;
@@ -168,6 +258,8 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
     p {
         font-size: 0.8rem;
         font-family: var(--geist-font-stack);
+        text-wrap: nowrap;
+        white-space: nowrap;
     }
 
     svg {
@@ -177,7 +269,7 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
     }
 }
 
-.chip-main:not(.loading-skeleton) {
+.chip-main:not(.loading-skeleton):not(.owner-shimmer) {
     border: 1px solid var(--border-5-color);
     background-color: var(--background-3-color);
 }

@@ -13,7 +13,6 @@ export async function onRequestValidateSession(event: H3Event) {
         });
     }
 
-    //@ts-expect-error
     if ((!session.secure.verified || !session.secure.user_id || !session.secure.user_role) && !session.secure.invitation_token) {
         throw createError({
             statusCode: 403,

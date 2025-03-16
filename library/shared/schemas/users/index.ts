@@ -9,7 +9,7 @@ import { type User } from '../../types/users'
 
 
 
-export { UserRoleSchema, AccountStatus, validateUserRole } from './base'
+export { UserRoleSchema, UserStatusSchema, validateUserRole } from './base'
 
 export const DBUserSchema = z.discriminatedUnion('role', [
     DBAdminUserSchema,

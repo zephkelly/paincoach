@@ -1,24 +1,46 @@
 import { ZodError } from 'zod';
 
+
 /**
- * Extracts field errors from a ZodError
- * @param error The ZodError to extract fields from
+ * Recursively extracts field error messages from Zod format output
+ * @param errors The Zod formatted error object
+ * @param path Current path in the object, used for recursion
+ * @param result Object to collect the field/error pairs
  * @param includeFirstErrorOnly Whether to include only the first error message per field
- * @returns An object with field names as keys and error messages as values
  */
-export function extractZodErrors(error: ZodError, includeFirstErrorOnly = false) {
-    const formattedError = error.format();
-    const fieldErrors: Record<string, string | string[]> = {};
-
-    const errorObject = Object.entries(formattedError)[1]
-    //@ts-expect-error
-    const firstObject = errorObject[0]
-    //@ts-expect-error
-    const firstObjectError = errorObject[1]._errors[0]
-    const errorString = firstObject + ': ' + firstObjectError
-
-    return [errorString]
-}
+function extractZodErrors(
+    errors: Record<string, any>,
+    path = '',
+    result: Record<string, string[]> = {},
+    includeFirstErrorOnly = false
+  ) {
+    // Skip processing if the errors object is null or undefined
+    if (!errors) return result;
+  
+    for (const [key, value] of Object.entries(errors)) {
+      // Skip the _errors property which we'll handle separately
+      if (key === '_errors') continue;
+      
+      const currentPath = path ? `${path}.${key}` : key;
+      
+      // If the value has _errors array, add it to our results
+      if (value._errors && value._errors.length > 0) {
+        result[currentPath] = includeFirstErrorOnly ? [value._errors[0]] : value._errors;
+      }
+      
+      // Recursively process nested objects
+      if (typeof value === 'object' && value !== null) {
+        extractZodErrors(value, currentPath, result, includeFirstErrorOnly);
+      }
+    }
+    
+    // Handle top-level errors
+    if (errors._errors && errors._errors.length > 0) {
+      result[path || 'root'] = includeFirstErrorOnly ? [errors._errors[0]] : errors._errors;
+    }
+    
+    return result;
+  }
 
 /**
  * Creates an H3 error response with Zod validation errors in the data field
@@ -27,9 +49,13 @@ export function extractZodErrors(error: ZodError, includeFirstErrorOnly = false)
  * @returns H3 compatible error object
  */
 export function createZodValidationError(error: ZodError, includeFirstErrorOnly = false) {
-    const fieldErrors = extractZodErrors(error, includeFirstErrorOnly);
+    const fieldErrors = error.format();
 
-    console.log('Validation errors:', fieldErrors);
+    const formattedErrors = extractZodErrors(fieldErrors, '', {}, includeFirstErrorOnly);
+    
+    // Use JSON.stringify with pretty-printing for better logging
+    console.log('Validation error:', JSON.stringify(formattedErrors, null, 2));
+
 
     if (import.meta.client) {
         throw new Error('Validation failed');

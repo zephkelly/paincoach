@@ -17,7 +17,7 @@ import { createAdminInvitation } from '~~/server/utils/auth/handlers/invite/admi
 export default defineEventHandler({
     onRequest: [
         (event) => onRequestValidateSession(event),
-        (event) => onRequestValidateRole(event, ['clinician', 'admin', 'super_admin']),
+        (event) => onRequestValidateRole(event, ['clinician', 'admin']),
     ],
     handler: async (event) => {
         const {

@@ -11,7 +11,7 @@
                 </div>
                 <div v-if="showRole" class="user-role-wrapper detail-wrapper role">
                     <div v-if="loading" class="skeleton-component skeleton-component-panel" />
-                     <DashboardAccountRoleChip :userRole="props.userInfo?.role" />
+                    <DashboardAccountRoleChip :userRole="userInfo?.role" :owner="userInfo?.role === 'admin' && userInfo.owner" paneled />
                 </div>
                 <div class="user-email-wrapper detail-wrapper email">
                     <p>{{ props.userInfo?.email }}</p>
@@ -23,13 +23,11 @@
 
 <script lang="ts" setup>
 import type { User } from '@@/shared/types/users';
-import { type MinimalUserInfo } from '~~lib/shared/types/users/minimal';
-
-import { capitaliseFirstLetter, getFirstLetter } from '@@/shared/utils/string/formatting';
+import { type DBMinimalUser } from '~~lib/shared/types/users/minimal';
 
 type UserInfoListItemProps = {
     loading: boolean,
-    userInfo: MinimalUserInfo | User | undefined
+    userInfo: DBMinimalUser | undefined
     hideLastName?: boolean
     showRole?: boolean
 }

@@ -1,6 +1,7 @@
 import { H3Event } from 'h3'
 import type { UserSession, SecureSessionData, User } from '#auth-utils';
 import { type UserRole } from '@@/shared/types/users';
+import { isValidRole } from '../../user/role';
 
 
 
@@ -12,15 +13,13 @@ export async function getPainCoachSession(event: H3Event) {
     const user_id: string = secureSession.user_id;
 
     const role: UserRole = secureSession.user_role;
-    const isSuperAdminRole = role === 'super_admin';
-    const isAdminRole = role === 'admin';
-    const isAdmin = isSuperAdminRole || isAdminRole;
-    const isClinicianRole = role === 'clinician';
-    const isPatientRole = role === 'patient';
-    const isIncompleteUserRole = role === 'incomplete_user';
+    const isAdmin = role === 'admin';
+    const isClinician = role === 'clinician';
+    const isPatient = role === 'patient';
+    const isIncompleteUser = role === 'incomplete_user';
 
-    function isRole(role: UserRole) {
-        return secureSession.user_role === role;
+    function isRole(roles: UserRole | UserRole[]) {
+        return isValidRole(roles, secureSession);
     }
 
     return {
@@ -31,19 +30,23 @@ export async function getPainCoachSession(event: H3Event) {
         user_id,
 
         role,
+        /**
+         * Bool check for roles
+         * @type {boolean}
+         * @readonly
+         * @memberof getPainCoachSession
+         */
         isRole,
 
         /**
-         * Bool check for Admins and Super Admins
+         * Bool check for admins and 
          * @type {boolean}
          * @readonly
          * @memberof getPainCoachSession
          */
         isAdmin,
-        isSuperAdminRole,
-        isAdminRole,
-        isClinicianRole,
-        isPatientRole,
-        isIncompleteUserRole,
+        isClinician,
+        isPatient,
+        isIncompleteUser,
     }
 }

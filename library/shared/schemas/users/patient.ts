@@ -15,17 +15,14 @@ export const PatientUserPrivateDataSchema = z.object({
         }, 'Date of birth cannot be in the future'),
 });
 
-export const DBPatientUserSchema = BaseDBUserSchema.extend({
+export const DBPatientUserFieldsSchema = z.object({
     role: z.literal('patient'),
-
     private_data: PatientUserPrivateDataSchema,
 });
 
-export const PatientUserSchema = BaseUserSchema.extend({
-    role: z.literal('patient'),
+export const DBPatientUserSchema = BaseDBUserSchema.merge(DBPatientUserFieldsSchema);
 
-    private_data: PatientUserPrivateDataSchema,
-});
+export const PatientUserSchema = BaseUserSchema.merge(DBPatientUserFieldsSchema);
 
 
 export function validatePatientUser(data: PatientUser) {

@@ -1,5 +1,7 @@
-import type { AdminUser, ClinicianUser, PatientUser } from '@@/shared/types/users';
-import { type AdminUserGetResponse } from '~~/server/api/v1/user/info/index.get';
+import type { AdminUser, ClinicianUser, PatientUser } from '~~lib/shared/types/users';
+import type { AdminUserGetResponse, ClinicianUserGetResponse } from '~~lib/shared/types/users/get';
+
+
 
 export const useUsers = async () => {
     const state = useState<{
@@ -28,22 +30,28 @@ export const useUsers = async () => {
         try {
             let fetchedUsers = undefined;
 
-            console.log(isMockingUser.value)
-
             if (isMockingUser.value) {
                 fetchedUsers = await $fetch<AdminUserGetResponse>('/api/v1/user/info?roles=all&page=0&limit=10', {
                     method: 'POST',
                     body: mockUserAPIData.value
                 });
+
+                state.value.adminUsers = fetchedUsers.users.admin;
+                state.value.clinicianUsers = fetchedUsers.users.clinician
+                state.value.patientUsers = fetchedUsers.users.patient
+            }
+            else if (userRole.value === 'admin') {
+                fetchedUsers = await $fetch<AdminUserGetResponse>('/api/v1/user/info?roles=all&page=0&limit=10');
+
+                state.value.adminUsers = fetchedUsers.users.admin;
+                state.value.clinicianUsers = fetchedUsers.users.clinician
+                state.value.patientUsers = fetchedUsers.users.patient
             }
             else {
-                fetchedUsers = await $fetch<AdminUserGetResponse>('/api/v1/user/info?roles=all&page=0&limit=10');
+                fetchedUsers = await $fetch<ClinicianUserGetResponse>('/api/v1/user/info?roles=all&page=0&limit=10');
+            
+                state.value.patientUsers = fetchedUsers.users.patient;
             }
-
-            state.value.adminUsers = fetchedUsers.users.admin;
-            state.value.clinicianUsers = fetchedUsers.users.clinician
-            state.value.patientUsers = fetchedUsers.users.patient
-            console.log(state.value)
         }
         catch (error: any) {
             console.log('Could not fetch users', error);
@@ -51,6 +59,7 @@ export const useUsers = async () => {
     }
 
     watch(() => userRole.value, (oldRole, newRole) => {
+
         console.log('Mock user role changed, fetching users');
         fetch();
     });

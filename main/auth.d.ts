@@ -10,6 +10,8 @@ declare module '#auth-utils' {
         user_role: UserRole;
         verified: boolean;
         profile_url?: string;
+
+        owner?: true;
     }
     
     interface SecureSessionData {

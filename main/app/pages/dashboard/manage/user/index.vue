@@ -13,6 +13,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { UserRole } from '@@/shared/types/users';
 import DashboardUserOverview from '~/components/dashboard/user/overview/index.vue';
 
 const {
@@ -27,7 +28,7 @@ const {
 
 fetch();
 
-watch(() => userRole.value, (role) => {
+watch(() => userRole.value, (role: UserRole | undefined) => {
     if (role === 'patient') {
         navigateTo('/dashboard');
     }
@@ -58,8 +59,8 @@ const currentTabs = computed(() => {
 })
 
 definePageMeta({
-    layout: 'app',
-    middleware: 'manage-users-redirect'
+   layout: 'app',
+     middleware: 'manage-users-redirect'
 });
 </script>
 

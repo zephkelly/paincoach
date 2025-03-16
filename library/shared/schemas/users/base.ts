@@ -1,12 +1,13 @@
 import { z, ZodError } from 'zod';
+import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 import { PHONE_REGEX } from '../../constants/phone';
-import type { UserRole } from '@@/shared/types/users';
+import type { UserRole, UserStatus } from '@@/shared/types/users';
 
 
 
-export const UserRoleSchema = z.enum(['super_admin', 'admin', 'clinician', 'patient', 'incomplete_user'])
-export const AccountStatus = z.enum(['active', 'inactive', 'pending'])
+export const UserRoleSchema = z.enum(['owner', 'admin', 'clinician', 'patient', 'incomplete_user'])
+export const UserStatusSchema = z.enum(['active', 'inactive', 'pending'])
 
 export const BaseDBUserSchema = z.object({
     id: z.string().uuid(),
@@ -42,7 +43,7 @@ export const BaseDBUserSchema = z.object({
 
     role: UserRoleSchema,
 
-    status: AccountStatus.default('pending'),
+    status: UserStatusSchema,
 
     registration_complete: z.boolean(),
 
@@ -83,6 +84,16 @@ export const BaseUserSchema = BaseDBUserSchema.omit({
     updated_at: true,
     version: true
 })
+
+export function validateUserStatus(status: string): UserStatus {
+    const parseResult = UserStatusSchema.safeParse(status)
+    
+    if (!parseResult.success) {
+        throw createZodValidationError(parseResult.error)
+    }
+    
+    return parseResult.data
+}
 
 export function validateUserRole(role: string): UserRole {
     try {

@@ -36,7 +36,7 @@
                         </div>
 
 
-                        <div class="incomplete-content" v-if="status === 'success'">
+                        <div class="incomplete-content" v-if="loadedInvitation">
                             <div class="registration-type-message" v-if="!isNotCompleted">
                                 <p>* Some information has been entered on your behalf, please verify it is correct before continuing</p>
                             </div>
@@ -53,9 +53,6 @@
 </template>
 
 <script lang="ts" setup>
-import Authenticator from '@/components/authenticator.vue';
-import { type UserInvitation } from '@@/shared/types/users/invitation/index';
-
 const {
     fetchNewSession,
 } = useAuth();
@@ -64,21 +61,28 @@ const {
     state: registerState
 } = useRegister();
 
-const { data: invitationData, status, error } = await useFetch<UserInvitation>('/api/v1/auth/invite');
+const {
+    loaded: loadedInvitation,
+    state: invitationState,
+    invitation: invitationData,
+    fetch: fetchInvitation
+} = useInvite();
 
-watch(status, (newStatus) => {
-    if (newStatus === 'success') {
-        console.log(invitationData.value);
-        //@ts-expect-error
-        registerState.value = invitationData.value?.registration_data;
-        registerState.value.role = invitationData.value?.role_name;
-        registerState.value.invitation_token = invitationData.value?.invitation_token;
-        registerState.value.id = invitationData.value?.user_id
-    }
-    else if (newStatus === 'error') {
-        console.error('Error fetching invitation data', error.value);
-    }
-}, { immediate: true });
+
+
+// watch(status, (newStatus) => {
+//     if (newStatus === 'success') {
+//         console.log(invitationData.value);
+//         //@ts-expect-error
+//         registerState.value = invitationData.value?.registration_data;
+//         registerState.value.role = invitationData.value?.role_name;
+//         registerState.value.invitation_token = invitationData.value?.invitation_token;
+//         registerState.value.id = invitationData.value?.user_id
+//     }
+//     else if (newStatus === 'error') {
+//         console.error('Error fetching invitation data', error.value);
+//     }
+// }, { immediate: true });
 
 const usersFirstName = computed(() => {
     if (invitationData.value?.registration_data?.first_name) {

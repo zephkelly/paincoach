@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import { MininmalUserInfoSchema } from '@@/shared/schemas/users/minimal'
+import { BaseDBMininmalUserSchema, DBMinimalUserSchema } from '@@/shared/schemas/users/minimal'
 
 
 
-export type MinimalUserInfo = z.infer<typeof MininmalUserInfoSchema>;
+export type BaseDBMininmalUser = z.infer<typeof BaseDBMininmalUserSchema>;
+export type DBMinimalUser = z.infer<typeof DBMinimalUserSchema>;

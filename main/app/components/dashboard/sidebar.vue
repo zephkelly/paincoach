@@ -12,7 +12,7 @@
                 <!-- User management -->
                 <li class="sidebar-item users" :class="{ closed: userRole === 'patient'}">
                     <Transition name="fast-fade">
-                        <div v-if="userRole === undefined || userRole === 'admin' || userRole === 'clinician'">
+                        <div v-if=" isAdminUser || userRole === 'clinician'">
                             <div class="sidebar-item-header">
                                 <div class="toggleable-header">
                                     <Transition name="fade">
@@ -80,11 +80,12 @@ const {
 
 const {
     ready,
-    userRole
+    userRole,
+    isAdminUser
 } = useAuth();
 
 const manageableUsersType = computed(() => {
-    if (userRole.value === 'admin') {
+    if (isAdminUser.value) {
         return 'users';
     } else if (userRole.value === 'clinician') {
         return 'patients';
@@ -92,7 +93,7 @@ const manageableUsersType = computed(() => {
 })
 
 const yourUsersLinkComputed = computed(() => {
-    if (userRole.value === 'admin') {
+    if (isAdminUser.value) {
         return `/dashboard/manage/user`;
     } else if (userRole.value === 'clinician') {
         return `/dashboard/manage/user/patient?tab=0`;
@@ -100,7 +101,7 @@ const yourUsersLinkComputed = computed(() => {
 })
 
 const yourAddUsersLinkComputed = computed(() => {
-    if (userRole.value === 'admin') {
+    if (isAdminUser.value) {
         return `/dashboard/manage/user/add`;
     } else if (userRole.value === 'clinician') {
         return `/dashboard/manage/user/patient?tab=1`;

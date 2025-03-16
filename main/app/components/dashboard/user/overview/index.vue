@@ -23,6 +23,8 @@ const {
     clinicianUsers,
     patientUsers
 } = await useUsers();
+
+console.log(adminUsers.value, clinicianUsers, patientUsers);
 </script>
 
 <style lang="scss" scoped>

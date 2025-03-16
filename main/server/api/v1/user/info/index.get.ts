@@ -1,10 +1,9 @@
-import { H3Error } from 'h3';
+import { H3Error, defineEventHandler } from 'h3';
 import type { PaginationParams } from '@@/shared/types/api';
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
-import type { DBTransaction } from '~~/server/types/db';
 import type { User, PatientUser, ClinicianUser, AdminUser } from '~~lib/shared/types/users';
 import { type UserRole } from '~~lib/shared/types/users';
 import { validateUsers } from '~~lib/shared/schemas/users';
@@ -12,22 +11,8 @@ import { validatePatientUsers } from '~~lib/shared/schemas/users/patient';
 
 import { getAllUsers } from '~~/server/utils/user/database/get/all';
 import { getUsersClinicianPatients } from '~~/server/utils/user/patients/database/get/clinicianPatients';
+import type { AdminUserGetResponse, ClinicianUserGetResponse } from '~~lib/shared/types/users/get';
 
-
-
-export interface AdminUserGetResponse {
-    users: {
-        admin: AdminUser[];
-        clinician: ClinicianUser[];
-        patient: PatientUser[];
-    };
-}
-
-export interface ClinicianUserGetResponse {
-    users: {
-        patient: PatientUser[];
-    };
-}
 
 export default defineEventHandler({
     onRequest: [
@@ -63,7 +48,7 @@ export default defineEventHandler({
                 const allfetchedUsers = await getAllUsers(db, paginationParams);
                 const validatedUsers = validateUsers(allfetchedUsers);
 
-                const userMap = new Map<UserRole, User[]>()
+                const userMap = new Map<Exclude<UserRole, 'incomplete_user'>, User[]>()
 
                 // Initialize empty arrays for each role type
                 userMap.set('admin', [])
@@ -74,13 +59,15 @@ export default defineEventHandler({
                 validatedUsers.forEach(user => {
                     const role = user.role as UserRole
 
-                    if (role === 'admin' || role === 'clinician' || role === 'patient') {
-                        // Type assertion based on role
+                    if (role === 'owner' || role === 'admin' || role === 'clinician' || role === 'patient') {
+    
                         if (role === 'admin') {
                             userMap.get('admin')?.push(user as AdminUser)
-                        } else if (role === 'clinician') {
+                        }
+                        else if (role === 'clinician') {
                             userMap.get('clinician')?.push(user as ClinicianUser)
-                        } else if (role === 'patient') {
+                        }
+                        else if (role === 'patient') {
                             userMap.get('patient')?.push(user as PatientUser)
                         }
                     }

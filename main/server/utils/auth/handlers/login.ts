@@ -2,9 +2,9 @@ import { H3Event, H3Error } from 'h3'
 import { type UserSession } from '#auth-utils'
 
 import { validateUUID } from '~lib/schemas/primitives'
-import { type User } from '~lib/types/users'
+import { type DBUser, type User } from '~lib/types/users'
 
-import { getUser } from '~~/server/utils/user/database/get/byEmail'
+import { getDBUser } from '~~/server/utils/user/database/get/byEmail'
 
 import { DatabaseService } from '~~/server/services/databaseService'
 
@@ -28,7 +28,7 @@ export async function handleLoginCredentials(
     const transaction = await DatabaseService.getInstance().createTransaction()
 
     try {
-        const user: User | undefined = await getUser(transaction, email);
+        const user: DBUser | undefined = await getDBUser(transaction, email);
 
         if (!user) {
             throw createError({
@@ -60,6 +60,8 @@ export async function handleLoginCredentials(
                 user_role: user.role,
                 verified: user.verified,
                 profile_url: user.profile_url || undefined,
+
+                owner: (user.role === 'admin' && user.owner === true) ? true : undefined,
             },
             secure: {
                 email: user.email,
@@ -73,7 +75,7 @@ export async function handleLoginCredentials(
         }
 
         await replaceUserSession(event, session, {
-            maxAge: 60 * 60 * 24 * 365 * 1, // 1 year
+            maxAge: 60 * 60 * 24 * 365 * 1,
         });
 
         setResponseStatus(event, 200, 'Ok')
