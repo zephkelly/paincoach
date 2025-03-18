@@ -254,7 +254,7 @@ definePageMeta({
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
 
     p {
         font-family: var(--serif-font-stack);
@@ -275,16 +275,14 @@ definePageMeta({
 }
 
 .incomplete-content {
-    margin-top: 4rem;
-
     .user-profile {
         align-items: center;
         margin-bottom: 0.5rem;
 
         .profile-wrapper {
             position: relative;
-            width: 30%;
-            min-width: 200px;
+            width: 25%;
+            min-width: 150px;
             height: auto;
 
             input {
@@ -311,7 +309,7 @@ definePageMeta({
 
             :deep() {
                 p {
-                    font-size: clamp(2.5rem, 5vw, 3.5rem);
+                    font-size: clamp(2rem, 5vw, 3rem);
                 }
             }
         }
