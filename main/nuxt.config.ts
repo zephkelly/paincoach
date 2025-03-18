@@ -117,19 +117,6 @@ export default defineNuxtConfig({
             ],
             htmlAttrs: { lang: 'en', },
         },
-
-        script: [{
-            innerHTML: `
-                (function() {
-                    document.documentElement.style.backgroundColor = '#09090b';
-
-                    window.addEventListener('load', () => {
-                        document.documentElement.style.removeProperty('background-color');
-                    });
-                })();
-            `,
-            type: 'text/javascript',
-        },],
     },
 
     vite: {
@@ -141,15 +128,6 @@ export default defineNuxtConfig({
             },
         },
     },
-
-    // routeRules: {
-    //     '/dashboard/**': {
-    //         ssr: false
-    //     },
-    //     '/dashboard/user/invite': {
-    //         ssr: true
-    //     }
-    // },
 
     typescript: {
         strict: true
