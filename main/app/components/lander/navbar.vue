@@ -84,7 +84,7 @@ section {
     top: 0;
     left: 0;
     right: 0;
-    background-color: var(--background-transparent);
+    background-color: var(--background-transparent-color);
     backdrop-filter: blur(8px);
     z-index: 1000;
     padding: 0rem 1rem;

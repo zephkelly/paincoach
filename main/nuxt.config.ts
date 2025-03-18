@@ -65,15 +65,15 @@ export default defineNuxtConfig({
     },
 
     css: [
+        '~/assets/scss/global.scss',
+        '~~lib/app/assets/scss/globals/index.scss',
+
+        '~~lib/app/assets/scss/reset.scss',
+
         '~/assets/scss/animations.scss',
         '~~lib/app/assets/scss/skeleton.scss',
         '~~lib/app/assets/scss/transition.scss',
         '~~lib/app/assets/scss/theme.scss',
-        '~~lib/app/assets/scss/reset.scss',
-
-        '~~lib/app/assets/scss/globals/index.scss',
-
-        '~/assets/scss/global.scss',
     ],
 
     app: {
@@ -116,7 +116,20 @@ export default defineNuxtConfig({
                 },
             ],
             htmlAttrs: { lang: 'en', },
-        }
+        },
+
+        script: [{
+            innerHTML: `
+                (function() {
+                    document.documentElement.style.backgroundColor = '#09090b';
+
+                    window.addEventListener('load', () => {
+                        document.documentElement.style.removeProperty('background-color');
+                    });
+                })();
+            `,
+            type: 'text/javascript',
+        },],
     },
 
     vite: {

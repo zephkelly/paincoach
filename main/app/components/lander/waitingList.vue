@@ -174,7 +174,7 @@ form {
         input {
             padding: 0.5rem;
             border: 1px solid var(--text-color);
-            background-color: var(--background);
+            background-color: var(--background-color);
             color: var(--text-color);
             height: 2rem;
             border-radius: 0.5rem;
