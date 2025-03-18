@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { type PageProps } from '@/types/page/index';
+import { type PageProps } from './../../types/page/index';
 import { useSlots, ref, onMounted, onUpdated } from 'vue';
 
 const props = defineProps<PageProps>();
