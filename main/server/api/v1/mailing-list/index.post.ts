@@ -1,3 +1,4 @@
+import { H3Error } from 'h3'
 import { DatabaseService } from '~~/server/services/databaseService'
 import { generateEmailToken } from '~~/server/utils/mailing-list/unsubscribe'
 
@@ -62,23 +63,32 @@ export default defineEventHandler(async (event) => {
             ]
         );
  
-        const response = await $fetch(`https://${dc}.api.mailchimp.com/3.0/lists/${listId}/members`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Basic ${Buffer.from(`any:${apiKey}`).toString('base64')}`
-            },
-            body: {
-                email_address: email,
-                status: 'subscribed',
-                merge_fields: {
-                    USUB_TOKEN: unsubscribeToken
+        try {
+            const response = await $fetch(`https://${dc}.api.mailchimp.com/3.0/lists/${listId}/members`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Basic ${Buffer.from(`any:${apiKey}`).toString('base64')}`
+                },
+                body: {
+                    email_address: email,
+                    status: 'subscribed',
+                    merge_fields: {
+                        USUB_TOKEN: unsubscribeToken
+                    }
                 }
+            })
+        }
+        catch (error: unknown) {
+            if (error instanceof H3Error) {
+                throw createError({
+                    statusCode: 409,
+                    statusText: 'Conflict',
+                    message: 'Email is already subscribed.'
+                })
             }
-        })
+        }
 
-        
-       
         // Send amazon ses transactional email
         await transaction.commit()
         setResponseStatus(event, 201)
@@ -86,6 +96,8 @@ export default defineEventHandler(async (event) => {
     catch (error: any) {
         console.log('Error subscribing user:', error)
         await transaction.rollback();
+
+        console.log('POST /api/v1/mailing-list error:', 'This email attempted to subscribe to mailing-list:', email)
         
         if (error.statusCode === 409) {
             throw createError({
