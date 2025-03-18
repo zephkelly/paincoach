@@ -1,6 +1,7 @@
 import type { UserRole } from "@@/shared/types/users";
 import { type UserInvitation } from "@@/shared/types/users/invitation/index";
-import { validateUserRegister, validateUserRegisterPartial } from "@@/shared/schemas/user/register";
+import { validateUserInvitation } from "@@/shared/schemas/user/invitation";
+
 
 
 export const useInvite = () => {
@@ -16,11 +17,15 @@ export const useInvite = () => {
     const loaded = computed(() => state.value.invitation !== null && state.value.invitation !== undefined && !state.value.fetching);
     const fetching = computed(() => state.value.fetching);
 
+    const invitationComputed = computed(() => state.value.invitation);
+
     async function fetch(token?: string) {
         const query = token ? `?token=${token}` : '';
         try {
-            const response = await $fetch<UserInvitation>('api/v1/auth/invite' + query);
-            state.value.invitation = response;
+            const response = await $fetch<UserInvitation>('/api/v1/auth/invite' + query);
+            const validatedUserInvitation = validateUserInvitation(response);
+            
+            state.value.invitation = validatedUserInvitation;
         }
         catch (error) {
             console.error(error);
@@ -36,7 +41,7 @@ export const useInvite = () => {
 
         loaded,
         fetching,
-        invitation,
+        invitation: invitationComputed,
 
         fetch,
         clear

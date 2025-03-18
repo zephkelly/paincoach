@@ -1,10 +1,8 @@
 import { z } from 'zod';
 
-import { BaseEncryptedPatientMedicationDataSchema } from '.';
 
 
-
-export const EncryptedPatientMedicationDataV1Schema = BaseEncryptedPatientMedicationDataSchema.extend({
+export const EncryptedPatientMedicationDataV1Schema = z.object({
     version: z.literal(1),
     data: z.object({
         start_date: z.date(),

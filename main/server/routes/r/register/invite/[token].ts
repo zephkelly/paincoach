@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
         const invitationResult = await db.query(`
             SELECT 
                 i.*,
-                r.name as role_name,
+                r.name as role,
                 CASE 
                     WHEN i.expires_at < NOW() THEN 'expired'
                     ELSE i.status 

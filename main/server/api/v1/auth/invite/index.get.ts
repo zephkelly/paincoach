@@ -21,8 +21,8 @@ export default defineEventHandler({
             user_id: requestingUserId,
 
             isAdmin,
-            isIncompleteUserRole,
-            isClinicianRole
+            isIncompleteUser,
+            isClinician
         } = await getPainCoachSession(event);
 
         const query = getQuery(event);
@@ -31,11 +31,11 @@ export default defineEventHandler({
 
         let invitation_token: string | undefined = undefined;
 
-        if (isIncompleteUserRole) {
+        if (isIncompleteUser) {
             invitation_token = session.secure?.invitation_token;
         }
         else {
-            if (!isAdmin && !isClinicianRole) {
+            if (!isAdmin && !isClinician) {
                 throw createError({
                     statusCode: 403,
                     message: 'Only invited users and invitees can access invitations'
@@ -55,7 +55,7 @@ export default defineEventHandler({
         const transaction = await DatabaseService.getInstance().createTransaction();
 
         try {
-            if (isClinicianRole) {
+            if (isClinician) {
                 const clinicianInvitation = await transaction.query<{ exists: boolean }>(`
                     SELECT EXISTS (
                         SELECT 1 FROM private.user_invitation WHERE invitation_token = $1 AND invited_by = $2
@@ -77,7 +77,7 @@ export default defineEventHandler({
                     ui.user_id,
                     ui.email,
                     ui.phone_number,
-                    r.name as role_name,
+                    r.name as role,
                     ui.invitation_token,
                     u.first_name as inviter_name,
                     r2.name as inviter_role_name,

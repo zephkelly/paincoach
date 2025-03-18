@@ -272,5 +272,10 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
 .chip-main:not(.loading-skeleton):not(.owner-shimmer) {
     border: 1px solid var(--border-5-color);
     background-color: var(--background-3-color);
+
+    &.paneled {
+        background-color: var(--background-4-color);
+        border-color: var(--border-5-color);
+    }
 }
 </style>

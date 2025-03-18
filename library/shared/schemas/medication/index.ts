@@ -5,11 +5,6 @@ import { EncryptedPatientMedicationDataV1Schema } from './v1';
 
 
 
-export const BaseEncryptedPatientMedicationDataSchema = z.object({
-    version: z.number().int(),
-    data: z.object({})
-});
-
 export const EncryptedPatientMedicationDataSchema = z.discriminatedUnion('version', [
     EncryptedPatientMedicationDataV1Schema
 ]);

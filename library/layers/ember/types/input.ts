@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { InputTypeSchema } from "../schemas/input";
-import { UserRegisterSchema, AdminRegisterSchema, ClinicianRegisterSchema, PatientRegisterSchema } from "@@/shared/schemas/user/register";
+import { AdminRegisterSchema, ClinicianRegisterSchema, PatientRegisterSchema } from "@@/shared/schemas/user/register";
 
 
 export type InputType = z.infer<typeof InputTypeSchema>;
@@ -16,4 +16,5 @@ export type InputField = {
     label: string;
     tabindex: number;
     required: boolean;
+    readonly?: boolean;
 }

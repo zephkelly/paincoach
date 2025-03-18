@@ -11,7 +11,7 @@ export const BaseUserInviteSchema = BaseDBUserSchema.pick({
     phone_number: true,
     first_name: true,
     last_name: true,
-    data_sharing_enabled: true
+    data_sharing_enabled: true,
 }).extend({
     confirm_email: z.string().email(),
 });

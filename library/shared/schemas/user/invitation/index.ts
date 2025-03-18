@@ -25,7 +25,7 @@ export const DBUserInvitationSchema = z.object({
     invited_by: z.string().uuid(),
     role_id: z.string().uuid(),
     registration_type: RegistrationTypeSchema,
-    expires_at: z.date(),
+    expires_at: z.coerce.date(),
     status: InvitationStatusSchema,
     created_at: z.coerce.date(),
     updated_at: z.coerce.date(),
@@ -42,7 +42,7 @@ export const UserInvitationSchema = DBUserInvitationSchema.omit({
     created_at: true,
     updated_at: true,
 }).extend({
-    role_name: InvitationRoleSchema,
+    role: InvitationRoleSchema,
     inviter_name: z.string(),
     inviter_profile_url: z.string().url().nullable(),
     inviter_role_name: UserRoleSchema,
