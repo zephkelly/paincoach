@@ -3,6 +3,7 @@ import { type UserRegisterPartial } from "@@/shared/types/users/register";
 import { validateUserRegister, validateUserRegisterPartial } from "@@/shared/schemas/user/register";
 
 
+
 export const useRegister = () => {
     const state = useState<UserRegisterPartial>('user_registration_state', () => ({
         invitation_token: undefined,

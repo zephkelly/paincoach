@@ -35,21 +35,20 @@ export const createMedicalRecord = (
     data: any,
     patientId: string,
     clinicianId: string
-  ): MedicalRecord => {
+): MedicalRecord => {
     const record = {
-      id: BigInt(Date.now()),
-      patient_id: patientId,
-      clinician_id: clinicianId,
-      record_practice_type: practiceType,
-      record_type: recordType,
-      encrypted_record_data: {
-        version,
-        data,
-      },
-      created_at: new Date(),
-      updated_at: new Date(),
+        id: BigInt(Date.now()),
+        patient_id: patientId,
+        clinician_id: clinicianId,
+        record_practice_type: practiceType,
+        record_type: recordType,
+        encrypted_record_data: {
+            version,
+            data,
+        },
+        created_at: new Date(),
+        updated_at: new Date(),
     };
     
-    // This will validate the record against the schema and throw if invalid
     return MedicalRecordSchema.parse(record);
-  };
+};
