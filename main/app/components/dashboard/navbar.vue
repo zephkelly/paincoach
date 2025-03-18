@@ -14,6 +14,10 @@
             </Authenticator>
         </div>
 
+        <button @click="swapMailingList">
+            Swap
+        </button>
+
         <div v-if="isAdminUser">
             <EButton @click="adminTogglesOpen = !adminTogglesOpen">Open</EButton>
             <div class="admin" v-show="adminTogglesOpen">
@@ -55,6 +59,10 @@ async function test() {
     catch(error) {
         console.error(error);
     }
+}
+
+async function swapMailingList() {
+    await $fetch('/api/v1/swap')
 }
 
 const {
