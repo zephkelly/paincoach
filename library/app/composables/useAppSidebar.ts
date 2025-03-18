@@ -1,8 +1,3 @@
-//@ts-expect-error
-import { type UserSession } from '#auth-utils';
-
-
-
 export const useAppSidebar = () => {
     const state = useState<{ open: boolean }>('app-sidebar', () => ({ 
         open: false 

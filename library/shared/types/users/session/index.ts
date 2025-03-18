@@ -5,7 +5,7 @@ import {
     SessionSecureDataObjectSchema,
     SessionUserSessionObjectSchema,
 
-} from '@@/shared/schemas/users/session';
+} from '@@/shared/schemas/user/session';
 
 
 

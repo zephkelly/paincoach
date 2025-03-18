@@ -8,8 +8,8 @@ import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 import { DatabaseService } from '~~/server/services/databaseService';
 
 import { validateUUID } from '@@/shared/schemas/primitives';
-import { validateUserStatus } from '@@/shared/schemas/users/base';
-import { validateBaseDBMinimalUser } from '@@/shared/schemas/users/minimal';
+import { validateUserStatus } from '@@/shared/schemas/user/base';
+import { validateBaseDBMinimalUser } from '@@/shared/schemas/user/minimal';
 
 import { type BaseDBMininmalUser } from '~~lib/shared/types/users/minimal'
 

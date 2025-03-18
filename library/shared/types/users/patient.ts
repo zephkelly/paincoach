@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DBPatientUserSchema, PatientUserSchema } from "../../schemas/users/patient";
+import { DBPatientUserSchema, PatientUserSchema } from "@@/shared/schemas/user/patient/index";
 
 
 

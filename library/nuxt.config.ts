@@ -22,7 +22,12 @@ export default defineNuxtConfig({
     },
 
     extends: [
-        './layers/ember'
+        './layers/ember',
+        './layers/paincrypt',
+    ],
+
+    modules: [
+        '@nuxt/test-utils/module'
     ],
 
     runtimeConfig: {

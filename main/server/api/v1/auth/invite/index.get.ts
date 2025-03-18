@@ -6,7 +6,7 @@ import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
 import type { UserInvitation } from '@@/shared/types/users/invitation';
-import { validateUserInvitation } from '@@/shared/schemas/users/invitation';
+import { validateUserInvitation } from '@@/shared/schemas/user/invitation';
 
 
 

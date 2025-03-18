@@ -1,6 +1,6 @@
 import type { UserRole } from "@@/shared/types/users";
 import { type UserInvitation } from "@@/shared/types/users/invitation/index";
-import { validateUserRegister, validateUserRegisterPartial } from "@@/shared/schemas/users/register";
+import { validateUserRegister, validateUserRegisterPartial } from "@@/shared/schemas/user/register";
 
 
 export const useInvite = () => {

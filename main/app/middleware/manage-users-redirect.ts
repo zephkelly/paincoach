@@ -1,4 +1,4 @@
-import { validateUserRole } from '~~lib/shared/schemas/users/base';
+import { validateUserRole } from '@@/shared/schemas/user/base';
 
 
 

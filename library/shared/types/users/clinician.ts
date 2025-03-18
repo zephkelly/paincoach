@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DBClinicianUserSchema, ClinicianUserSchema } from '../../schemas/users/clinician';
+import { DBClinicianUserSchema, ClinicianUserSchema } from '../../schemas/user/clinician';
 
 
 

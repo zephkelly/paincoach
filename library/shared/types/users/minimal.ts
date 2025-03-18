@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { BaseDBMininmalUserSchema, DBMinimalUserSchema } from '@@/shared/schemas/users/minimal'
+import { BaseDBMininmalUserSchema, DBMinimalUserSchema } from '@@/shared/schemas/user/minimal'
 
 
 

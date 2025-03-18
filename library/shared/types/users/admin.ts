@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DBAdminUserSchema, AdminUserSchema } from '../../schemas/users/admin';
+import { DBAdminUserSchema, AdminUserSchema } from '../../schemas/user/admin';
 
 
 

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { createZodValidationError } from '@@/shared/utils/zod/error';
 
-import { BaseDBUserSchema } from '@@/shared/schemas/users/base';
-import { MockUserDataSchema } from '@@/shared/schemas/users/mock';
+import { BaseDBUserSchema } from '@@/shared/schemas/user/base';
+import { MockUserDataSchema } from '@@/shared/schemas/user/mock';
 
 
 

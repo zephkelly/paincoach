@@ -3,7 +3,7 @@ import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 import { DBAdminUserSchema, AdminUserSchema } from "./admin";
 import { DBClinicianUserSchema, ClinicianUserSchema } from "./clinician";
-import { DBPatientUserSchema, PatientUserSchema } from "./patient";
+import { DBPatientUserSchema, PatientUserSchema } from "./patient/index";
 
 import { type User } from '../../types/users'
 
@@ -22,6 +22,7 @@ export const UserSchema = z.discriminatedUnion('role', [
     ClinicianUserSchema,
     PatientUserSchema
 ]);
+
 
 
 export function validateUser(data: User) {

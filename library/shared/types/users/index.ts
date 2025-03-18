@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import { UserStatusSchema, UserRoleSchema } from '@@/shared/schemas/users';
+import { UserStatusSchema, UserRoleSchema } from '@@/shared/schemas/user';
 import type { DBClinicianUser, ClinicianUser } from '../users/clinician';
 import type { DBPatientUser, PatientUser } from '../users/patient';
 import type { DBAdminUser, AdminUser } from './admin';

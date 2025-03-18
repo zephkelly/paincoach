@@ -1,10 +1,10 @@
 import type { UserRole } from "@@/shared/types/users";
 import { type UserRegisterPartial } from "@@/shared/types/users/register";
-import { validateUserRegister, validateUserRegisterPartial } from "@@/shared/schemas/users/register";
+import { validateUserRegister, validateUserRegisterPartial } from "@@/shared/schemas/user/register";
 
 
 export const useRegister = () => {
-    const state = useState<UserRegisterPartial>('registration_form', () => ({
+    const state = useState<UserRegisterPartial>('user_registration_state', () => ({
         invitation_token: undefined,
 
         id: undefined,
@@ -17,7 +17,7 @@ export const useRegister = () => {
         first_name: undefined,
         last_name: undefined,
         phone_number: undefined,
-        data_sharing_enabled: false,
+        data_sharing_enabled: undefined,
 
         // Clinician fields
         ahprah_registration_number: undefined,
@@ -25,7 +25,13 @@ export const useRegister = () => {
         practice_name: undefined,
         business_address: undefined,
         abn: undefined,
+
+        private_data: undefined
     }));
+
+    const desiredUserRole = computed(() => state.value.role);
+
+    
 
     watch(state.value, (value) => {
         try {

@@ -1,6 +1,6 @@
 import { H3Event } from 'h3'
 import { DatabaseService } from '~~/server/services/databaseService'
-import { RegistrationTypeSchema, InvitationStatusSchema } from '@@/shared/schemas/users/invitation'
+import { RegistrationTypeSchema, InvitationStatusSchema } from '@@/shared/schemas/user/invitation'
 import type { UserRole } from '@@/shared/types/users'
 import { handlePartialRegistration } from './partial'
 import { handleFullRegistration } from './full'

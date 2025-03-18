@@ -1,7 +1,7 @@
 import { H3Error } from "h3";
 import { DatabaseService } from "~~/server/services/databaseService";
 
-import { validateDBUserInvitation } from '~~lib/shared/schemas/users/invitation'
+import { validateDBUserInvitation } from '@@/shared/schemas/user/invitation'
 
 
 

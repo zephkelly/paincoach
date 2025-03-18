@@ -2,8 +2,7 @@ import { z } from 'zod';
 
 import {
     type PainFactors,
-    type PainFactorsPartial
-} from '../../types/record/factor';
+} from '@@/shared/types/record/physiotherapy/app_record';
 
 
 
@@ -24,26 +23,10 @@ export const PainFactorsSchema = z.object({
 
 export const PainFactorsPartialSchema = PainFactorsSchema.partial();
 
-export const PainFactorsRecordSchema = z.object({
-    date: z.date(),
-    factors: PainFactorsPartialSchema
-});
-
-
-export function safeValidatePainFactors(data: PainFactors) {
+export function validatePhysiotherapyAppRecord(data: PainFactors) {
     const parsedResult = PainFactorsSchema.safeParse(data)
 
     if (!parsedResult.success) {
         throw new Error(parsedResult.error.errors[0]?.message)
     }
-}
-
-export function safeValidatePainFactorsRecord(data: PainFactorsPartial) {
-    const parsedResult = PainFactorsRecordSchema.safeParse(data)
-
-    if (!parsedResult.success) {
-        throw new Error(parsedResult.error.errors[0]?.message)
-    }
-
-    return parsedResult.data
 }

@@ -4,7 +4,7 @@ import { validateUUID } from '~lib/schemas/primitives'
 import { createUser } from '~~/server/utils/user/database/create'
 import { getUserExists } from '~~/server/utils/user/database/get/exists'
 import { DatabaseService } from '~~/server/services/databaseService'
-import { InvitationStatusSchema } from '@@/shared/schemas/users/invitation'
+import { InvitationStatusSchema } from '@@/shared/schemas/user/invitation'
 import type { UserRole } from '@@/shared/types/users'
 
 

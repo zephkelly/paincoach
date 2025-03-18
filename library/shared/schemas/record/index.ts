@@ -1,64 +1,55 @@
 import { z } from 'zod';
+import { UUIDSchema, BigIntIDSchema } from '../primitives';
 
-import { PainFactorsRecordSchema } from './factor';
+import { PhysiotherapyAppRecordV1Schema } from './physiotherapy/app_record/v1';
 
-import { type User } from '../../types/users';
 import { type MedicalRecord } from '../../types/record';
 
 
 
-export const RecordPrivacyLevelSchema = z.enum(['standard', 'sensitive', 'restricted']);
+export const RecordPracticeTypeSchema = z.enum([
+    'physiotherapy'
+]);
 
-export const HealthDataSchema = z.object({
-    pain_factors: PainFactorsRecordSchema.optional(),
-    notes: z.string().optional(),
-    attachments: z.array(z.string()).optional()
+export const RecordTypeSchema = z.enum([
+    'app_record'
+]);
+  
+export const BaseMedicalRecordSchema = z.object({
+    id: BigIntIDSchema,
+    patient_id: UUIDSchema,
+    clinician_id: UUIDSchema,
+    created_at: z.date(),
+    updated_at: z.date()
 });
 
-export const MetadataSchema = z.object({
-    title: z.string().max(255),
-    category: z.string().max(100),
-    tags: z.array(z.string()).optional(),
-    created_by: z.string().uuid(),
-    last_modified_by: z.string().uuid()
-});
-
-export const MedicalRecordSchema = z.object({
-    id: z.string().uuid(),
-    patient_id: z.string().uuid(),
-    clinician_id: z.string().uuid(),
-    record_type: z.string().max(100),
-    metadata: MetadataSchema,
-    data: HealthDataSchema,
-    privacy_level: RecordPrivacyLevelSchema.default('standard'),
-    created_at: z.date().default(() => new Date()),
-    updated_at: z.date().default(() => new Date())
-});
+export const MedicalRecordSchema = z.discriminatedUnion('practice_type', [
+    PhysiotherapyAppRecordV1Schema,
+]);
 
 
-export function safeValidateMedicalRecord(data: MedicalRecord) {
-    const parsedResult = MedicalRecordSchema.safeParse(data);
-    if (!parsedResult.success) {
-        throw new Error(parsedResult.error.errors[0].message);
-    }
-    return parsedResult.data;
-}
-
-// Helper function to check data sharing rules
-export function validateUserDataSharingRules(data: User) {
-    if (data.last_data_sharing_revocation_date && !data.last_data_sharing_consent_date) {
-        throw new Error('Consent date is required for revocation');
-    }
+export const createMedicalRecord = (
+    practiceType: z.infer<typeof RecordPracticeTypeSchema>,
+    recordType: z.infer<typeof RecordTypeSchema>,
+    version: number,
+    data: any,
+    patientId: string,
+    clinicianId: string
+  ): MedicalRecord => {
+    const record = {
+      id: BigInt(Date.now()),
+      patient_id: patientId,
+      clinician_id: clinicianId,
+      record_practice_type: practiceType,
+      record_type: recordType,
+      encrypted_record_data: {
+        version,
+        data,
+      },
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
     
-    if (data.last_data_sharing_revocation_date && data.last_data_sharing_consent_date) {
-        if (data.last_data_sharing_revocation_date <= data.last_data_sharing_consent_date) {
-            throw new Error('Revocation date must be after consent date');
-        }
-    }
-    
-    if (data.last_data_sharing_revocation_date && data.data_sharing_enabled) {
-        throw new Error('Data sharing cannot be enabled if there is a revocation date');
-    }
-    
-    return true;
-}
+    // This will validate the record against the schema and throw if invalid
+    return MedicalRecordSchema.parse(record);
+  };

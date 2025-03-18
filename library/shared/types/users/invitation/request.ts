@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { InviteUserRequestSchema, UserInviteSchema, UserInvitePartialSchema } from '@@/shared/schemas/users/invitation/request';
+import { InviteUserRequestSchema, UserInviteSchema, UserInvitePartialSchema } from '@@/shared/schemas/user/invitation/request';
 
 
 

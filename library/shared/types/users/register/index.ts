@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserRegisterSchema, UserRegisterPartialSchema } from '@@/shared/schemas/users/register';
+import { UserRegisterSchema, UserRegisterPartialSchema } from '@@/shared/schemas/user/register';
 
 
 

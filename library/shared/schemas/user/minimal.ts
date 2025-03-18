@@ -2,7 +2,7 @@ import { boolean, z } from 'zod';
 import { BaseDBUserSchema } from './base';
 import { DBAdminUserFieldsSchema } from './admin';
 import { DBClinicianUserFieldsSchema } from './clinician';
-import { DBPatientUserFieldsSchema } from './patient';
+import { DBPatientUserFieldsSchema } from './patient/index';
 
 import { createZodValidationError } from '@@/shared/utils/zod/error';
 

@@ -7,7 +7,7 @@ import {
     PainFactorsSchema,
     PainFactorsPartialSchema,
     PainFactorsRecordSchema,
-} from '../../schemas/record/factor';
+} from '@@/shared/schemas/record/app_record';
 
 
 

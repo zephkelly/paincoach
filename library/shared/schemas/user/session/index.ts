@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { UUIDSchema } from '@@/shared/schemas/primitives';
 
-import { UserRoleSchema } from '@@/shared/schemas/users';
+import { UserRoleSchema } from '@@/shared/schemas/user';
 
 
 

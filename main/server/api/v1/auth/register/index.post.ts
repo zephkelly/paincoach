@@ -1,7 +1,7 @@
 import { z, ZodError } from 'zod';
 import { createZodValidationError } from '~~lib/shared/utils/zod/error';
-import { UserRoleSchema } from '~~lib/shared/schemas/users/base'
-import { PatientUserPrivateDataSchema } from '~~lib/shared/schemas/users/patient'
+import { UserRoleSchema } from '@@/shared/schemas/user/base'
+import { PatientUserPrivateDataSchema } from '@@/shared/schemas/user/patient/index'
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
 
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';

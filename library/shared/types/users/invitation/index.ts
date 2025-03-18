@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DBUserInvitationSchema, UserInvitationSchema, RegistrationTypeSchema, InvitationStatusSchema } from '@@/shared/schemas/users/invitation';
+import { DBUserInvitationSchema, UserInvitationSchema, RegistrationTypeSchema, InvitationStatusSchema } from '@@/shared/schemas/user/invitation';
 
 
 

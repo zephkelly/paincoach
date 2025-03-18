@@ -6,7 +6,7 @@ import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 import { DatabaseService } from '~~/server/services/databaseService';
 import type { User, PatientUser, ClinicianUser, AdminUser } from '~~lib/shared/types/users';
 import { type UserRole } from '~~lib/shared/types/users';
-import { validateUsers } from '~~lib/shared/schemas/users';
+import { validateUsers } from '@@/shared/schemas/user';
 
 import { getAllUsers } from '~~/server/utils/user/database/get/all';
 import { getAdminUsersClinicianPatients } from '~~/server/utils/user/patients/database/get/clinicianPatients'

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { MockUserDataSchema } from '@@/shared/schemas/users/mock';
+import { MockUserDataSchema } from '@@/shared/schemas/user/mock';
 
 
 

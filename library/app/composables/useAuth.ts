@@ -1,5 +1,5 @@
 import { type UserRole } from "@@/shared/types/users"
-import { type MinimalUserInfo } from "@@/shared/types/users/minimal"
+import { type DBMinimalUser } from "@@/shared/types/users/minimal"
 
 
 
@@ -63,7 +63,7 @@ export const useAuth = () => {
         if (actualUserRole.value === 'admin' && userId) {
             console.log('Fetching mock user data for', userId)
             try {
-                const response = await $fetch<MinimalUserInfo>(`/api/v1/auth/${userId}`, {
+                const response = await $fetch<DBMinimalUser>(`/api/v1/auth/${userId}`, {
                     method: 'GET',
                 })
 

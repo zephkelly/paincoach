@@ -3,7 +3,7 @@ import { type UserSession } from '#auth-utils'
 import type { DBUser, UserRole } from '~~lib/shared/types/users'
 import { validateUUID } from '~lib/schemas/primitives'
 import { DatabaseService } from '~~/server/services/databaseService'
-import { InvitationStatusSchema } from '@@/shared/schemas/users/invitation'
+import { InvitationStatusSchema } from '@@/shared/schemas/user/invitation'
 
 /**
  * Handles partial registration completion (password setup only)

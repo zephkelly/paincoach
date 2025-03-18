@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { createZodValidationError } from '@@/shared/utils/zod/error';
 
-import { BaseDBUserSchema, BaseUserSchema } from './base';
-import { type PatientUser } from '../../types/users/patient';
+import { BaseDBUserSchema, BaseUserSchema } from '@@/shared/schemas/user/base';
+import { type PatientUser } from '@@/shared/types/users/patient';
 
 
 export const PatientUserPrivateDataSchema = z.object({

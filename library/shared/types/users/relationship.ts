@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ClinicianPatientRelationshipSchema } from '../../schemas/users/relationship';
+import { ClinicianPatientRelationshipSchema } from '../../schemas/user/relationship';
 
 
 

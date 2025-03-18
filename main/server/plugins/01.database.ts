@@ -93,14 +93,6 @@ async function createTables(db: DatabaseService) {
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
 
-        CREATE TABLE IF NOT EXISTS private.patient_profile (
-            user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
-            -- Private information (visible only to admin)
-            private_data JSONB,
-            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-        );
-
         CREATE TABLE IF NOT EXISTS private.user_invitation (
             id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
             email TEXT NOT NULL,
@@ -131,21 +123,6 @@ async function createTables(db: DatabaseService) {
             UNIQUE(clinician_id, patient_id, status)
         );
 
-        -- Medical records with privacy levels
-        CREATE TABLE IF NOT EXISTS private.medical_record (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            patient_id UUID REFERENCES private.patient_profile(user_id),
-            clinician_id UUID REFERENCES private.clinician_profile(user_id),
-            record_type VARCHAR(100) NOT NULL,
-            -- Metadata (visible to admin)
-            metadata JSONB NOT NULL,
-            -- Health data (visible only to patient and assigned clinician)
-            data JSONB NOT NULL,
-            privacy_level TEXT DEFAULT 'standard',
-            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-        );
-
         CREATE TABLE IF NOT EXISTS private.email_feedback (
             feedback_id SERIAL PRIMARY KEY,
             email TEXT NOT NULL,
@@ -173,26 +150,48 @@ async function createTables(db: DatabaseService) {
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
+    `)
 
-        DO $$ 
-        BEGIN 
-            IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_users_role_id') THEN
-                CREATE INDEX idx_users_role_id ON private.user(role_id);
-            END IF;
+    await db.query(`
+        CREATE TABLE IF NOT EXISTS private.patient_profile (
+            user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
+            -- Private information (visible only to admin)
+            private_data JSONB,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS private.patient_medication (
+            id BIGSERIAL PRIMARY KEY,
+            patient_id UUID REFERENCES private.patient_profile(user_id) ON DELETE CASCADE,
+            clinician_id UUID REFERENCES private.clinician_profile(user_id),
             
-            IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_medical_records_patient_id') THEN
-                CREATE INDEX idx_medical_records_patient_id ON private.medical_record(patient_id);
-            END IF;
+            encrypted_medication_data JSONB NOT NULL,
             
-            IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_medical_records_clinician_id') THEN
-                CREATE INDEX idx_medical_records_clinician_id ON private.medical_record(clinician_id);
-            END IF;
-            
-            IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_clinician_patient_active') THEN
-                CREATE INDEX idx_clinician_patient_active ON private.clinician_patient_relationship(clinician_id, patient_id) 
-                WHERE status = 'active';
-            END IF;
-        END $$;
+            -- Tracking
+            created_by UUID REFERENCES private.user(id) NOT NULL,
+            updated_by UUID REFERENCES private.user(id),
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Medical records with privacy levels
+        CREATE TABLE IF NOT EXISTS private.medical_record (
+            id BIGSERIAL PRIMARY KEY,
+            patient_id UUID REFERENCES private.patient_profile(user_id),
+            clinician_id UUID REFERENCES private.clinician_profile(user_id),
+
+            record_practice_type TEXT NOT NULL, -- 'physiotherapy', 'psychology', etc.
+            record_type TEXT NOT NULL, -- 'app_record', etc.
+
+            -- Health data (visible only to patient and assigned clinician)
+            encrypted_data JSONB NOT NULL,
+
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        );
+
+        ALTER TABLE private.patient_medication ENABLE ROW LEVEL SECURITY;
     `)
 
 
@@ -287,6 +286,27 @@ async function createTables(db: DatabaseService) {
             -- Grant permissions
             GRANT USAGE ON SCHEMA private TO app_user;
             GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA private TO app_user;
+        END $$;
+
+
+        DO $$ 
+        BEGIN 
+            IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_users_role_id') THEN
+                CREATE INDEX idx_users_role_id ON private.user(role_id);
+            END IF;
+            
+            IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_medical_records_patient_id') THEN
+                CREATE INDEX idx_medical_records_patient_id ON private.medical_record(patient_id);
+            END IF;
+            
+            IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_medical_records_clinician_id') THEN
+                CREATE INDEX idx_medical_records_clinician_id ON private.medical_record(clinician_id);
+            END IF;
+            
+            IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname = 'idx_clinician_patient_active') THEN
+                CREATE INDEX idx_clinician_patient_active ON private.clinician_patient_relationship(clinician_id, patient_id) 
+                WHERE status = 'active';
+            END IF;
         END $$;
     `)
 
