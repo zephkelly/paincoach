@@ -35,6 +35,10 @@
                 <label for="data-sharing" class="form__label">Data Sharing</label>
                 <input type="checkbox" id="data-sharing" class="form__input" v-model="dataSharing" />
             </div>
+            <div class="form__group data-sharing">
+                <label for="data-sharing" class="form__label">Allowed clinician profile</label>
+                <input type="checkbox" id="data-sharing" class="form__input" v-model="allowedClinicianProfile" />
+            </div>
         </div>
         <div class="form__footer">
             <button type="submit" class="button button--primary" :disabled="isSubmitting">
@@ -46,8 +50,8 @@
 
 <script lang="ts" setup>
 import { H3Error } from 'h3'
-import { type InviteUserRequest } from '~~lib/shared/types/users/invitation/request';
-import { validateInviteUserRequest } from '@@/shared/schemas/user/invitation/request';
+import { type InviteUserRequest } from '@@/shared/types/users/invitation/create';
+import { validateInviteUserRequest } from '@@/shared/schemas/user/invitation/create';
 
 const {
     mockUserAPIData
@@ -59,13 +63,13 @@ const phone = ref('');
 const email = ref('');
 const confirmEmail = ref('');
 const dataSharing = ref(false);
+const allowedClinicianProfile = ref(false);
 
 // For handling form errors
 const formError = ref('');
 const isSubmitting = ref(false);
 
 async function submitInviteAdminForm() {
-    console.log(firstName.value, lastName.value, phone.value, email.value, confirmEmail.value, dataSharing.value);
     // Reset error state
     formError.value = '';
     isSubmitting.value = true;
@@ -86,6 +90,7 @@ async function submitInviteAdminForm() {
                 last_name: lastName.value,
                 phone_number: phone.value,
                 data_sharing_enabled: dataSharing.value,
+                allowed_additional_profiles: (allowedClinicianProfile.value) ? 'clinician' : undefined,
                 confirm_email: confirmEmail.value,
                 role: 'admin',
             },
@@ -111,6 +116,7 @@ async function submitInviteAdminForm() {
         email.value = '';
         confirmEmail.value = '';
         dataSharing.value = false;
+        allowedClinicianProfile.value = false;
         
         // You could add success message or redirect here
     } catch (error: unknown) {

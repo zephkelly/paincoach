@@ -5,8 +5,8 @@ import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/v
 
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
-import { type InviteUserRequest } from '@@/shared/types/users/invitation/request';
-import { validateInviteUserRequest } from '@@/shared/schemas/user/invitation/request';
+import { type InviteUserRequest } from '@@/shared/types/users/invitation/create';
+import { validateInviteUserRequest } from '@@/shared/schemas/user/invitation/create';
 
 import { DatabaseService } from '~~/server/services/databaseService';
 import { createPatientInvitation } from '~~/server/utils/auth/handlers/invite/patient';

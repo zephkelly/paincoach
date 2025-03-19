@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { createZodValidationError } from '@@/shared/utils/zod/error';
 
-import { BaseDBUserSchema } from '@@/shared/schemas/user/base';
+import { DBClinicianUserFieldsSchema } from '../clinician';
+import { BaseDBUserSchema, UserRoleSchema } from '@@/shared/schemas/user/base';
 import { MockUserDataSchema } from '@@/shared/schemas/user/mock';
 
 
@@ -18,6 +19,7 @@ export const BaseUserInviteSchema = BaseDBUserSchema.pick({
 
 const AdminInviteSchema = BaseUserInviteSchema.extend({
     role: z.literal('admin'),
+    allowed_additional_profiles: z.array(UserRoleSchema).optional(),
 });
 
 const AdminInvitePartialSchema = AdminInviteSchema.partial().extend({
@@ -25,12 +27,7 @@ const AdminInvitePartialSchema = AdminInviteSchema.partial().extend({
 })
 
 const ClinicianInviteSchema = BaseUserInviteSchema.extend({
-    role: z.literal('clinician'),
-    ahprah_registration_number: z.string(),
-    specialisation: z.string().optional(),
-    practice_name: z.string().optional(),
-    business_address: z.string().optional(),
-    abn: z.string().optional(),
+    ...DBClinicianUserFieldsSchema.shape,
 });
 
 const ClinicianInvitePartialSchema = ClinicianInviteSchema.partial().extend({
@@ -47,13 +44,13 @@ const PatientInvitePartialSchema = PatientInviteSchema.partial().extend({
 })
 
 
-export const UserInviteSchema = z.discriminatedUnion('role', [AdminInviteSchema, ClinicianInviteSchema, PatientInviteSchema]);
+export const UserInviteDataSchema = z.discriminatedUnion('role', [AdminInviteSchema, ClinicianInviteSchema, PatientInviteSchema]);
 
-export const UserInvitePartialSchema = z.discriminatedUnion('role', [AdminInvitePartialSchema, ClinicianInvitePartialSchema, PatientInvitePartialSchema]);
+export const UserInviteDataPartialSchema = z.discriminatedUnion('role', [AdminInvitePartialSchema, ClinicianInvitePartialSchema, PatientInvitePartialSchema]);
 
 
 export const InviteUserRequestSchema = z.object({
-    user: UserInviteSchema,
+    user: UserInviteDataSchema,
     mock: MockUserDataSchema.partial().optional(),
 }).refine((data) => {
     return data.user.email === data.user?.confirm_email;

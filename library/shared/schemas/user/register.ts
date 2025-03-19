@@ -1,63 +1,67 @@
 import { z } from 'zod';
 import { createZodValidationError } from '@@/shared/utils/zod/error';
 
-import { BaseUserInviteSchema } from './invitation/request';
+import { UserRoleSchema } from './base';
+import { BaseUserInviteSchema } from './invitation/create';
 
-import { AdminUserSchema } from './admin';
-import { ClinicianUserSchema } from './clinician';
-import { PatientUserSchema } from './patient';
+import { AdminUserSchema, DBAdminUserFieldsSchema } from './admin';
+import { ClinicianUserSchema, DBClinicianUserFieldsSchema } from './clinician';
+import { PatientUserSchema, DBPatientUserFieldsSchema } from './patient';
 
 import { PatientMedicationSchema } from '../medication';
 
 
 
 export const BaseUserRegisterSchema = BaseUserInviteSchema.extend({
+    invitation_token: z.string().uuid(),
+
     id: z.string().uuid(),
     role: z.string(),
     password: z.string(),
     confirm_password: z.string(),
     confirm_email: z.string().email(),
     profile_url: z.string().url().nullable().optional(),
-    invitation_token: z.string().uuid(),
     
     will_use_app: z.boolean().default(false),
     medications: PatientMedicationSchema.array().optional(),
 });
 
-
-export const AdminRegisterSchema = BaseUserRegisterSchema.extend({
-    role: z.literal('admin'),
-});
-const AdminRegisterPartialSchema = AdminRegisterSchema.partial().extend({
-    role: z.literal('admin'),
-})
+export const BaseUserRegisterPartialSchema = BaseUserRegisterSchema.partial()
 
 
 export const ClinicianRegisterSchema = BaseUserRegisterSchema.extend({
-    role: z.literal('clinician'),
-    ahprah_registration_number: z.string(),
-    specialisation: z.string().optional(),
-    practice_name: z.string().optional(),
-    business_address: z.string().optional(),
-    abn: z.string().optional(),
+    ...DBClinicianUserFieldsSchema.shape,
 });
-const ClinicianRegisterPartialSchema = ClinicianRegisterSchema.partial().extend({
+export const ClinicianRegisterPartialSchema = ClinicianRegisterSchema.partial().extend({
     role: z.literal('clinician'),
 })
 
 
 export const PatientRegisterSchema = BaseUserRegisterSchema.extend({
-    role: z.literal('patient'),
-
+    ...DBPatientUserFieldsSchema.shape,
     will_use_app: z.literal(true),
 });
-const PatientRegisterPartialSchema = PatientRegisterSchema.partial().extend({
+export const PatientRegisterPartialSchema = PatientRegisterSchema.partial().extend({
     role: z.literal('patient'),
+    will_use_app: z.literal(true),
 })
 
 const UndefinedRegisterPartialSchema = BaseUserRegisterSchema.partial().extend({
     role: z.undefined(),
 });
+
+
+
+export const AdminRegisterSchema = BaseUserRegisterSchema.extend({
+    ...DBAdminUserFieldsSchema.shape,
+    allowed_additional_profiles: z.array(UserRoleSchema).optional(),
+    additional_profiles: z.array(
+        z.union([DBPatientUserFieldsSchema, DBClinicianUserFieldsSchema])
+    ).optional(),
+});
+export const AdminRegisterPartialSchema = AdminRegisterSchema.partial().extend({
+    role: z.literal('admin'),
+})
 
 export const UserRegisterSchema = z.discriminatedUnion('role', [
     AdminUserSchema,

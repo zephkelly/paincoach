@@ -1,17 +1,20 @@
-import { type UserRegisterPartial } from "@@/shared/types/users/register";
+import { type UserRole } from "@@/shared/types/users";
+import type { UserRegisterPartial } from "@@/shared/types/users/register";
 import { type UserInvitation } from "@@/shared/types/users/invitation";
+import { type UserInviteDataPartial } from "@@/shared/types/users/invitation/create";
 
-import { BASE_USER_INVITE_REGISTER_FIELDS } from "@@/shared/types/users/register/fields";
-
+import { BASE_USER_INVITE_REGISTER_FIELDS, CLINICIAN_USER_INVITE_REGISTER_FIELDS } from "@@/shared/types/users/register/fields";
 
 import { validateUserRegisterPartial } from "@@/shared/schemas/user/register";
 
 
 
 export const useRegister = () => {
-    const state = useState<UserRegisterPartial>('user_registration_state', () => ({
-        invitation_token: undefined,
+    const inviteData = ref<UserInvitation | undefined>(undefined);
 
+    const state = useState<UserRegisterPartial>('base_user_registration_state', () => ({
+        invitation_token: undefined,
+        
         id: undefined,
         profile_url: undefined,
         email: undefined,
@@ -24,6 +27,9 @@ export const useRegister = () => {
         phone_number: undefined,
         data_sharing_enabled: undefined,
 
+        will_use_app: undefined,
+        medications: undefined,
+
         // Clinician fields
         ahprah_registration_number: undefined,
         specialisation: undefined,
@@ -31,30 +37,58 @@ export const useRegister = () => {
         business_address: undefined,
         abn: undefined,
 
-        will_use_app: undefined,
+        // Admin fields
+        allowed_additional_profiles: undefined,
+        additional_profiles: undefined,
     }));
+
+
+    function setInviteData(invitation_registration_data: UserInvitation) {
+        inviteData.value = invitation_registration_data;
+    }
 
     const registrationState = computed(() => state.value);
 
     const desiredUserRole = computed(() => state.value.role);
 
-    function setInviteData(invitation_registration_data: UserInvitation) {
-        if (invitation_registration_data.role === 'patient') {
+    const canRegisterAdditionalProfiles = computed<UserRole[]>(() => {
+        if (state.value.role !== 'admin' || inviteData.value?.role !== 'admin') return [];
+        
+        //@ts-expect-error
+        return inviteData.value?.registration_data?.allowed_additional_profiles;
+    });
+
+    // function getAdditionalProfileFieldValues(profile: UserRole) {
+    //     if (state.value.role !== 'admin' || inviteData.value?.role !== 'admin') return {};
+
+    //     if (state.value.additional_profiles === undefined) return undefined;
+
+    //     const additionalProfiles = state.value.additional_profiles;
+    // }
+
+
+    watch(inviteData, (value) => {
+        if (value === undefined) return;
+
+        const registration_data: UserInviteDataPartial | undefined = value.registration_data;
+
+        state.value.invitation_token = value.invitation_token;
+        state.value.id = value.user_id;
+        state.value.confirm_email = value.email;
+        
+        if (value.role === 'patient') {
             state.value.will_use_app = true;
         }
 
-        const registration_data = invitation_registration_data.registration_data || {};
-        
+        //@ts-expect-error
         state.value = {
             ...state.value,
-            invitation_token: invitation_registration_data.invitation_token,
-            id: invitation_registration_data.user_id,
-            confirm_email: invitation_registration_data.email,
             ...registration_data
         }
 
         console.log('Invite data set:', state.value);
-    }
+    }, { immediate: true });
+
 
     const fieldErrors = ref<UserRegisterPartial>({});
 
@@ -63,10 +97,8 @@ export const useRegister = () => {
     };
     
     const setFieldValue = (identifier: string, value: any) => {
-        // Here you can add your verification logic
         let validatedValue = value;
 
-        // Update the state with the validated value
         state.value = {
             ...state.value,
             [identifier]: validatedValue
@@ -88,14 +120,15 @@ export const useRegister = () => {
     }, { immediate: true, deep: true });
 
     return {
-        state,
         setInviteData,
 
         registrationState,
 
         BASE_USER_INVITE_REGISTER_FIELDS,
+        CLINICIAN_USER_INVITE_REGISTER_FIELDS,
 
         desiredUserRole,
+        canRegisterAdditionalProfiles,
 
         getFieldValue,
         setFieldValue,

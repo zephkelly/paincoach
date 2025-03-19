@@ -6,13 +6,6 @@ import { type PatientUser } from '@@/shared/types/users/patient';
 
 
 export const PatientUserPrivateDataSchema = z.object({
-    date_of_birth: z.date()
-        .refine((date) => {
-            if (date) {
-                return date <= new Date()
-            }
-            return true
-        }, 'Date of birth cannot be in the future'),
 });
 
 export const DBPatientUserFieldsSchema = z.object({

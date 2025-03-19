@@ -1,5 +1,5 @@
 import { UserRole } from "~~lib/shared/types/users";
-import { UserInvitePartial } from '@@/shared/schemas/user/invitation/request'
+import { UserInvitePartial } from '@@/shared/schemas/user/invitation/create'
 
 
 

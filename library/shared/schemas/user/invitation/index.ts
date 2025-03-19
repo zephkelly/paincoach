@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 import { UserRoleSchema } from '../base';
-import { UserInvitePartialSchema } from './request';
+import { UserInviteDataPartialSchema } from './create';
 import type { DBUserInvitation, UserInvitation } from '@@/shared/types/users/invitation';
 
 import { BigIntIDSchema } from '@@/shared/schemas/primitives';
@@ -30,7 +30,7 @@ export const DBUserInvitationSchema = z.object({
     created_at: z.coerce.date(),
     updated_at: z.coerce.date(),
 
-    registration_data: UserInvitePartialSchema.optional(),
+    registration_data: UserInviteDataPartialSchema.optional(),
 });
 
 export const UserInvitationSchema = DBUserInvitationSchema.omit({

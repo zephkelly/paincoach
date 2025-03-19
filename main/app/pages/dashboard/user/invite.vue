@@ -70,6 +70,31 @@
                                     :modelValue="getFieldValue(field.identifier)"
                                     @input="setFieldValue(field.identifier, $event.target.value)"
                                 />
+
+                                <EInput v-if="canRegisterAdditionalProfiles.includes('clinician') && desiredUserRole === 'admin'"
+                                    id="wants-clinician-profile"
+                                    type="checkbox"
+                                    label="Would you like to also register as a clinician?"
+                                    :modelValue="wantsAdditionalClinicianProfile"
+                                    :required="false"
+                                    @input="setWantsAdditionalClinicianProfile($event.target.value)" />
+
+                                <div class="clinician-fields" v-if="(canRegisterAdditionalProfiles.includes('clinician') && wantsAdditionalClinicianProfile) || desiredUserRole === 'clinician'">
+                                    <h2>Additional Clinician Profile</h2>
+                                    <component
+                                        v-for="field in CLINICIAN_USER_INVITE_REGISTER_FIELDS"
+                                        :key="field.identifier"
+                                        :is="getComponent(field.inputType)"
+                                        :id="field.identifier"
+                                        :label="field.label"
+                                        :type="field.inputType"
+                                        :readonly="field.readonly"
+                                        :required="field.required"
+                                        :tabindex="field.tabindex"
+                                        :modelValue="getFieldValue(field.identifier)"
+                                        @input="setFieldValue(field.identifier, $event.target.value)"
+                                    />
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -90,9 +115,12 @@ const {
 const {
     registrationState,
 
+    canRegisterAdditionalProfiles,
+
     desiredUserRole,
     setInviteData,
     BASE_USER_INVITE_REGISTER_FIELDS,
+    CLINICIAN_USER_INVITE_REGISTER_FIELDS,
 
     getFieldValue,
     setFieldValue
@@ -104,6 +132,11 @@ const {
     invitation: invitationData,
     fetch: fetchInvitation
 } = useInvite();
+
+const wantsAdditionalClinicianProfile = ref(false);
+function setWantsAdditionalClinicianProfile(value: boolean) {
+    wantsAdditionalClinicianProfile.value = value;
+}
 
 // Add a ref for the profile image
 const profileImageUrl = ref<string | null>(null);

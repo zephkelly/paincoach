@@ -63,13 +63,12 @@ export default defineNuxtConfig({
         '~lib/schemas': resolve(__dirname, '../library/shared/schemas'),
         '~lib/utils': resolve(__dirname, '../library/shared/utils'),
     },
-
+    
     css: [
+        '~~lib/app/assets/scss/reset.scss',
         '~/assets/scss/global.scss',
         '~~lib/app/assets/scss/globals/index.scss',
-
-        '~~lib/app/assets/scss/reset.scss',
-
+        
         '~/assets/scss/animations.scss',
         '~~lib/app/assets/scss/skeleton.scss',
         '~~lib/app/assets/scss/transition.scss',

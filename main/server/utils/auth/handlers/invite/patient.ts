@@ -1,7 +1,7 @@
 import { type SecureSessionData } from "#auth-utils";
 import { type DBTransaction } from "~~/server/types/db";
 
-import { type InviteUserRequest } from "~~lib/shared/types/users/invitation/request";
+import { type InviteUserRequest } from "@@/shared/types/users/invitation/create";
 
 
 
