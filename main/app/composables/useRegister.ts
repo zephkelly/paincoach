@@ -3,7 +3,9 @@ import type { UserRegisterPartial } from "@@/shared/types/users/register";
 import { type UserInvitation } from "@@/shared/types/users/invitation";
 import { type UserInviteDataPartial } from "@@/shared/types/users/invitation/create";
 
-import { BASE_USER_INVITE_REGISTER_FIELDS, CLINICIAN_USER_INVITE_REGISTER_FIELDS } from "@@/shared/types/users/register/fields";
+import { type DBEncryptedPatientMedicationDataV1Partial } from "@@/shared/types/users/medication/v1";
+
+import { BASE_USER_INVITE_REGISTER_FIELDS, CLINICIAN_USER_INVITE_REGISTER_FIELDS, MEDICATION_FIELDS } from "@@/shared/types/users/register/fields";
 
 import { validateUserRegisterPartial } from "@@/shared/schemas/user/register";
 
@@ -27,7 +29,7 @@ export const useRegister = () => {
         phone_number: undefined,
         data_sharing_enabled: undefined,
 
-        will_use_app: undefined,
+        will_use_app: true,
         medications: undefined,
 
         // Clinician fields
@@ -41,6 +43,48 @@ export const useRegister = () => {
         allowed_additional_profiles: undefined,
         additional_profiles: undefined,
     }));
+
+
+    // Medications ------------------------------------------------------------
+    const takesMedication = ref<boolean>(false);
+    const medicationsState = ref<Exclude<DBEncryptedPatientMedicationDataV1Partial, 'reason'>[]>([]);
+    const currentMedicationsState = computed(() => medicationsState.value);
+
+    function getMedicationFieldValues(field: keyof DBEncryptedPatientMedicationDataV1Partial, index: number) {
+        const medication = medicationsState.value[index];
+
+        if (medication === undefined) return undefined;
+
+        return medication[field];
+    }
+
+    function setMedicationFieldValues(field: keyof DBEncryptedPatientMedicationDataV1Partial, index: number, value: any) {
+        const medication = medicationsState.value[index];
+
+        if (medication === undefined) return;
+
+        medicationsState.value[index] = {
+            ...medication,
+            [field]: value
+        };
+
+        console.log(`Medication ${index} field ${field} updated to:`, value);
+    }
+
+    function addMedication() {
+        medicationsState.value.push({
+            start_date: undefined,
+            end_date: undefined,
+            is_on_going: true,
+            medication_name: undefined,
+            dosage: undefined,
+            frequency: undefined,
+
+            notes: undefined,
+        });
+    }
+
+    addMedication();
 
 
     function setInviteData(invitation_registration_data: UserInvitation) {
@@ -58,6 +102,8 @@ export const useRegister = () => {
         return inviteData.value?.registration_data?.allowed_additional_profiles;
     });
 
+    const willUseApplication = computed(() => state.value.will_use_app);
+
     // function getAdditionalProfileFieldValues(profile: UserRole) {
     //     if (state.value.role !== 'admin' || inviteData.value?.role !== 'admin') return {};
 
@@ -74,17 +120,15 @@ export const useRegister = () => {
 
         state.value.invitation_token = value.invitation_token;
         state.value.id = value.user_id;
-        state.value.confirm_email = value.email;
+        state.value.confirm_email = value.email; 
         
-        if (value.role === 'patient') {
-            state.value.will_use_app = true;
-        }
-
         //@ts-expect-error
         state.value = {
             ...state.value,
             ...registration_data
         }
+
+        state.value.will_use_app = true;
 
         console.log('Invite data set:', state.value);
     }, { immediate: true });
@@ -112,6 +156,8 @@ export const useRegister = () => {
         try {
             const validatedData = validateUserRegisterPartial(value);
 
+            console.log('Validated data:', validatedData);
+
             if (validatedData.role === undefined) return;
         }
         catch (error) {
@@ -123,14 +169,24 @@ export const useRegister = () => {
         setInviteData,
 
         registrationState,
-
+        
         BASE_USER_INVITE_REGISTER_FIELDS,
         CLINICIAN_USER_INVITE_REGISTER_FIELDS,
-
+        
         desiredUserRole,
         canRegisterAdditionalProfiles,
-
+        willUseApplication,
+        
         getFieldValue,
         setFieldValue,
+        
+        
+        //Medication
+        MEDICATION_FIELDS,
+        currentMedicationsState,
+        takesMedication,
+        addMedication,
+        getMedicationFieldValues,
+        setMedicationFieldValues,
     }
 }

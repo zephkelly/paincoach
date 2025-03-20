@@ -12,9 +12,11 @@ export type UserFieldKeys =
 
 export type InputField = {
     inputType: InputType;
-    identifier: Exclude<UserFieldKeys, 'invitation_token'>;
+    identifier: string;
     label: string;
     tabindex: number;
     required: boolean;
     readonly?: boolean;
+    default?: any;
+    placeholder?: string;
 }

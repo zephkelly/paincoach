@@ -14,7 +14,19 @@
                 </div>
             </template>
             <template #incomplete>
-                <div class="incomplete-registration-container">
+                <!-- <div class="incomplete-registration-container">
+                    <div class="incomplete-registration-wrapper">
+                        <PagedModal
+                            v-if="isModalOpen"
+                            :pages="pages"
+                            :component-props="componentProps"
+                            v-bind="modalProps"
+                            v-on="modalEvents"
+                            height="400"
+                        />
+                    </div>
+                </div> -->
+               <div class="incomplete-registration-container">
                     <div class="invitation-information flex-row">
                         <DashboardUserProfileImage
                             class="inviter-profile-image"
@@ -27,62 +39,41 @@
                         <p class="invitation-text">has invited you to...</p>
                     </div>
                     <div class="inner-wrapper">
-                        <div class="form-header">
-                            <h1>Complete your registration</h1>
-                            <p class="welcome">Welcome to Pain Coach{{ (usersFirstName) ? `, ${usersFirstName}` : undefined }}</p>
-                        </div>
                         <div class="incomplete-content" v-if="loadedInvitation">
                             <form class="invitation-form flex-col">
-                                <div class="user-profile flex-col">
-                                    <div class="profile-wrapper">
-                                        <input 
-                                            type="file" 
-                                            accept="image/*"
-                                            class="profile-input"
-                                            ref="userProfileImageInput"
-                                        />
-                                        <DashboardUserProfileImage
-                                            class="user-profile-image"
-                                            :id="registrationState.id"
-                                            :firstName="registrationState.first_name"
-                                            :profileUrl="profileImageUrl"
-                                            :loading="false"
-                                            @load="handleProfileImageChange"
-                                            @click.prevent="triggerOpenImageInput"
-                                        />
-                                        <DashboardAccountRoleChip
-                                            :userRole="desiredUserRole"
-                                            paneled
-                                            class="user-type"
-                                        />
+                                <div class="main-fields form-style">
+                                    <div class="form-header">
+                                        <h1>Complete your registration</h1>
+                                        <p class="welcome">Welcome to Pain Coach{{ (usersFirstName) ? `, ${usersFirstName}` : undefined }}</p>
                                     </div>
-                                </div>
-                                <component
-                                    v-for="field in BASE_USER_INVITE_REGISTER_FIELDS"
-                                    :key="field.identifier"
-                                    :is="getComponent(field.inputType)"
-                                    :id="field.identifier"
-                                    :label="field.label"
-                                    :type="field.inputType"
-                                    :readonly="field.readonly"
-                                    :required="field.required"
-                                    :tabindex="field.tabindex"
-                                    :modelValue="getFieldValue(field.identifier)"
-                                    @input="setFieldValue(field.identifier, $event.target.value)"
-                                />
-
-                                <EInput v-if="canRegisterAdditionalProfiles.includes('clinician') && desiredUserRole === 'admin'"
-                                    id="wants-clinician-profile"
-                                    type="checkbox"
-                                    label="Would you like to also register as a clinician?"
-                                    :modelValue="wantsAdditionalClinicianProfile"
-                                    :required="false"
-                                    @input="setWantsAdditionalClinicianProfile($event.target.value)" />
-
-                                <div class="clinician-fields" v-if="(canRegisterAdditionalProfiles.includes('clinician') && wantsAdditionalClinicianProfile) || desiredUserRole === 'clinician'">
-                                    <h2>Additional Clinician Profile</h2>
+                                    <div class="user-profile flex-col">
+                                        <div class="profile-wrapper">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                class="profile-input"
+                                                ref="userProfileImageInput"
+                                            />
+                                            <DashboardUserProfileImage
+                                                class="user-profile-image"
+                                                :id="registrationState.id"
+                                                :firstName="registrationState.first_name"
+                                                :profileUrl="profileImageUrl"
+                                                :loading="false"
+                                                @load="handleProfileImageChange"
+                                                @click.prevent="triggerOpenImageInput"
+                                            />
+                                            <DashboardAccountRoleChip
+                                                :userRole="desiredUserRole"
+                                                paneled
+                                                class="user-type"
+                                            />
+                                        </div>
+                                    </div>
                                     <component
-                                        v-for="field in CLINICIAN_USER_INVITE_REGISTER_FIELDS"
+                                        v-for="field in BASE_USER_INVITE_REGISTER_FIELDS"
+                                        class="input-field"
+                                        :class="{ 'field-required': field.required }"
                                         :key="field.identifier"
                                         :is="getComponent(field.inputType)"
                                         :id="field.identifier"
@@ -91,10 +82,114 @@
                                         :readonly="field.readonly"
                                         :required="field.required"
                                         :tabindex="field.tabindex"
+                                        :default="field.default"
                                         :modelValue="getFieldValue(field.identifier)"
-                                        @input="setFieldValue(field.identifier, $event.target.value)"
+                                        @input="setFieldValue(field.identifier, (field.inputType === 'checkbox') ? $event.target.checked : $event.target.value)"
                                     />
+    
+                                    <EInput v-if="desiredUserRole !== 'clinician'"
+                                        id="wants-clinician-profile"
+                                        type="checkbox"
+                                        label="Would you like to share anonymous data with Pain Coach to improve our services?"
+                                        :modelValue="getFieldValue('data_sharing_enabled') as boolean"
+                                        :required="false"
+                                        @input="setFieldValue('data_sharing_enabled', $event.target.checked)" />
+                                    
+
+                                    <div class="medications-container flex-col" :class="{ 'active': willUseApplication }">
+
+                                        <EInput v-if="desiredUserRole !== 'clinician'"
+                                            id="wants-clinician-profile"
+                                            type="checkbox"
+                                            label="Would you like access to the Pain Coach app for personal use?"
+                                            :modelValue="getFieldValue('will_use_app') as boolean"
+                                            :required="true"
+                                            @input="setFieldValue('will_use_app', $event.target.checked)" />
+
+                                        <EInput v-if="desiredUserRole !== 'clinician'" class="takes-medication-input" :class="{ 'active': willUseApplication }"
+                                            id="takes-medication"
+                                            type="checkbox"
+                                            label="Have you used any medications for pain recently?"
+                                            :modelValue="takesMedication"
+                                            :required="true"
+                                            @input="takesMedication = $event.target.checked" />
+
+                                        <div class="medication-fields flex-col" :class="{ 'active': willUseApplication && takesMedication }">
+                                            <div class="medications-header">
+                                                <div class="fields-header flex-row">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m10.5 20.5l10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7m-2-12l7 7"/></svg>
+                                                    <h2>Pain Medication{{ currentMedicationsState.length > 1 ? 's' : '' }}</h2>
+                                                </div>
+                                                <p>Enter your recent medication history</p>
+                                            </div>
+                                            
+                                            <ul>
+                                                <li class="medication-fields-wrapper" v-for="(medication, index) in currentMedicationsState" :key="index">
+                                                    <h3>{{ getMedicationFieldValues('medication_name', index) ? getMedicationFieldValues('medication_name', index) : 'Unnamed Medication' }} {{ '#' + (index + 1) }}</h3>
+                                                    <component
+                                                        v-for="field in MEDICATION_FIELDS"
+                                                        
+                                                        class="input-field"
+                                                        :class="[{ 'field-required': field.required, 'disabled-end-date': field.identifier === 'end_date' && getMedicationFieldValues('is_on_going', index) === true }, field.identifier]"
+                                                        :key="field.identifier"
+                                                        :is="getComponent(field.inputType)"
+                                                        :id="field.identifier"
+                                                        :label="field.label"
+                                                        :type="field.inputType"
+                                                        :readonly="field.readonly"
+                                                        :required="field.required"
+                                                        :tabindex="field.tabindex"
+                                                        :default="field.default"
+                                                        :placeholder="field.placeholder"
+                                                        :modelValue="getMedicationFieldValues(field.identifier, index)"
+                                                        @input="setMedicationFieldValues(field.identifier, index, (field.inputType === 'checkbox') ? $event.target.checked : $event.target.value)"
+                                                    />
+                                                </li>
+                                            </ul>
+
+                                            <EButton class="add-medication-button flex-row" type="button" @click="addMedication">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7v14"/></svg>
+                                                Add Medication
+                                            </EButton>
+                                        </div>
+                                    </div>  
+
+                                    <EInput v-if="canRegisterAdditionalProfiles.includes('clinician') && desiredUserRole === 'admin'"
+                                        id="wants-clinician-profile"
+                                        type="checkbox"
+                                        label="Would you like to register a clinician profile?"
+                                        :modelValue="wantsAdditionalClinicianProfile"
+                                        :required="false"
+                                        @input="setWantsAdditionalClinicianProfile($event.target.checked)" />
+                                        
+                                    <EButton class="submit-button primary" :class="{ active: !wantsAdditionalClinicianProfile }" type="submit">Submit</EButton>
+                                                                    
                                 </div>
+
+                                <Transition name="fade-height">
+                                    <div class="additional-clinician-profile-fields form-style" v-if="canRegisterAdditionalProfiles.includes('clinician') && wantsAdditionalClinicianProfile">
+                                        <div class="additional-clinician-profile-wrapper">
+                                        <div class="fields-header flex-row">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor"><path d="M20 22v-3c0-2.828 0-4.243-.879-5.121C18.243 13 16.828 13 14 13l-2 2l-2-2c-2.828 0-4.243 0-5.121.879C4 14.757 4 16.172 4 19v3m12-9v5.5"/><path d="M8.5 13v4m0 0a2 2 0 0 1 2 2v1m-2-3a2 2 0 0 0-2 2v1m9-13.5v-1a3.5 3.5 0 1 0-7 0v1a3.5 3.5 0 1 0 7 0m1.25 12.75a.75.75 0 1 1-1.5 0a.75.75 0 0 1 1.5 0"/></g></svg>
+                                            <h2>Additional Clinician Profile</h2>
+                                        </div>
+                                        <component
+                                            v-for="field in CLINICIAN_USER_INVITE_REGISTER_FIELDS"
+                                            :key="field.identifier"
+                                            :is="getComponent(field.inputType)"
+                                            :id="field.identifier"
+                                            :label="field.label"
+                                            :type="field.inputType"
+                                            :readonly="field.readonly"
+                                            :required="field.required"
+                                            :tabindex="field.tabindex"
+                                            :default="field.default"
+                                            :modelValue="getFieldValue(field.identifier)"
+                                            @input="setFieldValue(field.identifier, $event.target.value)"
+                                        />
+                                        </div>
+                                    </div>
+                                </Transition>
                             </form>
                         </div>
                     </div>
@@ -105,25 +200,60 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import DashboardUserInviteIncompleteAStep from "~/components/dashboard/user/invite/incomplete/aStep.vue";
+import DashboardUserInviteIncompleteBStep from "~/components/dashboard/user/invite/incomplete/bStep.vue";
 import { getComponent } from "~~lib/layers/ember/utils/input";
+
+// Paged modal 
+const {
+  isModalOpen,
+  currentPage,
+  openModal,
+  modalProps,
+  modalEvents
+} = usePagedModal();
+
+isModalOpen.value = true;
+
+
+const pages: Component[] = [
+    DashboardUserInviteIncompleteAStep,
+    DashboardUserInviteIncompleteBStep
+];
+
+// Optional props to pass to each component
+const componentProps: Record<number, Record<string, any>>[] = [
+  { /* props for first page */ },
+  { /* props for second page */ },
+];
+// ----------------------------
+
 
 const {
     fetchNewSession,
 } = useAuth();
 
 const {
-    registrationState,
-
-    canRegisterAdditionalProfiles,
-
-    desiredUserRole,
-    setInviteData,
     BASE_USER_INVITE_REGISTER_FIELDS,
     CLINICIAN_USER_INVITE_REGISTER_FIELDS,
 
+    registrationState,
+
+    canRegisterAdditionalProfiles,
+    willUseApplication,
+
+    desiredUserRole,
+    setInviteData,
+
     getFieldValue,
-    setFieldValue
+    setFieldValue,
+
+    MEDICATION_FIELDS,
+    currentMedicationsState,
+    takesMedication,
+    addMedication,
+    getMedicationFieldValues,
+    setMedicationFieldValues
 } = useRegister();
 
 const {
@@ -132,6 +262,7 @@ const {
     invitation: invitationData,
     fetch: fetchInvitation
 } = useInvite();
+
 
 const wantsAdditionalClinicianProfile = ref(false);
 function setWantsAdditionalClinicianProfile(value: boolean) {
@@ -154,6 +285,8 @@ const handleProfileImageChange = (file: File) => {
     // For example, you might want to add it to your register data
     // setFieldValue('profileImage', file);
 };
+
+
 
 onMounted(async () => {
     await fetchInvitation();
@@ -221,8 +354,26 @@ definePageMeta({
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    // height: 100%;
     width: 100%;
+    
+    .incomplete-registration-wrapper {
+        width: 100%;
+        box-sizing: border-box;
+        max-width: 800px;
+        // padding: 2rem 1.25rem;
+        // padding-top: 0.25rem;
+        background-color: var(--background-3-color);
+        border: 1px solid var(--border-4-color);
+        border-radius: 0.5rem;
+        box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.1);
+
+        :deep() {
+            .page-indicators {
+                padding: 0.3rem 0.4rem;
+            }
+        }
+    }
 }
 
 .invitation-information {
@@ -276,11 +427,6 @@ definePageMeta({
     width: 100%;
     box-sizing: border-box;
     max-width: 800px;
-    background-color: var(--background-3-color);
-    border: 1px solid var(--border-4-color);
-    border-radius: 0.5rem;
-    padding: 2rem 1.25rem;
-    padding-top: 2rem;
 }
 
 .form-header {
@@ -347,7 +493,6 @@ definePageMeta({
             }
         }
     }
-
     .user-type {
         font-size: 0.8rem;
         color: var(--text-4-color);
@@ -355,16 +500,219 @@ definePageMeta({
         align-items: center;
     }
 
-    .registration-type-message {
-        font-size: 0.8rem;
-        font-family: var(--serif-font-stack);
-        // font-style: italic;
-        color: var(--text-7-color);
-        margin-top: 1rem;
-    }
 
-    form {
-        gap: 0.5rem;
+    form.invitation-form {
+        // gap: 0.5rem;
+        margin-bottom: 4rem;
+
+        .submit-button {
+            height: 0px;
+            overflow: hidden;
+            transition: height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+            padding: 0rem;
+            opacity: 0;
+            margin-top: 0rem;
+
+            &.active {
+                height: 32px;
+                opacity: 1;
+                margin-top: 1.25rem;
+            }
+        }
+
+        .form-style {
+            background-color: var(--background-3-color);
+            border: 1px solid var(--border-4-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.1);
+
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .main-fields {
+            padding: 2rem 1.25rem;
+            z-index: 2;
+            padding-bottom: 1.25rem;
+        }
+
+        .additional-clinician-profile-fields {
+            position: relative;
+            top: -2rem;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+            z-index: 1;
+            box-sizing: border-box;
+            height: auto; /* Changed from fixed height */
+
+            .additional-clinician-profile-wrapper {
+                width: calc(100% - 2.5rem);
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                padding-top: 4.5rem;
+                padding-bottom: 2rem;
+            }
+        }
+
+        .medications-container {
+            margin-top: 0rem;
+            margin-bottom: 0rem;
+            transition: margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+            
+            .medications-header {
+                margin-top: 1rem;
+                
+
+                .fields-header {
+                    margin-bottom: 0.25rem;
+                }
+
+                p {
+                    font-size: 0.8rem;
+                    color: var(--text-7-color);
+                }
+            }
+
+            .medication-fields {
+                gap: 0.5rem;
+                max-height: 0px;
+                transition: max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+                overflow: hidden;
+                opacity: 0;
+    
+                &.active {
+                    max-height: 500px;
+                    opacity: 1;
+                }
+
+                ul, li {
+                    display: flex;
+                    flex-direction: column;
+                    // gap: 0.5rem;
+                }
+
+                ul {
+                    li  {
+                        &:first-of-type {
+                            margin-top: 1rem;
+                        }
+
+                        &:not(:first-of-type) {
+                            margin-top: 1.5rem;
+                        }
+
+                        .input-wrapper {
+                            margin-bottom: 0.5rem;
+                        }
+
+                        .start_date {
+                            transition: margin-bottom 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+                        }
+
+                        .end_date {
+                            opacity: 1;
+                            max-height: 55px;
+                            transition: max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+                            overflow: hidden;
+                        }
+
+                        .disabled-end-date {
+                            opacity: 0;
+                            max-height: 0;
+                        }
+
+                        &:has(.disabled-end-date) {
+                            .start_date {
+                                margin-bottom: 0rem;
+                            }
+                        }
+                    }
+                }
+
+                .add-medication-button {
+                    gap: 0.35rem;
+                    align-items: center;
+                    justify-content: center;
+                    width: 150px;
+
+                    background-color: transparent;
+                    border: 1px solid var(--text-color);
+                    color: var(--text-color);
+
+                    svg {
+                        aspect-ratio: 1;
+                        height: 14px;
+                        width: auto;
+                    }
+                }
+            }
+
+            &.active {
+                margin-top: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .takes-medication-input {
+                max-height: 0rem;
+                transition: max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+                overflow: hidden;
+                margin-top: 0rem;
+                opacity: 0;
+
+                &.active {
+                    max-height: 32px;
+                    margin-top: 0.5rem;
+                    opacity: 1;
+                }
+            }
+        }
+
+        .fields-header {
+            gap: 0.5rem;
+            height: 24px;
+            align-items: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+
+            svg {
+                aspect-ratio: 1;
+                height: 18px;
+                width: auto;
+            }
+        }
+
+        :deep() {
+            .input-wrapper {
+                &.checkbox {
+                    flex-direction: row;
+                }
+            }
+        }
+
     }
+}
+
+.fade-height-active {
+    height: 417px;
+}
+.fade-height-enter-active,
+.fade-height-leave-active {
+  transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+  max-height: 417px; /* Ensure this is large enough for your content */
+  opacity: 1;
+  overflow: hidden;
+  border-width: 1px;
+}
+
+.fade-height-enter-from,
+.fade-height-leave-to {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-top: 0;
+  margin-bottom: 0;
+  border-width: 0;
 }
 </style>

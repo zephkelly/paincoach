@@ -437,12 +437,232 @@ describe('EnvelopeEncryption', () => {
       expect(() => envelopeEncryption.decrypt(tamperedData)).toThrow();
     });
   });
-  
+
   describe('rotateKey', () => {
+    it('should re-encrypt only the data key with the newest key', () => {
+      // Set up data that was encrypted with the older key
+      const testData = { message: 'encrypted with old key' };
+  
+      if (!encryptionKeys[1]) throw new Error('No encryption keys available');
+      
+      // Create a temporary instance with only the second key
+      const tempEncryption = new EnvelopeEncryption([encryptionKeys[1]]);
+      
+      // Mock Date.now for consistent timestamps
+      const originalDateNow = Date.now;
+      let dateNowCounter = 0;
+      
+      try {
+        Date.now = vi.fn().mockImplementation(() => {
+          return 1600000000000 + (dateNowCounter++ * 1000);
+        });
+        
+        // Create a predictable encryption
+        vi.mocked(crypto.randomBytes).mockImplementation((size) => {
+          const buffer = Buffer.alloc(size);
+          buffer.fill(10); // Consistent value for predictable output
+          return buffer;
+        });
+        
+        const originalEncrypted = tempEncryption.encrypt(testData);
+        
+        if (!encryptionKeys[0] || !encryptionKeys[1]) throw new Error('No encryption keys available');
+        
+        // Verify it's using the old key
+        expect(originalEncrypted.keyId).toBe(encryptionKeys[1].id);
+        
+        // Store original encrypted data for comparison
+        const originalEncryptedData = originalEncrypted.encryptedData;
+        const originalIv = originalEncrypted.iv;
+        
+        // Rotate only the key (optimized rotation)
+        const rotated = envelopeEncryption.rotateKey(originalEncrypted);
+        
+        // The keyId should now be the newest key
+        expect(rotated.keyId).toBe(encryptionKeys[0].id);
+        
+        // The data should still decrypt correctly
+        const decrypted = envelopeEncryption.decrypt<typeof testData>(rotated);
+        expect(decrypted).toEqual(testData);
+        
+        // Unlike rotateKeyDeep, the actual encrypted data and IV should remain unchanged
+        // Only the data key should be different
+        expect(rotated.encryptedData).toBe(originalEncryptedData);
+        expect(rotated.iv).toBe(originalIv);
+        expect(rotated.encryptedDataKey).not.toBe(originalEncrypted.encryptedDataKey);
+      } finally {
+        // Restore original Date.now
+        Date.now = originalDateNow;
+      }
+    });
+  
+    it('should skip re-encryption if already using the primary key', () => {
+      const testData = { message: 'already encrypted with primary key' };
+      
+      // Encrypt with primary key
+      const encrypted = envelopeEncryption.encrypt(testData);
+      
+      if (!encryptionKeys[0]) throw new Error('No encryption keys available');
+      
+      // Verify it's using the primary key
+      expect(encrypted.keyId).toBe(encryptionKeys[0].id);
+      
+      // Apply rotation
+      const rotated = envelopeEncryption.rotateKey(encrypted);
+      
+      // Since it's already using the primary key, it should return the same object
+      expect(rotated).toEqual(encrypted);
+      
+      // Should be exactly the same instance (not just equal)
+      expect(rotated === encrypted).toBe(true);
+    });
+  
+    it('should be much faster than rotateKeyDeep for large data', () => {
+      // Create a large test object
+      const largeData = {
+        data: Array(5000).fill(0).map((_, i) => ({ 
+          id: i, 
+          value: `large value ${i}`, 
+          nested: { prop: `nested property ${i}` }
+        }))
+      };
+  
+      if (!encryptionKeys[1]) throw new Error('No encryption keys available');
+      
+      // Create a temporary instance with only the second key
+      const tempEncryption = new EnvelopeEncryption([encryptionKeys[1]]);
+      
+      // Encrypt with the older key
+      const encrypted = tempEncryption.encrypt(largeData);
+      
+      // Perform optimized rotation and measure time
+      const startOptimized = performance.now();
+      const optimizedRotated = envelopeEncryption.rotateKey(encrypted);
+      const optimizedTime = performance.now() - startOptimized;
+      
+      // Perform deep rotation and measure time
+      const startDeep = performance.now();
+      const deepRotated = envelopeEncryption.rotateKeyDeep(encrypted);
+      const deepTime = performance.now() - startDeep;
+      
+      // The optimized rotation should be significantly faster
+      // We'll use a reasonable threshold that allows for some variability
+      // but ensures the optimization is meaningful
+      expect(optimizedTime).toBeLessThan(deepTime * 0.5);
+      
+      // Both should produce correctly decryptable results
+      const decryptedOptimized = envelopeEncryption.decrypt(optimizedRotated);
+      const decryptedDeep = envelopeEncryption.decrypt(deepRotated);
+      
+      expect(decryptedOptimized).toEqual(largeData);
+      expect(decryptedDeep).toEqual(largeData);
+    });
+  
+    it('should throw appropriate errors for invalid data', () => {
+      const invalidData: EncryptedData = {
+        encryptedData: 'invalid-format-without-dot',
+        encryptedDataKey: 'some-key.with-tag',
+        keyId: 'key-1',
+        iv: Buffer.alloc(16).toString('base64')
+      };
+      
+      expect(() => envelopeEncryption.rotateKey(invalidData)).toThrow('Invalid encrypted data format');
+    });
+  
+    it('should throw error if no primary key is available', () => {
+      const testData = { message: 'test' };
+      const encrypted = envelopeEncryption.encrypt(testData);
+      
+      // Create instance with empty keys array but bypass constructor check
+      const instance = new EnvelopeEncryption([encrypted.keyId as any]);
+      
+      // @ts-ignore - Modifying private property for testing
+      instance.encryptionKeys = [];
+      
+      // Should throw when attempting to rotate without a primary key
+      expect(() => instance.rotateKey(encrypted)).toThrow('No primary encryption key available');
+    });
+  
+    it('should compare performance between rotateKey and rotateKeyDeep for different payload sizes', () => {
+      // Test with different payload sizes
+      const payloadSizes = [10, 100, 1000, 10000];
+      const results = [];
+  
+      if (!encryptionKeys[1]) throw new Error('No encryption keys available');
+      
+      // Create a temporary instance with only the second key
+      const oldKeyInstance = new EnvelopeEncryption([encryptionKeys[1]]);
+      
+      for (const size of payloadSizes) {
+        // Create data of specified size
+        const testData = {
+          items: Array(size).fill(0).map((_, i) => ({ 
+            id: i, 
+            value: `value-${i}`
+          }))
+        };
+        
+        // Encrypt with old key
+        const encrypted = oldKeyInstance.encrypt(testData);
+        
+        // Measure optimized rotation
+        const startOptimized = performance.now();
+        const optimizedRotated = envelopeEncryption.rotateKey(encrypted);
+        const optimizedTime = performance.now() - startOptimized;
+        
+        // Measure deep rotation
+        const startDeep = performance.now();
+        const deepRotated = envelopeEncryption.rotateKeyDeep(encrypted);
+        const deepTime = performance.now() - startDeep;
+        
+        // Record results
+        results.push({
+          size,
+          optimizedTime,
+          deepTime,
+          speedupFactor: deepTime / optimizedTime
+        });
+        
+        // Both should produce correctly decryptable results
+        const decryptedOptimized = envelopeEncryption.decrypt(optimizedRotated);
+        const decryptedDeep = envelopeEncryption.decrypt(deepRotated);
+        
+        expect(decryptedOptimized).toEqual(testData);
+        expect(decryptedDeep).toEqual(testData);
+        
+        // As payload size increases, the performance gap should widen
+        if (size > 100) {
+          expect(optimizedTime).toBeLessThan(deepTime * 0.5);
+        }
+      }
+      
+      // Log performance comparison results in a structured way
+      console.log('Performance comparison between rotateKey and rotateKeyDeep:');
+      results.forEach(result => {
+        console.log(`Size: ${result.size}, Optimized: ${result.optimizedTime.toFixed(2)}ms, Deep: ${result.deepTime.toFixed(2)}ms, Speedup: ${result.speedupFactor.toFixed(2)}x`);
+      });
+      
+      // Verify that the speedup factor increases with payload size
+      // This confirms that the optimization is more effective for larger payloads
+      if (results.length >= 3) {
+          if (!results[0]) throw new Error('No encryption keys available');
+
+        const smallSpeedup = results[0].speedupFactor;
+
+        if (!results[results.length - 1]) throw new Error('No encryption keys available');
+        
+        //@ts-expect-error
+        const largeSpeedup = results[results.length - 1].speedupFactor;
+        expect(largeSpeedup).toBeGreaterThan(smallSpeedup);
+      }
+    });
+  });
+  
+  describe('rotateKeyDeep', () => {
     it('should decrypt and re-encrypt data with the newest key', () => {
         // Set up data that was encrypted with the older key
         const testData = { message: 'encrypted with old key' };
-
+    
         if (!encryptionKeys[1]) throw new Error('No encryption keys available');
         
         // Create a temporary instance with only the second key
@@ -473,7 +693,7 @@ describe('EnvelopeEncryption', () => {
           expect(oldEncrypted.keyId).toBe(encryptionKeys[1].id);
           
           // Rotate the key
-          const rotated = envelopeEncryption.rotateKey<typeof testData>(oldEncrypted);
+          const rotated = envelopeEncryption.rotateKeyDeep<typeof testData>(oldEncrypted);
           
           // The keyId should now be the newest key
           expect(rotated.keyId).toBe(encryptionKeys[0].id);
@@ -529,7 +749,7 @@ describe('EnvelopeEncryption', () => {
         });
         
         // Rotate (should re-encrypt with same primary key but different random values)
-        const rotated = envelopeEncryption.rotateKey<typeof testData>(encrypted);
+        const rotated = envelopeEncryption.rotateKeyDeep<typeof testData>(encrypted);
         
         // The keyId should remain the same
         expect(rotated.keyId).toBe(encrypted.keyId);
@@ -551,7 +771,7 @@ describe('EnvelopeEncryption', () => {
         iv: Buffer.alloc(16).toString('base64')
       };
       
-      expect(() => envelopeEncryption.rotateKey(invalidData)).toThrow('Invalid encrypted data format');
+      expect(() => envelopeEncryption.rotateKeyDeep(invalidData)).toThrow('Invalid encrypted data format');
     });
   });
   
@@ -718,11 +938,11 @@ describe('EnvelopeEncryption', () => {
       expect(encrypted1.keyId).toBe(key2.id);
       
       // First rotation to middle key
-      const encrypted2 = instance2.rotateKey<typeof testData>(encrypted1);
+      const encrypted2 = instance2.rotateKeyDeep<typeof testData>(encrypted1);
       expect(encrypted2.keyId).toBe(key1.id);
       
       // Second rotation to newest key
-      const encrypted3 = instance3.rotateKey<typeof testData>(encrypted2);
+      const encrypted3 = instance3.rotateKeyDeep<typeof testData>(encrypted2);
       expect(encrypted3.keyId).toBe(key0.id);
       
       // Data should still be correctly decryptable
@@ -965,7 +1185,7 @@ describe('EnvelopeEncryption', () => {
       const encrypted1 = instance1.encrypt(testData);
       
       // Instance 3 can decrypt and rotate to newest key
-      const rotated = instance3.rotateKey<typeof testData>(encrypted1);
+      const rotated = instance3.rotateKeyDeep<typeof testData>(encrypted1);
       
       // Instance 2 should not be able to decrypt after rotation
       expect(() => instance2.decrypt(rotated)).toThrow();
@@ -1013,7 +1233,7 @@ describe('EnvelopeEncryption', () => {
       
       // Rotate all items
       const rotatedItems = encryptedItems.map(item => 
-        newInstance.rotateKey(item)
+        newInstance.rotateKeyDeep(item)
       );
       
       // Verify all items now use newest key

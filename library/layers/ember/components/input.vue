@@ -2,7 +2,8 @@
     <div class="input-wrapper" :class="[{ 'readonly': readonly }, type]">
         <label v-if="label" :for="id" class="input-label">{{ label }}</label>
         <input
-            :value="modelValue"
+            :checked="type === 'checkbox' ? !!modelValue : undefined"
+            :value="type !== 'checkbox' ? modelValue : undefined"
             @input="updateModelValue"
             @blur="handleBlur"
             :id="id"
@@ -42,6 +43,7 @@ import { type InputType } from '@@/layers/ember/types/input';
     min?: number | string;
     max?: number | string;
     disabled?: boolean;
+    default?: any;
     readonly?: boolean;
     placeholder?: string;
     validateOnInput?: boolean;
@@ -57,7 +59,22 @@ import { type InputType } from '@@/layers/ember/types/input';
   const dirtyValue = ref(false);
   const customInvalid = ref(false);
   
-
+  // Set default value if provided and modelValue is undefined
+  onMounted(() => {
+    if (props.default !== undefined && props.modelValue === undefined) {
+      if (props.type === 'checkbox' && inputRef.value) {
+        inputRef.value.checked = !!props.default;
+        emit('update:modelValue', !!props.default);
+      } else {
+        emit('update:modelValue', props.default);
+      }
+    }
+    
+    // For checkboxes, ensure the checked state matches modelValue
+    if (props.type === 'checkbox' && inputRef.value) {
+      inputRef.value.checked = !!props.modelValue;
+    }
+  });
   
   // Combined input classes
   const inputClasses = computed(() => {
@@ -74,7 +91,14 @@ import { type InputType } from '@@/layers/ember/types/input';
   // Handle validation on input
   function updateModelValue(event: Event) {
     const target = event.target as HTMLInputElement;
-    const value = target.value;
+    let value;
+    
+    if (props.type === 'checkbox') {
+      value = target.checked;
+    } else {
+      value = target.value;
+    }
+    
     emit('update:modelValue', value);
     dirtyValue.value = true;
   }
@@ -85,6 +109,12 @@ import { type InputType } from '@@/layers/ember/types/input';
     emit('blur', event);
   }
   
+  // Watch for changes to modelValue to update the input
+  watch(() => props.modelValue, (newValue) => {
+    if (props.type === 'checkbox' && inputRef.value) {
+      inputRef.value.checked = !!newValue;
+    }
+  });
   
   // Public method to reset the field
   function reset() {
@@ -108,7 +138,7 @@ import { type InputType } from '@@/layers/ember/types/input';
       touched.value = true;
     }
   });
-  </script>
+</script>
    
 <style lang="scss" scoped>
 .input-wrapper {
@@ -127,10 +157,21 @@ import { type InputType } from '@@/layers/ember/types/input';
 
     &.checkbox {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
 
         input {
-            width: 14px;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            order: -1;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: var(--text-4-color);
+            flex: 1;
         }
     }
 }
@@ -155,6 +196,7 @@ input {
         background-color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
         color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
         border-color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+    margin: 0;
     
     &:hover {
         border-color: var(--border-3-color);
@@ -168,11 +210,25 @@ input {
     &.is-invalid {
         border-color: var(--error-color);
     }
+
+    &::placeholder {
+        color: var(--text-8-color);
+    }
+
+    
     
     &:disabled {
         opacity: 0.6;
         cursor: not-allowed;
     }
+}
+
+input[type="date"]:not(:valid):not(:focus) {
+    color: var(--text-8-color);
+}
+
+input[type="date"]:valid {
+  color: var(--text-color);
 }
 
 .error-message {

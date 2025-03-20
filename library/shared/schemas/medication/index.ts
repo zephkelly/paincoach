@@ -1,20 +1,24 @@
 import { z } from 'zod';
 import { UUIDSchema, BigIntIDSchema } from '../primitives';
 
-import { EncryptedPatientMedicationDataV1Schema } from './v1';
+import { DBEncryptedPatientMedicationV1Schema } from './v1';
 
 
 
-export const EncryptedPatientMedicationDataSchema = z.discriminatedUnion('version', [
-    EncryptedPatientMedicationDataV1Schema
+export const DBEncryptedPatientMedicationDataSchema = z.discriminatedUnion('version', [
+    DBEncryptedPatientMedicationV1Schema
 ]);
 
-export const PatientMedicationSchema = z.object({
+export const DBEncryptedPatientMedicationDataPartialSchema = z.discriminatedUnion('version', [
+    DBEncryptedPatientMedicationV1Schema.partial()
+]);
+
+export const DBPatientMedicationSchema = z.object({
     id: BigIntIDSchema,
     patient_id: UUIDSchema,
     clinician_id: UUIDSchema,
 
-    encrypted_medication_data: EncryptedPatientMedicationDataSchema,
+    encrypted_medication_data: DBEncryptedPatientMedicationDataSchema,
 
     created_by: UUIDSchema,
     updated_by: UUIDSchema,

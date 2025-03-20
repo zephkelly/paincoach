@@ -149,17 +149,74 @@ export class EnvelopeEncryption {
     }
   
     /**
-     * Re-encrypt data with the newest key
+     * Re-encrypt only the data key (KEK) with the newest key
+     * This optimized method avoids decrypting and re-encrypting the data itself,
+     * which is one of the key benefits of envelope encryption
+     * 
+     * @param encryptedData The encrypted data object
+     * @returns New encrypted data object with the data key encrypted with the newest key
+     */
+    rotateKey(encryptedData: EncryptedData): EncryptedData {
+        // First validate the encrypted data format
+        // Split the encrypted data and auth tag
+        const parts = encryptedData.encryptedData.split('.');
+        if (parts.length !== 2) {
+        throw new Error('Invalid encrypted data format');
+        }
+        
+        // Get the primary key first before trying to decrypt
+        const primaryKey = this.encryptionKeys[0];
+        if (!primaryKey) {
+        throw new Error('No primary encryption key available');
+        }
+        
+        // Skip re-encryption if already using the primary key
+        if (encryptedData.keyId === primaryKey.id) {
+        return encryptedData;
+        }
+        
+        // Now decrypt the data key using any available key
+        let dataKey: Buffer | null = null;
+        
+        for (const key of this.encryptionKeys) {
+            try {
+                dataKey = this.decryptDataKey(encryptedData.encryptedDataKey, key);
+                break;
+            } catch (error) {
+                // Try the next key
+                continue;
+            }
+        }
+        
+        if (!dataKey) {
+        throw new Error('Failed to decrypt data key with any available key');
+        }
+        
+        // Re-encrypt the data key with the primary key
+        const encryptedDataKey = this.encryptDataKey(dataKey, primaryKey);
+        
+        // Return a new encrypted data object with the re-encrypted data key
+        return {
+            ...encryptedData,
+            encryptedDataKey,
+            keyId: primaryKey.id
+        };
+    }
+
+    /**
+     * Re-encrypt data with the newest key by fully decrypting and re-encrypting
+     * This is the original rotation method that does a full re-encryption
+     * 
      * @param encryptedData The encrypted data object
      * @returns New encrypted data object
      */
-    rotateKey<T>(encryptedData: EncryptedData): EncryptedData {
-        // First decrypt the data
-        const decryptedData = this.decrypt<T>(encryptedData);
-        
-        // Create a custom encryption method that ensures new random values
-        // for testing purposes
-        const forceUniqueEncrypt = <U>(data: U): EncryptedData => {
+    rotateKeyDeep<T>(encryptedData: EncryptedData): EncryptedData {
+      // First decrypt the data
+      const decryptedData = this.decrypt<T>(encryptedData);
+      
+      // Create a custom encryption method that ensures new random values
+      // for testing purposes
+      const forceUniqueEncrypt = <U>(data: U): EncryptedData => {
         // Create a wrapper object to preserve the undefined value type
         const wrapper = { value: data, isUndefined: data === undefined };
         
@@ -186,21 +243,21 @@ export class EnvelopeEncryption {
         // Use the primary (newest) key to encrypt the data key
         const primaryKey = this.encryptionKeys[0];
         if (!primaryKey) {
-            throw new Error('No primary encryption key available');
+          throw new Error('No primary encryption key available');
         }
         
         const encryptedDataKey = this.encryptDataKey(dataKey, primaryKey);
         
         return {
-            encryptedData: encryptedDataWithTag,
-            encryptedDataKey,
-            keyId: primaryKey.id,
-            iv: iv.toString('base64')
+          encryptedData: encryptedDataWithTag,
+          encryptedDataKey,
+          keyId: primaryKey.id,
+          iv: iv.toString('base64')
         };
-        };
-        
-        // Use our custom encryption function for rotation
-        return forceUniqueEncrypt(decryptedData);
+      };
+      
+      // Use our custom encryption function for rotation
+      return forceUniqueEncrypt(decryptedData);
     }
   
     /**

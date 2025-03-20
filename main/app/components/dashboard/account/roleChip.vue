@@ -6,7 +6,6 @@
         skeleton: userRole === undefined,
         'has-default-slot': hasDefaultSlot,
         'owner': userRole === 'admin' && owner,
-        
     }">
     
         <div class="chip-main" :class="{ 

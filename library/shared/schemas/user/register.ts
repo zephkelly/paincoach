@@ -8,7 +8,7 @@ import { AdminUserSchema, DBAdminUserFieldsSchema } from './admin';
 import { ClinicianUserSchema, DBClinicianUserFieldsSchema } from './clinician';
 import { PatientUserSchema, DBPatientUserFieldsSchema } from './patient';
 
-import { PatientMedicationSchema } from '../medication';
+import { DBPatientMedicationSchema } from '../medication';
 
 
 
@@ -23,7 +23,7 @@ export const BaseUserRegisterSchema = BaseUserInviteSchema.extend({
     profile_url: z.string().url().nullable().optional(),
     
     will_use_app: z.boolean().default(false),
-    medications: PatientMedicationSchema.array().optional(),
+    medications: DBPatientMedicationSchema.array().optional(),
 });
 
 export const BaseUserRegisterPartialSchema = BaseUserRegisterSchema.partial()
@@ -57,7 +57,7 @@ export const AdminRegisterSchema = BaseUserRegisterSchema.extend({
     allowed_additional_profiles: z.array(UserRoleSchema).optional(),
     additional_profiles: z.array(
         z.union([DBPatientUserFieldsSchema, DBClinicianUserFieldsSchema])
-    ).optional(),
+    ).max(2).optional(),
 });
 export const AdminRegisterPartialSchema = AdminRegisterSchema.partial().extend({
     role: z.literal('admin'),
