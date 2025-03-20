@@ -3,11 +3,13 @@ import type { UserRegisterPartial } from "@@/shared/types/users/register";
 import { type UserInvitation } from "@@/shared/types/users/invitation";
 import { type UserInviteDataPartial } from "@@/shared/types/users/invitation/create";
 
+import { type DBClinicianSpecialisations } from "@@/shared/types/users/clinician";
+
 import { type DBEncryptedPatientMedicationDataV1Partial } from "@@/shared/types/users/medication/v1";
 
 import { BASE_USER_INVITE_REGISTER_FIELDS, CLINICIAN_USER_INVITE_REGISTER_FIELDS, MEDICATION_FIELDS } from "@@/shared/types/users/register/fields";
 
-import { validateUserRegisterPartial } from "@@/shared/schemas/user/register";
+import { validateUserRegister, validateUserRegisterPartial } from "@@/shared/schemas/user/register";
 
 
 
@@ -34,9 +36,8 @@ export const useRegister = () => {
 
         // Clinician fields
         ahprah_registration_number: undefined,
-        specialisation: undefined,
+        specialisation: 'physiotherapy' as DBClinicianSpecialisations,
         practice_name: undefined,
-        business_address: undefined,
         abn: undefined,
 
         // Admin fields
@@ -98,8 +99,7 @@ export const useRegister = () => {
     const canRegisterAdditionalProfiles = computed<UserRole[]>(() => {
         if (state.value.role !== 'admin' || inviteData.value?.role !== 'admin') return [];
         
-        //@ts-expect-error
-        return inviteData.value?.registration_data?.allowed_additional_profiles;
+        return inviteData.value?.registration_data?.allowed_additional_profiles || [];
     });
 
     const willUseApplication = computed(() => state.value.will_use_app);
@@ -122,10 +122,13 @@ export const useRegister = () => {
         state.value.id = value.user_id;
         state.value.confirm_email = value.email; 
         
-        //@ts-expect-error
         state.value = {
             ...state.value,
-            ...registration_data
+            ...registration_data,
+            allowed_additional_profiles: undefined,
+
+            //@ts-expect-error
+            additional_profiles: undefined,
         }
 
         state.value.will_use_app = true;
@@ -152,13 +155,53 @@ export const useRegister = () => {
         console.log('Current field errors:', fieldErrors.value);
     };
 
-    watch(state, (value) => {
+    watch([state, medicationsState], () => {
         try {
-            const validatedData = validateUserRegisterPartial(value);
+            const validatedData = validateUserRegisterPartial(state.value);
 
             console.log('Validated data:', validatedData);
+            console.log('original data:', state.value);
 
             if (validatedData.role === undefined) return;
+
+            const allowedAdditionalRoles = inviteData.value?.registration_data?.allowed_additional_profiles;
+
+            const allowedRole = (allowedAdditionalRoles && allowedAdditionalRoles.length >= 1) ? allowedAdditionalRoles[0] : undefined;
+
+            const newMedicationsArray = medicationsState.value.map((medication) => {
+                return {
+                    encrypted_medication_data: {
+                        version: 1,
+                        data: medication,
+                    }
+                }
+            }) || undefined;
+
+            console.log('New medications array:', newMedicationsArray);
+
+            let newValue  = {
+                ...state.value,
+                allowed_additional_profiles: allowedAdditionalRoles,
+                additional_profiles: [{
+                        role: allowedRole,
+                        // @ts-expect-error
+                        ahprah_registration_number: state.value.ahprah_registration_number,
+                        // @ts-expect-error
+                        specialisation: state.value.specialisation,
+                        // @ts-expect-error
+                        practice_name: state.value.practice_name,
+                        // @ts-expect-error
+                        abn: state.value.abn,
+                    }
+                ],
+                medications: newMedicationsArray,
+            }
+
+            console.log('New value:', newValue);
+
+            const validatedData2 = validateUserRegister(newValue);
+
+            console.log('Validated data 2:', validatedData2);
         }
         catch (error) {
             console.error(error);

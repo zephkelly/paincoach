@@ -1,7 +1,8 @@
 import { z } from 'zod';
-import { DBClinicianUserSchema, ClinicianUserSchema } from '../../schemas/user/clinician';
+import { DBClinicianUserSchema, ClinicianUserSchema, DBClinicianSpecialisations } from '../../schemas/user/clinician';
 
 
+export type DBClinicianSpecialisations = z.infer<typeof DBClinicianSpecialisations>;
 
 export type DBClinicianUser = z.infer<typeof DBClinicianUserSchema>;
 export type ClinicianUser = z.infer<typeof ClinicianUserSchema>;

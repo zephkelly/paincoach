@@ -51,6 +51,8 @@ function extractZodErrors(
 export function createZodValidationError(error: ZodError, includeFirstErrorOnly = false) {
     const fieldErrors = error.format();
 
+    console.log(error);
+
     const formattedErrors = extractZodErrors(fieldErrors, '', {}, includeFirstErrorOnly);
     
     // Use JSON.stringify with pretty-printing for better logging

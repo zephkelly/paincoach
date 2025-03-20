@@ -76,7 +76,7 @@ const DosageSchema = z.object({
 
 export const DBEncryptedPatientMedicationDataV1Schema = z.object({
     start_date: z.date(),
-    end_date: z.date().nullable(),
+    end_date: z.date().nullable().optional(),
     is_on_going: z.boolean(),
  
     medication_name: z.string().min(2, "Medication name must be at least 2 characters"),

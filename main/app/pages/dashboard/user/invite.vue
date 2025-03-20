@@ -96,7 +96,7 @@
                                         @input="setFieldValue('data_sharing_enabled', $event.target.checked)" />
                                     
 
-                                    <div class="medications-container flex-col" :class="{ 'active': willUseApplication }">
+                                    <div class="medications-container flex-col" :class="{ 'active': willUseApplication, 'medications': takesMedication }">
 
                                         <EInput v-if="desiredUserRole !== 'clinician'"
                                             id="wants-clinician-profile"
@@ -125,7 +125,7 @@
                                             
                                             <ul>
                                                 <li class="medication-fields-wrapper" v-for="(medication, index) in currentMedicationsState" :key="index">
-                                                    <h3>{{ getMedicationFieldValues('medication_name', index) ? getMedicationFieldValues('medication_name', index) : 'Unnamed Medication' }} {{ '#' + (index + 1) }}</h3>
+                                                    <h3><span>{{ (index + 1) + '.' }}</span> {{ getMedicationFieldValues('medication_name', index) ? getMedicationFieldValues('medication_name', index) : 'Medication' }}</h3>
                                                     <component
                                                         v-for="field in MEDICATION_FIELDS"
                                                         
@@ -142,7 +142,7 @@
                                                         :default="field.default"
                                                         :placeholder="field.placeholder"
                                                         :modelValue="getMedicationFieldValues(field.identifier, index)"
-                                                        @input="setMedicationFieldValues(field.identifier, index, (field.inputType === 'checkbox') ? $event.target.checked : $event.target.value)"
+                                                        @update:modelValue="(value: any) => setMedicationFieldValues(field.identifier, index, value)"
                                                     />
                                                 </li>
                                             </ul>
@@ -162,31 +162,40 @@
                                         :required="false"
                                         @input="setWantsAdditionalClinicianProfile($event.target.checked)" />
                                         
-                                    <EButton class="submit-button primary" :class="{ active: !wantsAdditionalClinicianProfile }" type="submit">Submit</EButton>
+                                    <EButton 
+                                        class="submit-button primary"
+                                        :disabled="!wantsAdditionalClinicianProfile"
+                                        :class="{ active: !wantsAdditionalClinicianProfile }"
+                                        type="submit"
+                                    >
+                                        Submit
+                                    </EButton>
                                                                     
                                 </div>
 
                                 <Transition name="fade-height">
                                     <div class="additional-clinician-profile-fields form-style" v-if="canRegisterAdditionalProfiles.includes('clinician') && wantsAdditionalClinicianProfile">
                                         <div class="additional-clinician-profile-wrapper">
-                                        <div class="fields-header flex-row">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor"><path d="M20 22v-3c0-2.828 0-4.243-.879-5.121C18.243 13 16.828 13 14 13l-2 2l-2-2c-2.828 0-4.243 0-5.121.879C4 14.757 4 16.172 4 19v3m12-9v5.5"/><path d="M8.5 13v4m0 0a2 2 0 0 1 2 2v1m-2-3a2 2 0 0 0-2 2v1m9-13.5v-1a3.5 3.5 0 1 0-7 0v1a3.5 3.5 0 1 0 7 0m1.25 12.75a.75.75 0 1 1-1.5 0a.75.75 0 0 1 1.5 0"/></g></svg>
-                                            <h2>Additional Clinician Profile</h2>
-                                        </div>
-                                        <component
-                                            v-for="field in CLINICIAN_USER_INVITE_REGISTER_FIELDS"
-                                            :key="field.identifier"
-                                            :is="getComponent(field.inputType)"
-                                            :id="field.identifier"
-                                            :label="field.label"
-                                            :type="field.inputType"
-                                            :readonly="field.readonly"
-                                            :required="field.required"
-                                            :tabindex="field.tabindex"
-                                            :default="field.default"
-                                            :modelValue="getFieldValue(field.identifier)"
-                                            @input="setFieldValue(field.identifier, $event.target.value)"
-                                        />
+                                            <div class="fields-header flex-row">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor"><path d="M20 22v-3c0-2.828 0-4.243-.879-5.121C18.243 13 16.828 13 14 13l-2 2l-2-2c-2.828 0-4.243 0-5.121.879C4 14.757 4 16.172 4 19v3m12-9v5.5"/><path d="M8.5 13v4m0 0a2 2 0 0 1 2 2v1m-2-3a2 2 0 0 0-2 2v1m9-13.5v-1a3.5 3.5 0 1 0-7 0v1a3.5 3.5 0 1 0 7 0m1.25 12.75a.75.75 0 1 1-1.5 0a.75.75 0 0 1 1.5 0"/></g></svg>
+                                                <h2>Additional Clinician Profile</h2>
+                                            </div>
+                                            <component
+                                                v-for="field in CLINICIAN_USER_INVITE_REGISTER_FIELDS"
+                                                :key="field.identifier"
+                                                :is="getComponent(field.inputType)"
+                                                :id="field.identifier"
+                                                :label="field.label"
+                                                :type="field.inputType"
+                                                :readonly="field.readonly"
+                                                :required="field.required"
+                                                :tabindex="field.tabindex"
+                                                :default="field.default"
+                                                :modelValue="getFieldValue(field.identifier)"
+                                                @input="setFieldValue(field.identifier, $event.target.value)"
+                                            />
+
+                                            <EButton class="submit-button secondary" :class="{ active: wantsAdditionalClinicianProfile }" :disabled="wantsAdditionalClinicianProfile" type="submit">Submit</EButton>
                                         </div>
                                     </div>
                                 </Transition>
@@ -332,9 +341,23 @@ const isNotCompleted = computed(() => {
     }
 });
 
+const medicationsMaxHeightStyle = computed(() => {
+    if (currentMedicationsState.value.length > 0) {
+        return {
+            maxHeight: `${currentMedicationsState.value.length * 400}px`
+        }
+    }
+    else {
+        return {
+            maxHeight: '0px'
+        }
+    }
+}); 
+
 const userProfileImageInput = ref<HTMLInputElement | null>(null);
 function triggerOpenImageInput() {
-    userProfileImageInput.value?.click();
+    alert('Uploading profile images is currently not supported');
+    // userProfileImageInput.value?.click();
 }
 
 onMounted(async () => {
@@ -508,15 +531,30 @@ definePageMeta({
         .submit-button {
             height: 0px;
             overflow: hidden;
-            transition: height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+            transition:
+                height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                background-color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+            background-color: var(--text-color);
             padding: 0rem;
             opacity: 0;
             margin-top: 0rem;
+            cursor: pointer;
+            color: var(--text-invert-3-color);
 
             &.active {
                 height: 32px;
                 opacity: 1;
                 margin-top: 1.25rem;
+            }
+
+            &:hover {
+                background-color: var(--text-4-color);
+            }
+
+            &:active {
+                background-color: var(--text-2-color);
             }
         }
 
@@ -561,10 +599,19 @@ definePageMeta({
             margin-bottom: 0rem;
             transition: margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
             
-            .medications-header {
+            &.active {
                 margin-top: 1rem;
-                
+                margin-bottom: 1rem;
 
+                &.medications {
+                    margin-top: 2rem;
+                    margin-bottom: 2rem;
+                }
+            }
+            
+            .medications-header {
+                margin-top: 2rem;
+                
                 .fields-header {
                     margin-bottom: 0.25rem;
                 }
@@ -583,7 +630,7 @@ definePageMeta({
                 opacity: 0;
     
                 &.active {
-                    max-height: 500px;
+                    max-height: v-bind(medicationsMaxHeightStyle);
                     opacity: 1;
                 }
 
@@ -595,6 +642,10 @@ definePageMeta({
 
                 ul {
                     li  {
+                        border-left: 1px solid var(--border-4-color);
+                        padding: 0rem 1.25rem;
+                        margin: 0.5rem 0rem;
+
                         &:first-of-type {
                             margin-top: 1rem;
                         }
@@ -603,8 +654,22 @@ definePageMeta({
                             margin-top: 1.5rem;
                         }
 
+                        h3 {
+                            margin-bottom: 0.8rem;
+
+                            span {
+                                font-weight: 700;
+                                color: var(--text-7-color);
+                                margin-right: 0.2rem;
+                            }
+                        }
+
                         .input-wrapper {
                             margin-bottom: 0.5rem;
+
+                            &:last-child {
+                                margin-bottom: 0rem;
+                            }
                         }
 
                         .start_date {
@@ -647,11 +712,6 @@ definePageMeta({
                         width: auto;
                     }
                 }
-            }
-
-            &.active {
-                margin-top: 1.5rem;
-                margin-bottom: 2rem;
             }
 
             .takes-medication-input {
@@ -700,7 +760,7 @@ definePageMeta({
 .fade-height-enter-active,
 .fade-height-leave-active {
   transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-  max-height: 417px; /* Ensure this is large enough for your content */
+  max-height: 514px; /* Ensure this is large enough for your content */
   opacity: 1;
   overflow: hidden;
   border-width: 1px;

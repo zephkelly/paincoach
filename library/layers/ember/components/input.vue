@@ -9,13 +9,8 @@
             :id="id"
             :class="inputClasses"
             :required="required"
-            :pattern="pattern"
             :type="type"
             :tabindex="tabindex"
-            :minlength="minlength"
-            :maxlength="maxlength"
-            :min="min"
-            :max="max"
             :disabled="disabled"
             :readonly="readonly"
             :placeholder="placeholder"
@@ -28,36 +23,22 @@
 </template>
    
 <script lang="ts" setup>
-import { type InputType } from '@@/layers/ember/types/input';
+import { type InputType, type InputProps } from '@@/layers/ember/types/input';
 
-  type InputProps = {
-    modelValue: string | number | boolean | undefined;
-    id: string;
-    required: boolean;
+type BaseInputProps = InputProps & {
     type: InputType;
-    tabindex?: number;
-    label?: string;
-    pattern?: string;
-    minlength?: number | string;
-    maxlength?: number | string;
-    min?: number | string;
-    max?: number | string;
-    disabled?: boolean;
-    default?: any;
-    readonly?: boolean;
-    placeholder?: string;
     validateOnInput?: boolean;
     forceInvalid?: boolean;
     customValidationMessage?: string;
-  }
+}
 
-  const props = defineProps<InputProps>();
+const props = defineProps<BaseInputProps>();
 
-  const emit = defineEmits(['update:modelValue', 'blur', 'valid', 'invalid']);
-  const inputRef = ref<HTMLInputElement | null>(null);
-  const touched = ref(false);
-  const dirtyValue = ref(false);
-  const customInvalid = ref(false);
+const emit = defineEmits(['update:modelValue', 'blur', 'valid', 'invalid']);
+const inputRef = ref<HTMLInputElement | null>(null);
+const touched = ref(false);
+const dirtyValue = ref(false);
+const customInvalid = ref(false);
   
   // Set default value if provided and modelValue is undefined
   onMounted(() => {

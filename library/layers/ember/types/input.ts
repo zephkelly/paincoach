@@ -20,3 +20,15 @@ export type InputField = {
     default?: any;
     placeholder?: string;
 }
+
+export type InputProps = {
+    id: string;
+    modelValue: any;
+    required: boolean;
+    label?: string;
+    disabled?: boolean;
+    readonly?: boolean;
+    default?: any;
+    placeholder?: string;
+    tabindex?: number;
+}

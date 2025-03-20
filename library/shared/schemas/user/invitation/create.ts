@@ -15,6 +15,7 @@ export const BaseUserInviteSchema = BaseDBUserSchema.pick({
     data_sharing_enabled: true,
 }).extend({
     confirm_email: z.string().email(),
+    allowed_additional_profiles: z.array(UserRoleSchema).optional(),
 });
 
 const AdminInviteSchema = BaseUserInviteSchema.extend({

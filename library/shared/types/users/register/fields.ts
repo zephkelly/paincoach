@@ -1,4 +1,5 @@
 import { type InputField } from "@@/layers/ember/types/input"
+import type { DBEncryptedPatientMedicationDataV1Partial } from "@@/shared/types/users/medication/v1"
 
 
 
@@ -72,6 +73,7 @@ export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: InputField[] = [
         identifier: 'ahprah_registration_number',
         tabindex: 1,
         required: true,
+        placeholder: 'eg. MED0123456789',
     },
     {
         inputType: 'text',
@@ -79,18 +81,13 @@ export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: InputField[] = [
         identifier: 'specialisation',
         tabindex: 1,
         required: false,
+        default: 'physiotherapy',
+        readonly: true,
     },
     {
         inputType: 'text',
         label: 'Practice Name',
         identifier: 'practice_name',
-        tabindex: 1,
-        required: false,
-    },
-    {
-        inputType: 'text',
-        label: 'Business Address',
-        identifier: 'business_address',
         tabindex: 1,
         required: false,
     },
@@ -103,8 +100,10 @@ export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: InputField[] = [
     }
 ];
 
-
-export const MEDICATION_FIELDS: InputField[] = [
+type MedicalInputField = InputField & {
+    identifier: keyof DBEncryptedPatientMedicationDataV1Partial;
+}
+export const MEDICATION_FIELDS: MedicalInputField[] = [
     {
         inputType: 'text',
         label: 'Medication Name',
@@ -143,7 +142,7 @@ export const MEDICATION_FIELDS: InputField[] = [
     },
     {
         inputType: 'checkbox',
-        label: 'Is Ongoing',
+        label: 'Ongoing',
         identifier: 'is_on_going',
         tabindex: 1,
         required: true,

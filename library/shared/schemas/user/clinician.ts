@@ -5,6 +5,10 @@ import { type ClinicianUser } from '../../types/users/clinician';
 
 
 
+export const DBClinicianSpecialisations = z.enum([
+    'physiotherapy',
+]);
+
 export const DBClinicianUserFieldsSchema = z.object({
     role: z.literal('clinician'),
     
@@ -12,17 +16,13 @@ export const DBClinicianUserFieldsSchema = z.object({
         .min(1, 'License number is required')
         .max(100, 'License number must be less than 100 characters'),
 
-    specialisation: z.string()
-        .max(100, 'Specialization must be less than 100 characters')
-        .nullable(),
+    specialisation: DBClinicianSpecialisations,
 
     practice_name: z.string()
         .max(255, 'Practice name must be less than 255 characters')
-        .nullable(),
+        .nullable().optional(),
 
-    business_address: z.string().optional(),
-
-    abn: z.string().optional(),
+    abn: z.string().nullable().optional(),
 });
 
 export const DBClinicianUserSchema = BaseDBUserSchema.extend({

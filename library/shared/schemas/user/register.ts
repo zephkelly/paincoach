@@ -8,7 +8,9 @@ import { AdminUserSchema, DBAdminUserFieldsSchema } from './admin';
 import { ClinicianUserSchema, DBClinicianUserFieldsSchema } from './clinician';
 import { PatientUserSchema, DBPatientUserFieldsSchema } from './patient';
 
-import { DBPatientMedicationSchema } from '../medication';
+import { DBPatientMedicationSchema } from '../medication/index';
+
+import { DBEncryptedPatientMedicationDataV1Schema } from '../medication/v1';
 
 
 
@@ -23,7 +25,9 @@ export const BaseUserRegisterSchema = BaseUserInviteSchema.extend({
     profile_url: z.string().url().nullable().optional(),
     
     will_use_app: z.boolean().default(false),
-    medications: DBPatientMedicationSchema.array().optional(),
+    medications: z.array(
+        DBEncryptedPatientMedicationDataV1Schema.partial()
+    ).nullable().optional()
 });
 
 export const BaseUserRegisterPartialSchema = BaseUserRegisterSchema.partial()
@@ -51,22 +55,24 @@ const UndefinedRegisterPartialSchema = BaseUserRegisterSchema.partial().extend({
 });
 
 
-
 export const AdminRegisterSchema = BaseUserRegisterSchema.extend({
     ...DBAdminUserFieldsSchema.shape,
     allowed_additional_profiles: z.array(UserRoleSchema).optional(),
     additional_profiles: z.array(
-        z.union([DBPatientUserFieldsSchema, DBClinicianUserFieldsSchema])
-    ).max(2).optional(),
+        z.discriminatedUnion('role', [
+            DBPatientUserFieldsSchema,
+            DBClinicianUserFieldsSchema.partial(),
+        ])
+    ).max(1).optional(),
 });
 export const AdminRegisterPartialSchema = AdminRegisterSchema.partial().extend({
     role: z.literal('admin'),
 })
 
 export const UserRegisterSchema = z.discriminatedUnion('role', [
-    AdminUserSchema,
-    ClinicianUserSchema,
-    PatientUserSchema,
+    AdminRegisterSchema,
+    ClinicianRegisterSchema,
+    PatientRegisterSchema,
 ]);
 
 export function validateUserRegister(data: unknown) {
