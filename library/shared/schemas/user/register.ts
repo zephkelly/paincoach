@@ -26,7 +26,7 @@ export const BaseUserRegisterSchema = BaseUserInviteSchema.extend({
     
     will_use_app: z.boolean().default(false),
     medications: z.array(
-        DBEncryptedPatientMedicationDataV1Schema.partial()
+        DBEncryptedPatientMedicationDataV1Schema
     ).nullable().optional()
 });
 

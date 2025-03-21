@@ -153,6 +153,7 @@ const customInvalid = ref(false);
             font-size: 0.85rem;
             color: var(--text-4-color);
             flex: 1;
+            user-select: none;
         }
     }
 }

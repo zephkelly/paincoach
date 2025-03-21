@@ -16,7 +16,7 @@ export const DBClinicianUserFieldsSchema = z.object({
         .min(1, 'License number is required')
         .max(100, 'License number must be less than 100 characters'),
 
-    specialisation: DBClinicianSpecialisations,
+    specialisation: DBClinicianSpecialisations.default('physiotherapy'),
 
     practice_name: z.string()
         .max(255, 'Practice name must be less than 255 characters')
@@ -24,6 +24,8 @@ export const DBClinicianUserFieldsSchema = z.object({
 
     abn: z.string().nullable().optional(),
 });
+
+export const DBClinicianUserFieldsPartialSchema = DBClinicianUserFieldsSchema.partial();
 
 export const DBClinicianUserSchema = BaseDBUserSchema.extend({
     ...DBClinicianUserFieldsSchema.shape,

@@ -5,6 +5,7 @@
             <input
                 v-model="internalValue"
                 @update:modelValue="handleInput"
+                @input="updateModelValue"
                 :id="id"
                 :required="required"
                 type="number"
@@ -100,6 +101,13 @@
     internalValue.value = numValue;
     emit('update:modelValue', numValue);
   };
+
+  function updateModelValue(event: Event) {
+    const target = event.target as HTMLInputElement;
+    let value;
+    
+    emit('update:modelValue', value);
+  }
   
   // Increment and decrement functions
   const increment = () => {

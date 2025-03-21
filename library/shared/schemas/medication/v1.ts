@@ -43,19 +43,19 @@ const DosageSchema = z.object({
     value: z.number().optional(),
     unit: DoseUnitSchema.optional(),
 }).transform(data => {
+    console.log(data);
     const normalized = data.original.replace(/^(\d+(?:\.\d+)?)\s+(mg|g|mcg|mL|L|IU|mEq)$/i, '$1$2');
-    
+    console.log(normalized);
     const match = normalized.match(/^(\d+(?:\.\d+)?)(mg|g|mcg|mL|L|IU|mEq)$/i);
-    
+    console.log(match);
     let value: number | undefined = undefined;
     let unit: z.infer<typeof DoseUnitSchema> | undefined = undefined;
     
     if (match && match[1] && match[2]) {
         value = parseFloat(match[1]);
-        const lowercaseUnit = match[2].toLowerCase();
-        if (VALID_DOSE_UNITS.includes(lowercaseUnit as any)) {
-            unit = lowercaseUnit as z.infer<typeof DoseUnitSchema>;
-        }
+        console.log(value);
+
+        unit = DoseUnitSchema.parse(match[2]);
     }
     
     return {
@@ -75,8 +75,8 @@ const DosageSchema = z.object({
 );
 
 export const DBEncryptedPatientMedicationDataV1Schema = z.object({
-    start_date: z.date(),
-    end_date: z.date().nullable().optional(),
+    start_date: z.coerce.date(),
+    end_date: z.coerce.date().nullable().optional(),
     is_on_going: z.boolean(),
  
     medication_name: z.string().min(2, "Medication name must be at least 2 characters"),

@@ -88,23 +88,23 @@
                                     />
     
                                     <EInput v-if="desiredUserRole !== 'clinician'"
-                                        id="wants-clinician-profile"
+                                        id="share-anonymous-data"
                                         type="checkbox"
                                         label="Would you like to share anonymous data with Pain Coach to improve our services?"
                                         :modelValue="getFieldValue('data_sharing_enabled') as boolean"
-                                        :required="false"
+                                        :required="true"
                                         @input="setFieldValue('data_sharing_enabled', $event.target.checked)" />
                                     
 
                                     <div class="medications-container flex-col" :class="{ 'active': willUseApplication, 'medications': takesMedication }">
 
                                         <EInput v-if="desiredUserRole !== 'clinician'"
-                                            id="wants-clinician-profile"
+                                            id="wants-personal-access"
                                             type="checkbox"
                                             label="Would you like access to the Pain Coach app for personal use?"
-                                            :modelValue="getFieldValue('will_use_app') as boolean"
+                                            :modelValue="state.user.will_use_app"
                                             :required="true"
-                                            @input="setFieldValue('will_use_app', $event.target.checked)" />
+                                            @input="state.user.will_use_app = $event.target.checked" />
 
                                         <EInput v-if="desiredUserRole !== 'clinician'" class="takes-medication-input" :class="{ 'active': willUseApplication }"
                                             id="takes-medication"
@@ -118,13 +118,13 @@
                                             <div class="medications-header">
                                                 <div class="fields-header flex-row">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m10.5 20.5l10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7m-2-12l7 7"/></svg>
-                                                    <h2>Pain Medication{{ currentMedicationsState.length > 1 ? 's' : '' }}</h2>
+                                                    <h2>Pain Medication{{ medicationState && medicationState.length > 1 ? 's' : '' }}</h2>
                                                 </div>
                                                 <p>Enter your recent medication history</p>
                                             </div>
                                             
                                             <ul>
-                                                <li class="medication-fields-wrapper" v-for="(medication, index) in currentMedicationsState" :key="index">
+                                                <li class="medication-fields-wrapper" v-for="(medication, index) in medicationState" :key="index">
                                                     <h3><span>{{ (index + 1) + '.' }}</span> {{ getMedicationFieldValues('medication_name', index) ? getMedicationFieldValues('medication_name', index) : 'Medication' }}</h3>
                                                     <component
                                                         v-for="field in MEDICATION_FIELDS"
@@ -142,8 +142,8 @@
                                                         :default="field.default"
                                                         :placeholder="field.placeholder"
                                                         :modelValue="getMedicationFieldValues(field.identifier, index)"
-                                                        @update:modelValue="(value: any) => setMedicationFieldValues(field.identifier, index, value)"
-                                                    />
+                                                        @input="setMedicationFieldValues(field.identifier, index, $event.target.value)"
+                                                        />
                                                 </li>
                                             </ul>
 
@@ -195,7 +195,7 @@
                                                 @input="setFieldValue(field.identifier, $event.target.value)"
                                             />
 
-                                            <EButton class="submit-button secondary" :class="{ active: wantsAdditionalClinicianProfile }" :disabled="wantsAdditionalClinicianProfile" type="submit">Submit</EButton>
+                                            <EButton class="submit-button secondary" :class="{ active: state.wants_additional_profiles }" :disabled="wantsAdditionalClinicianProfile" type="submit">Submit</EButton>
                                         </div>
                                     </div>
                                 </Transition>
@@ -243,10 +243,15 @@ const {
 } = useAuth();
 
 const {
+    state,
+    registrationState,
+    medicationState,
+
+    wantsAdditionalClinicianProfile,
+
     BASE_USER_INVITE_REGISTER_FIELDS,
     CLINICIAN_USER_INVITE_REGISTER_FIELDS,
 
-    registrationState,
 
     canRegisterAdditionalProfiles,
     willUseApplication,
@@ -258,7 +263,6 @@ const {
     setFieldValue,
 
     MEDICATION_FIELDS,
-    currentMedicationsState,
     takesMedication,
     addMedication,
     getMedicationFieldValues,
@@ -273,9 +277,13 @@ const {
 } = useInvite();
 
 
-const wantsAdditionalClinicianProfile = ref(false);
 function setWantsAdditionalClinicianProfile(value: boolean) {
-    wantsAdditionalClinicianProfile.value = value;
+    if (value) {
+        state.value.wants_additional_profiles = ['clinician'];
+    }
+    else {
+        state.value.wants_additional_profiles = [];
+    }
 }
 
 // Add a ref for the profile image
@@ -342,9 +350,9 @@ const isNotCompleted = computed(() => {
 });
 
 const medicationsMaxHeightStyle = computed(() => {
-    if (currentMedicationsState.value.length > 0) {
+    if (state.value.user.medications && state.value.user.medications.length > 0) {
         return {
-            maxHeight: `${currentMedicationsState.value.length * 400}px`
+            maxHeight: `${state.value.user.medications.length * 400}px`
         }
     }
     else {
@@ -542,6 +550,7 @@ definePageMeta({
             margin-top: 0rem;
             cursor: pointer;
             color: var(--text-invert-3-color);
+            pointer-events: none;
 
             &.active {
                 height: 32px;
