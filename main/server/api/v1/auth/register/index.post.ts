@@ -1,64 +1,17 @@
+import { H3Error } from 'h3';
 import { z, ZodError } from 'zod';
 import { createZodValidationError } from '~~lib/shared/utils/zod/error';
-import { UserRoleSchema } from '@@/shared/schemas/user/base'
-import { PatientUserPrivateDataSchema } from '@@/shared/schemas/user/patient/index'
+
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
 
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
+import { DatabaseService } from '~~/server/services/databaseService';
+import { InvitationService } from '~~/server/services/models/invitationService';
 
+import type { UserRegister } from '@@/shared/types/users/register/index';
+import { validateUserRegister } from '@@/shared/schemas/user/register';
 
-
-const BaseRegisterUserRequestSchema = z.object({
-    desired_user_role: UserRoleSchema,
-    invitation_token: z.string(),
-
-    password: z.string().optional(),
-    confirm_password: z.string().optional(),
-    first_name: z.string().optional(),
-    last_name: z.string().optional(),
-    phone_number: z.string().optional(),
-    email: z.string().optional(),
-})
-
-const ClinicianRegisterRequestSchema = BaseRegisterUserRequestSchema.extend({
-    desired_user_role: z.literal('clinician'),
-
-    ahprah_registration_number: z.string()
-        .min(1, 'License number is required')
-        .max(100, 'License number must be less than 100 characters')
-        .optional(),
-
-    specialisation: z.string()
-        .max(100, 'Specialization must be less than 100 characters')
-        .optional(),
-
-    practice_name: z.string()
-        .max(255, 'Practice name must be less than 255 characters')
-        .optional(),
-
-    business_address: z.string().optional(),
-
-    abn: z.string().optional(),
-})
-
-const PatientRegisterRequestSchema = BaseRegisterUserRequestSchema.extend({
-    desired_user_role: z.literal('patient'),
-
-    private_data: PatientUserPrivateDataSchema.optional()
-})
-
-const AdminRegisterRequestSchema = BaseRegisterUserRequestSchema.extend({
-    desired_user_role: z.literal('admin'),
-})
-
-const UserRegisterRequestSchema = z.discriminatedUnion('desired_user_role', [
-    AdminRegisterRequestSchema,
-    ClinicianRegisterRequestSchema,
-    PatientRegisterRequestSchema
-])
-
-export type UserRegisterRequest = z.infer<typeof UserRegisterRequestSchema>;
 
 
 export default defineEventHandler({
@@ -72,17 +25,87 @@ export default defineEventHandler({
             secureSession
         } = await getPainCoachSession(event);
 
-        const body = await readBody<UserRegisterRequest>(event);
+        const body = await readBody<UserRegister>(event);
+        
+        const transaction = await DatabaseService.getInstance().createTransaction();
 
         try {
-            const validatedRequest = UserRegisterRequestSchema.parse(body)
+            const validatedRegisterRequest = validateUserRegister(body);
+
+            const invitation_token = validatedRegisterRequest.invitation_token;
+            const secureSessionInvitationToken = secureSession.invitation_token;
+
+            if (invitation_token && secureSessionInvitationToken && invitation_token !== secureSessionInvitationToken) {
+                throw createError({
+                    statusCode: 400,
+                    message: 'Invalid invitation token',
+                });
+            }
+            
+
+            const validatedInvitation = await InvitationService.getInvitationByTokenTransaction(invitation_token, transaction);
+            
+            const allowedPrimaryProfile = validatedInvitation.role;
+            const invitedEmail = validatedInvitation.email;
+            const invitedPhoneNumber = validatedInvitation.phone_number;
+            const allowedAdditionalProfiles = validatedInvitation.registration_data?.allowed_additional_profiles;
+
+            const isAdminAndInvitedAsOwner = 
+                validatedInvitation.inviter_role_name === 'admin' &&
+                validatedInvitation.role === 'admin' &&
+                //@ts-expect-error
+                validatedInvitation.registration_data?.owner;
+
+            // Ensure request is valid in the context of the invitation
+            if ((validatedInvitation.role === 'admin' || validatedInvitation.role === 'clinician') && validatedInvitation.inviter_role_name !== 'admin') {
+                throw createError({
+                    statusCode: 400,
+                    message: 'Invalid request',
+                });
+            }
+
+            if (validatedInvitation.role === 'patient') {
+
+                if (validatedInvitation.inviter_role_name === 'clinician') {
+
+                }
+
+                throw createError({
+                    statusCode: 400,
+                    message: 'Invalid request',
+                });
+            }
+
+            if (allowedPrimaryProfile !== validatedRegisterRequest.role) {
+                throw createError({
+                    statusCode: 400,
+                    message: 'Invalid request',
+                });
+            }
+
+            if (invitedEmail !== validatedRegisterRequest.email || invitedPhoneNumber !== validatedRegisterRequest.phone_number) {
+                throw createError({
+                    statusCode: 400,
+                    message: 'Invalid request',
+                });
+            }
+
+            transaction.commit();
 
 
+            console.log('Validated registration request:', validatedRegisterRequest);
+            console.log('Validated invitation:', validatedInvitation);
         }
         catch (error: unknown) {
-            console.error('POST: /api/v1/auth/register:')
+            console.error('POST: /api/v1/auth/register:', error)
+            transaction.rollback();
+
             if (error instanceof ZodError) {
                 throw createZodValidationError(error);
+            }
+
+            if (error instanceof H3Error) {
+                throw error;
             }
         }
     }

@@ -9,5 +9,10 @@ button {
     border: 1px solid var(--border-8-color);
     border-radius: 8px;
     padding: 0.5rem 1rem;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }
 </style>

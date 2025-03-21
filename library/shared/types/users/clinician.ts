@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
     DBClinicianUserSchema,
+    DBClinicianUserFieldsSchema,
     DBClinicianUserFieldsPartialSchema,
     ClinicianUserSchema,
     DBClinicianSpecialisations
@@ -8,6 +9,7 @@ import {
 
 
 export type DBClinicianSpecialisations = z.infer<typeof DBClinicianSpecialisations>;
+export type DBClinicianUserFields = z.infer<typeof DBClinicianUserFieldsSchema>;
 export type DBClinicianUserFieldsPartial = z.infer<typeof DBClinicianUserFieldsPartialSchema>;
 
 export type DBClinicianUser = z.infer<typeof DBClinicianUserSchema>;

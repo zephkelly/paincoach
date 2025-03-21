@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createZodValidationError } from '@@/shared/utils/zod/error';
 
+import { DBAdminUserFieldsSchema } from '../admin';
 import { DBClinicianUserFieldsSchema } from '../clinician';
 import { BaseDBUserSchema, UserRoleSchema } from '@@/shared/schemas/user/base';
 import { MockUserDataSchema } from '@@/shared/schemas/user/mock';
@@ -19,7 +20,8 @@ export const BaseUserInviteSchema = BaseDBUserSchema.pick({
 });
 
 const AdminInviteSchema = BaseUserInviteSchema.extend({
-    role: z.literal('admin'),
+    ...DBAdminUserFieldsSchema.shape,
+    
     allowed_additional_profiles: z.array(UserRoleSchema).optional(),
 });
 

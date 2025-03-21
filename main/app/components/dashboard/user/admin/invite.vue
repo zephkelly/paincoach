@@ -36,8 +36,8 @@
                 <input type="checkbox" id="data-sharing" class="form__input" v-model="dataSharing" />
             </div>
             <div class="form__group data-sharing">
-                <label for="data-sharing" class="form__label">Allowed clinician profile</label>
-                <input type="checkbox" id="data-sharing" class="form__input" v-model="allowedClinicianProfile" />
+                <label for="clinician-profile" class="form__label">Allowed clinician profile</label>
+                <input type="checkbox" id="clinician-profile" class="form__input" v-model="allowedClinicianProfile" />
             </div>
         </div>
         <div class="form__footer">
@@ -84,13 +84,14 @@ async function submitInviteAdminForm() {
     try {
         // Create the invite request object
         const inviteRequest: InviteUserRequest = {
+            //@ts-expect-error
             user: {
                 email: email.value,
                 first_name: firstName.value,
                 last_name: lastName.value,
                 phone_number: phone.value,
                 data_sharing_enabled: dataSharing.value,
-                allowed_additional_profiles: (allowedClinicianProfile.value) ? 'clinician' : undefined,
+                allowed_additional_profiles: (allowedClinicianProfile.value) ? ['clinician'] : undefined,
                 confirm_email: confirmEmail.value,
                 role: 'admin',
             },

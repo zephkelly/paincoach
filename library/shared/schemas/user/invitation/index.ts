@@ -3,7 +3,7 @@ import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 import { UserRoleSchema } from '../base';
 import { UserInviteDataPartialSchema } from './create';
-import type { DBUserInvitation, UserInvitation } from '@@/shared/types/users/invitation';
+import type { DBUserInvitation, UserInvitation, MinimalUserInvitation } from '@@/shared/types/users/invitation';
 
 import { BigIntIDSchema } from '@@/shared/schemas/primitives';
 
@@ -34,6 +34,27 @@ export const DBUserInvitationSchema = z.object({
 });
 
 export const UserInvitationSchema = DBUserInvitationSchema.omit({
+    role_id: true,
+    status: true,
+}).extend({
+    role: InvitationRoleSchema,
+    inviter_role_name: UserRoleSchema,
+});
+
+export const UserInvitationSchemaPartial = UserInvitationSchema.partial();
+
+export function validateUserInvitation(data: UserInvitation) {
+    const parsedResult = UserInvitationSchema.safeParse(data)
+
+    if (!parsedResult.success) {
+        throw createZodValidationError(parsedResult.error)
+    }
+
+    return parsedResult.data
+}
+
+
+export const MinimalInvitationSchema = DBUserInvitationSchema.omit({
     id: true,
     linked_user_id: true,
     invited_by: true,
@@ -48,6 +69,8 @@ export const UserInvitationSchema = DBUserInvitationSchema.omit({
     inviter_role_name: UserRoleSchema,
 });
 
+export const MinimalUserInvitationSchemaPartial = MinimalInvitationSchema.partial();
+
 
 
 export function validateDBUserInvitation(data: DBUserInvitation) {
@@ -60,8 +83,8 @@ export function validateDBUserInvitation(data: DBUserInvitation) {
     return parsedResult.data
 }
 
-export function validateUserInvitation(data: UserInvitation) {
-    const parsedResult = UserInvitationSchema.safeParse(data)
+export function validateMinimalUserInvitation(data: MinimalUserInvitation) {
+    const parsedResult = MinimalInvitationSchema.safeParse(data)
 
     if (!parsedResult.success) {
         throw createZodValidationError(parsedResult.error)

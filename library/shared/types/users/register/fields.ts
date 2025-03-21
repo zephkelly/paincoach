@@ -48,22 +48,6 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: InputField[] = [
         tabindex: 1,
         required: true,
     },
-    // {
-    //     inputType: 'checkbox',
-    //     label: 'Would you like to share anonymous data with Pain Coach to improve our services?',
-    //     identifier: 'data_sharing_enabled',
-    //     tabindex: 1,
-    //     required: true,
-    //     default: false
-    // },
-    // {
-    //     inputType: 'checkbox',
-    //     label: 'Would you like a personal account to use the Pain Coach app?',
-    //     identifier: 'will_use_app',
-    //     tabindex: 1,
-    //     required: true,
-    //     default: true
-    // }
 ];
 
 export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: InputField[] = [
@@ -145,7 +129,7 @@ export const MEDICATION_FIELDS: MedicalInputField[] = [
         label: 'Ongoing',
         identifier: 'is_on_going',
         tabindex: 1,
-        required: true,
+        required: false,
         default: true
     },
 ]

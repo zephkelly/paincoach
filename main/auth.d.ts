@@ -30,6 +30,8 @@ declare module '#auth-utils' {
 
         registration_data?: UserInvitePartial;
 
+        additional_profiles?: UserRole[];
+
         verified: boolean;
         logged_in_at: Date;
         version: number;

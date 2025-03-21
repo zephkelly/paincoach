@@ -1,7 +1,7 @@
 import { type UserRole } from "@@/shared/types/users";
-import type { UserRegisterPartial } from "@@/shared/types/users/register";
-import type { DBClinicianUserFieldsSchema } from "@@/shared/schemas/user/clinician";
-import { type UserInvitation } from "@@/shared/types/users/invitation";
+import type { UserRegister, UserRegisterPartial } from "@@/shared/types/users/register";
+import type { DBClinicianUserFields } from "@@/shared/types/users/clinician";
+import { type MinimalUserInvitation } from "@@/shared/types/users/invitation";
 import { type UserInviteDataPartial } from "@@/shared/types/users/invitation/create";
 
 import { type DBClinicianUserFieldsPartial } from "@@/shared/types/users/clinician";
@@ -15,7 +15,7 @@ import { validateUserRegister, validateUserRegisterPartial } from "@@/shared/sch
 
 
 export const useRegister = () => {
-    const inviteData = ref<UserInvitation | undefined>(undefined);
+    const inviteData = ref<MinimalUserInvitation | undefined>(undefined);
 
     const state = useState<{
         user: UserRegisterPartial,
@@ -67,15 +67,15 @@ export const useRegister = () => {
     }));
 
     const medicationState = computed(() => state.value.medications);
-
+    
     const wantsAdditionalClinicianProfile = computed(() => state.value.wants_additional_profiles.includes('clinician'));
+    
+    const willUseApplication = computed(() => state.value.user.will_use_app);
 
-
-
-
+    
+    
     // Medications ------------------------------------------------------------
     const takesMedication = ref<boolean>(false);
-    // const currentMedicationsState = computed(() => state.value.medications);
 
     function getMedicationFieldValues(field: keyof DBEncryptedPatientMedicationDataV1Partial, index: number) {
         const medications = state.value.medications;
@@ -129,30 +129,9 @@ export const useRegister = () => {
     }
 
 
-    function setInviteData(invitation_registration_data: UserInvitation) {
+    function setInviteData(invitation_registration_data: MinimalUserInvitation) {
         inviteData.value = invitation_registration_data;
     }
-
-    const registrationState = computed(() => state.value.user);
-
-    const desiredUserRole = computed(() => state.value.user.role);
-
-    const canRegisterAdditionalProfiles = computed<UserRole[]>(() => {
-        if (state.value.user.role !== 'admin' || inviteData.value?.role !== 'admin') return [];
-        
-        return inviteData.value?.registration_data?.allowed_additional_profiles || [];
-    });
-
-    const willUseApplication = computed(() => state.value.user.will_use_app);
-
-    // function getAdditionalProfileFieldValues(profile: UserRole) {
-    //     if (state.value.role !== 'admin' || inviteData.value?.role !== 'admin') return {};
-
-    //     if (state.value.additional_profiles === undefined) return undefined;
-
-    //     const additionalProfiles = state.value.additional_profiles;
-    // }
-
 
     watch(inviteData, (value) => {
         if (value === undefined) return;
@@ -166,7 +145,7 @@ export const useRegister = () => {
         state.value.user = {
             ...state.value.user,
             ...registration_data,
-
+            
             //@ts-expect-error
             additional_profiles: undefined,
         }
@@ -175,6 +154,18 @@ export const useRegister = () => {
 
         console.log('Invite data set:', state.value);
     }, { immediate: true });
+
+    const registrationState = computed(() => state.value.user);
+
+    const desiredUserRole = computed(() => state.value.user.role);
+
+    const canRegisterAdditionalProfiles = computed<UserRole[]>(() => {
+        if (state.value.user.role !== 'admin' || inviteData.value?.role !== 'admin') return [];
+        
+        return inviteData.value?.registration_data?.allowed_additional_profiles || [];
+    });
+
+
 
 
     const fieldErrors = ref<UserRegisterPartial>({});
@@ -190,10 +181,22 @@ export const useRegister = () => {
             ...state.value.user,
             [identifier]: validatedValue
         };
-        
-        console.log(`Field ${identifier} updated to:`, validatedValue);
-        console.log('Current field errors:', fieldErrors.value);
     };
+
+    const getAdditionalClinicianProfileFieldValue = (identifier: keyof DBClinicianUserFields) => {
+        return state.value.additional_profiles.clinician[identifier];
+    };
+
+    const setAdditionalClinicianProfileFieldValue = (identifier: keyof DBClinicianUserFields, value: any) => {
+        let validatedValue = value;
+
+        state.value.additional_profiles.clinician = {
+            ...state.value.additional_profiles.clinician,
+            [identifier]: validatedValue
+        };
+    };
+
+    const validatedRegistrationData = ref<UserRegister | undefined>(undefined);
 
     watch(state, () => {
         try {
@@ -202,7 +205,6 @@ export const useRegister = () => {
 
             if (takesMedication.value && state.value.medications !== undefined) {
                 medicationsArray = state.value.medications;
-                console.log('medicationsArray:', medicationsArray);
             }
 
             let additionalProfilesArray = [];
@@ -220,61 +222,38 @@ export const useRegister = () => {
                 medications: medicationsArray,
             }
 
-            console.log('Pre-validated data:', registrationData);
-
             const validatedData = validateUserRegisterPartial(registrationData);
-
-            console.log('Post partial validation:', validatedData);
-
-
-            console.log('Pre-full validated data:', registrationData);
 
             const validatedData2 = validateUserRegister(registrationData);
 
             console.log('Post full validation:', validatedData2);
 
-            // console.log('Validated data:', validatedData);
-            // console.log('original data:', state.value);
-
-            // if (validatedData.role === undefined) return;
-
-            // const allowedAdditionalRoles = inviteData.value?.registration_data?.allowed_additional_profiles;
-
-            // const allowedRole = (allowedAdditionalRoles && allowedAdditionalRoles.length >= 1) ? allowedAdditionalRoles[0] : undefined;
-
-            // console.log(state.value.medications);
-            
-
-            // console.log('New medications array:', medicationsArray);
-
-            // let newValue  = {
-            //     ...state.value,
-            //     allowed_additional_profiles: allowedAdditionalRoles,
-            //     additional_profiles: [{
-            //             role: allowedRole,
-            //             // @ts-expect-error
-            //             ahprah_registration_number: state.value.additional.ahprah_registration_number,
-            //             // @ts-expect-error
-            //             specialisation: state.value.specialisation,
-            //             // @ts-expect-error
-            //             practice_name: state.value.practice_name,
-            //             // @ts-expect-error
-            //             abn: state.value.abn,
-            //         }
-            //     ],
-            //     medications: medicationsArray,
-            // }
-
-            // console.log('New value:', newValue);
-
-            // const validatedData2 = validateUserRegister(newValue);
-
-            // console.log('Validated data 2:', validatedData2);
+            validatedRegistrationData.value = validatedData2;
         }
         catch (error) {
-            console.error(error);
+            validatedRegistrationData.value = undefined;
+            console.log(error);
         }
     }, { deep: true });
+
+    const canSubmit = computed(() => validatedRegistrationData.value !== undefined);
+
+    async function submitRegistration() {
+        try {
+            if (!canSubmit.value || validatedRegistrationData.value === undefined) {
+                console.error('Invalid registration data');
+                throw new Error('Invalid registration data');
+            }
+
+            const response = await $fetch('/api/v1/auth/register', {
+                method: 'POST',
+                body: validatedRegistrationData.value,
+            });
+        }
+        catch(error) {
+            console.error('Error submitting registration:', error);
+        }
+    }
 
     return {
         state,
@@ -286,15 +265,16 @@ export const useRegister = () => {
         setInviteData,
         
         BASE_USER_INVITE_REGISTER_FIELDS,
-        CLINICIAN_USER_INVITE_REGISTER_FIELDS,
         
         desiredUserRole,
         canRegisterAdditionalProfiles,
         willUseApplication,
+
+        canSubmit,
+        submitRegistration,
         
         getFieldValue,
         setFieldValue,
-        
         
         //Medication
         MEDICATION_FIELDS,
@@ -302,5 +282,9 @@ export const useRegister = () => {
         addMedication,
         getMedicationFieldValues,
         setMedicationFieldValues,
+        
+        CLINICIAN_USER_INVITE_REGISTER_FIELDS,
+        getAdditionalClinicianProfileFieldValue,
+        setAdditionalClinicianProfileFieldValue,
     }
 }

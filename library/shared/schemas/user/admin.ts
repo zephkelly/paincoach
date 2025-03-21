@@ -8,7 +8,7 @@ import { type AdminUser } from '../../types/users/admin';
 
 export const DBAdminUserFieldsSchema = z.object({
     role: z.literal('admin'),
-    owner: z.literal(false).default(false),
+    owner: z.boolean().default(false),
 })
 
 export const DBAdminUserSchema = BaseDBUserSchema.merge(DBAdminUserFieldsSchema);

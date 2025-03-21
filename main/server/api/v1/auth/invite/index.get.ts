@@ -5,8 +5,9 @@ import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/v
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
-import type { UserInvitation } from '@@/shared/types/users/invitation';
-import { validateUserInvitation } from '@@/shared/schemas/user/invitation';
+import type { MinimalUserInvitation } from '@@/shared/types/users/invitation/index';
+import { validateMinimalUserInvitation } from '@@/shared/schemas/user/invitation';
+import { InvitationService } from '~~/server/services/models/invitationService';
 
 
 
@@ -72,35 +73,7 @@ export default defineEventHandler({
                 }
             }
 
-            const invitation = await transaction.query<UserInvitation>(`
-                SELECT 
-                    ui.user_id,
-                    ui.email,
-                    ui.phone_number,
-                    r.name as role,
-                    ui.invitation_token,
-                    u.first_name as inviter_name,
-                    r2.name as inviter_role_name,
-                    u.profile_url as inviter_profile_url,
-                    ui.expires_at,
-                    ui.registration_type,
-                    ui.registration_data
-                FROM private.user_invitation ui
-                JOIN private.role r ON ui.role_id = r.id
-                JOIN private.user u ON ui.invited_by = u.id
-                JOIN private.role r2 ON u.role_id = r2.id
-                WHERE ui.invitation_token = $1
-                LIMIT 1
-            `, [invitation_token]);
-
-            if (invitation.length === 0 || !invitation[0]) {
-                throw createError({
-                    statusCode: 404,
-                    message: 'Invitation not found',
-                });
-            }
-
-            const validatedInvitation = validateUserInvitation(invitation[0]);
+            const validatedInvitation = await InvitationService.getMinimalInvitationByTokenTransaction(invitation_token, transaction);
 
             transaction.commit();
 

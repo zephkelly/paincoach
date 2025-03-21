@@ -40,7 +40,7 @@
                     </div>
                     <div class="inner-wrapper">
                         <div class="incomplete-content" v-if="loadedInvitation">
-                            <form class="invitation-form flex-col">
+                            <form class="invitation-form flex-col" @submit.prevent="submitRegistration">
                                 <div class="main-fields form-style">
                                     <div class="form-header">
                                         <h1>Complete your registration</h1>
@@ -92,7 +92,7 @@
                                         type="checkbox"
                                         label="Would you like to share anonymous data with Pain Coach to improve our services?"
                                         :modelValue="getFieldValue('data_sharing_enabled') as boolean"
-                                        :required="true"
+                                        :required="false"
                                         @input="setFieldValue('data_sharing_enabled', $event.target.checked)" />
                                     
 
@@ -103,7 +103,7 @@
                                             type="checkbox"
                                             label="Would you like access to the Pain Coach app for personal use?"
                                             :modelValue="state.user.will_use_app"
-                                            :required="true"
+                                            :required="false"
                                             @input="state.user.will_use_app = $event.target.checked" />
 
                                         <EInput v-if="desiredUserRole !== 'clinician'" class="takes-medication-input" :class="{ 'active': willUseApplication }"
@@ -111,7 +111,7 @@
                                             type="checkbox"
                                             label="Have you used any medications for pain recently?"
                                             :modelValue="takesMedication"
-                                            :required="true"
+                                            :required="false"
                                             @input="takesMedication = $event.target.checked" />
 
                                         <div class="medication-fields flex-col" :class="{ 'active': willUseApplication && takesMedication }">
@@ -137,8 +137,8 @@
                                                         :label="field.label"
                                                         :type="field.inputType"
                                                         :readonly="field.readonly"
-                                                        :required="field.required"
-                                                        :tabindex="field.tabindex"
+                                                        :required="(takesMedication) ? field.required : false"
+                                                        :tabindex="(takesMedication) ? field.tabindex : -1"
                                                         :default="field.default"
                                                         :placeholder="field.placeholder"
                                                         :modelValue="getMedicationFieldValues(field.identifier, index)"
@@ -164,7 +164,7 @@
                                         
                                     <EButton 
                                         class="submit-button primary"
-                                        :disabled="!wantsAdditionalClinicianProfile"
+                                        :disabled="wantsAdditionalClinicianProfile || !canSubmit"
                                         :class="{ active: !wantsAdditionalClinicianProfile }"
                                         type="submit"
                                     >
@@ -191,11 +191,11 @@
                                                 :required="field.required"
                                                 :tabindex="field.tabindex"
                                                 :default="field.default"
-                                                :modelValue="getFieldValue(field.identifier)"
-                                                @input="setFieldValue(field.identifier, $event.target.value)"
+                                                :modelValue="getAdditionalClinicianProfileFieldValue(field.identifier as any)"
+                                                @input="setAdditionalClinicianProfileFieldValue(field.identifier as any, $event.target.value)"
                                             />
 
-                                            <EButton class="submit-button secondary" :class="{ active: state.wants_additional_profiles }" :disabled="wantsAdditionalClinicianProfile" type="submit">Submit</EButton>
+                                            <EButton class="submit-button secondary" :class="{ active: state.wants_additional_profiles }" :disabled="!wantsAdditionalClinicianProfile || !canSubmit" type="submit">Submit</EButton>
                                         </div>
                                     </div>
                                 </Transition>
@@ -247,18 +247,21 @@ const {
     registrationState,
     medicationState,
 
-    wantsAdditionalClinicianProfile,
-
-    BASE_USER_INVITE_REGISTER_FIELDS,
-    CLINICIAN_USER_INVITE_REGISTER_FIELDS,
-
-
-    canRegisterAdditionalProfiles,
     willUseApplication,
-
     desiredUserRole,
-    setInviteData,
+    canRegisterAdditionalProfiles,
 
+    canSubmit,
+    submitRegistration,
+    
+    CLINICIAN_USER_INVITE_REGISTER_FIELDS,
+    wantsAdditionalClinicianProfile,
+    getAdditionalClinicianProfileFieldValue,
+    setAdditionalClinicianProfileFieldValue,
+    
+    setInviteData,
+    
+    BASE_USER_INVITE_REGISTER_FIELDS,
     getFieldValue,
     setFieldValue,
 
@@ -556,6 +559,7 @@ definePageMeta({
                 height: 32px;
                 opacity: 1;
                 margin-top: 1.25rem;
+                pointer-events: all;
             }
 
             &:hover {
@@ -564,6 +568,11 @@ definePageMeta({
 
             &:active {
                 background-color: var(--text-2-color);
+            }
+
+            &:disabled {
+                background-color: var(--text-7-color);
+                cursor: not-allowed;
             }
         }
 

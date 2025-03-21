@@ -73,7 +73,20 @@ export const UserRegisterSchema = z.discriminatedUnion('role', [
     AdminRegisterSchema,
     ClinicianRegisterSchema,
     PatientRegisterSchema,
-]);
+]).refine((data) => {
+    if (data.password !== data.confirm_password) {
+        console.log('passwords do not match');
+
+        return false;
+    }
+    
+    if (data.email !== data.confirm_email) {
+        console.log('emails do not match');
+        return false;
+    }
+
+    return true;
+});
 
 export function validateUserRegister(data: unknown) {
     const parsedData = UserRegisterSchema.safeParse(data);
@@ -90,7 +103,20 @@ export const UserRegisterPartialSchema = z.discriminatedUnion('role', [
     ClinicianRegisterPartialSchema,
     PatientRegisterPartialSchema,
     UndefinedRegisterPartialSchema
-]);
+]).refine((data) => {
+    if (data.password !== data.confirm_password) {
+        console.log('passwords do not match');
+
+        return false;
+    }
+    
+    if (data.email !== data.confirm_email) {
+        console.log('emails do not match');
+        return false;
+    }
+
+    return true;
+});
 
 export function validateUserRegisterPartial(data: unknown) {
     const parsedData = UserRegisterPartialSchema.safeParse(data);
