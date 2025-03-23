@@ -48,11 +48,11 @@
 </template>
 
 <script setup lang="ts">
-import type { UserRole } from '@@/shared/types/users';
+import type { Role } from '@@/shared/types/users';
 import { useSlots, computed } from 'vue';
 
 interface ChipProps {
-    userRole: UserRole | undefined;
+    userRole: Role | undefined;
     owner?: boolean;
     paneled?: boolean;
 }

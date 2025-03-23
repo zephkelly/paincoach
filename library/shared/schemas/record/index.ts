@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UUIDSchema, BigIntIDSchema } from '../primitives';
+import { UUIDSchema, BigIntSchema } from '../primitives';
 
 import { PhysiotherapyAppRecordV1Schema } from './physiotherapy/app_record/v1';
 
@@ -16,7 +16,7 @@ export const RecordTypeSchema = z.enum([
 ]);
   
 export const BaseMedicalRecordSchema = z.object({
-    id: BigIntIDSchema,
+    id: BigIntSchema,
     patient_id: UUIDSchema,
     clinician_id: UUIDSchema,
     created_at: z.date(),

@@ -1,7 +1,7 @@
 import { H3Event } from 'h3'
 import { DatabaseService } from '~~/server/services/databaseService'
 import { RegistrationTypeSchema, InvitationStatusSchema } from '@@/shared/schemas/user/invitation'
-import type { UserRole } from '@@/shared/types/users'
+import type { Role } from '@@/shared/types/users'
 import { handlePartialRegistration } from './partial'
 import { handleFullRegistration } from './full'
 
@@ -13,7 +13,7 @@ import { handleFullRegistration } from './full'
  */
 export async function handleRegisterCredentials(
     event: H3Event,
-    desired_role: UserRole,
+    desired_role: Role,
     body: {
         invitation_token: string,
         password?: string,

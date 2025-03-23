@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { DBEncryptedPatientMedicationDataSchema, DBEncryptedPatientMedicationDataPartialSchema } from '@@/shared/schemas/medication/index';
+import { DBEncryptedPatientMedicationDataSchema, DBEncryptedPatientMedicationDataPartialSchema } from '@@/shared/schemas/v1/medication/index';
 
 
 

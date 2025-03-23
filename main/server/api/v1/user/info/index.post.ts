@@ -5,7 +5,7 @@ import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
 import type { User, PatientUser, ClinicianUser, AdminUser } from '~~lib/shared/types/users';
-import { type UserRole } from '~~lib/shared/types/users';
+import { type Role } from '~~lib/shared/types/users';
 import { validateUsers } from '@@/shared/schemas/user';
 
 import { getAllUsers } from '~~/server/utils/user/database/get/all';
@@ -57,7 +57,7 @@ export default defineEventHandler({
         const { mock: mockUser } = await readBody<{
             mock?: {
                 id?: string,
-                role?: UserRole
+                role?: Role
             }
         }>(event);
 
@@ -72,7 +72,7 @@ export default defineEventHandler({
                 const allfetchedUsers = await getAllUsers(db, paginationParams);
                 const validatedUsers = validateUsers(allfetchedUsers);
 
-                const userMap = new Map<UserRole, User[]>()
+                const userMap = new Map<Role, User[]>()
 
                 // Initialize empty arrays for each role type
                 userMap.set('admin', [])
@@ -81,7 +81,7 @@ export default defineEventHandler({
 
                 // Sort users into the appropriate role category with type casting
                 validatedUsers.forEach(user => {
-                    const role = user.role as UserRole
+                    const role = user.role as Role
 
                     if (role === 'admin' || role === 'clinician' || role === 'patient') {
                         // Type assertion based on role

@@ -54,7 +54,7 @@
 <script setup lang="ts">
 //@ts-expect-error
 import { type User, type UserSession } from '#auth-utils';
-import type { UserRole } from '@@/shared/types/users';
+import type { Role } from '@@/shared/types/users';
 import { computed } from 'vue';
 
 type AuthenticatorProps = {
@@ -74,9 +74,9 @@ interface AuthState {
     error: ComputedRef<boolean>
     clearSession: () => void
     user: Ref<User | null>
-    userRole: ComputedRef<UserRole | undefined>
+    userRole: ComputedRef<Role | undefined>
     isMockingRole: ComputedRef<boolean>
-    actualUserRole: ComputedRef<UserRole | undefined>
+    actualUserRole: ComputedRef<Role | undefined>
 }
 
 import { useAuth } from '@/composables/useAuth';

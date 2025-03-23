@@ -1,7 +1,16 @@
 import { z } from "zod";
-import { DBPatientUserSchema, PatientUserSchema } from "@@/shared/schemas/user/patient/index";
+import {
+    DBPatientUserFieldsSchema,
+    DBPatientUserFieldsPartialSchema,
+
+    DBPatientUserSchema,
+    PatientUserSchema
+} from "@@/shared/schemas/user/patient/index";
 
 
+
+export type DBPatientUserFields = z.infer<typeof DBPatientUserFieldsSchema>;
+export type DBPatientUserFieldsPartial = z.infer<typeof DBPatientUserFieldsPartialSchema>;
 
 export type DBPatientUser = z.infer<typeof DBPatientUserSchema>;
 export type PatientUser = z.infer<typeof PatientUserSchema>;

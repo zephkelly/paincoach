@@ -5,7 +5,7 @@ import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
 import type { User, PatientUser, ClinicianUser, AdminUser } from '~~lib/shared/types/users';
-import { type UserRole } from '~~lib/shared/types/users';
+import { type Role } from '~~lib/shared/types/users';
 import { validateUsers } from '@@/shared/schemas/user';
 import { validatePatientUsers } from '@@/shared/schemas/user/patient/index';
 
@@ -48,7 +48,7 @@ export default defineEventHandler({
                 const allfetchedUsers = await getAllUsers(db, paginationParams);
                 const validatedUsers = validateUsers(allfetchedUsers);
 
-                const userMap = new Map<Exclude<UserRole, 'incomplete_user'>, User[]>()
+                const userMap = new Map<Exclude<Role, 'incomplete_user'>, User[]>()
 
                 // Initialize empty arrays for each role type
                 userMap.set('admin', [])
@@ -57,7 +57,7 @@ export default defineEventHandler({
 
                 // Sort users into the appropriate role category with type casting
                 validatedUsers.forEach(user => {
-                    const role = user.role as UserRole
+                    const role = user.role as Role
 
                     if (role === 'owner' || role === 'admin' || role === 'clinician' || role === 'patient') {
     

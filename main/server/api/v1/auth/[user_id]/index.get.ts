@@ -8,10 +8,10 @@ import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 import { DatabaseService } from '~~/server/services/databaseService';
 
 import { validateUUID } from '@@/shared/schemas/primitives';
-import { validateUserStatus } from '@@/shared/schemas/user/base';
-import { validateBaseDBMinimalUser } from '@@/shared/schemas/user/minimal';
+import { validateUserStatus } from '@@/shared/schemas/v1/user/base';
+import { validateMinimalUser } from '@@/shared/schemas/v1/user/minimal';
 
-import { type BaseDBMininmalUser } from '~~lib/shared/types/users/minimal'
+import { type MinimalUser } from '~~lib/shared/types/v1/user/minimal'
 
 
 
@@ -61,9 +61,9 @@ export default defineEventHandler({
                     });
                 }
                 
-                const userSecureSessionInformation: BaseDBMininmalUser = {
-                    id: secureSession.user_id,
-                    role: secureSession.user_role,
+                const userSecureSessionInformation: MinimalUser = {
+                    uuid: secureSession.user_id,
+                    primary_role: secureSession.primary_role,
                     email: secureSession.email,
                     first_name: userSession.first_name,
                     profile_url: userSession.profile_url,
@@ -75,7 +75,7 @@ export default defineEventHandler({
                 return userSecureSessionInformation;
             }
 
-            const userResult = await transaction.query<BaseDBMininmalUser>(`
+            const userResult = await transaction.query<MinimalUser>(`
                 SELECT 
                     u.id,
                     u.email,
@@ -97,12 +97,12 @@ export default defineEventHandler({
                 });
             }
 
-            const user = validateBaseDBMinimalUser(userResult[0])
+            const user = validateMinimalUser(userResult[0])
 
             setResponseStatus(event, 200);
-            const fetchedUserInformation: BaseDBMininmalUser = {
-                id: user.id,
-                role: user.role,
+            const fetchedUserInformation: MinimalUser = {
+                uuid: user.uuid,
+                primary_role: user.primary_role,
                 email: user.email,
                 first_name: user.first_name,
                 last_name: user.last_name,

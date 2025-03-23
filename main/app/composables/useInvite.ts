@@ -1,6 +1,6 @@
-import type { UserRole } from "@@/shared/types/users";
+import type { Role } from "@@/shared/types/v1/role";
 import { type MinimalUserInvitation } from "@@/shared/types/users/invitation/index";
-import { validateMinimalUserInvitation } from "@@/shared/schemas/user/invitation";
+import { validateMinimalUserInvitation } from "@@/shared/schemas/v1/user/invitation/minimal";
 
 
 

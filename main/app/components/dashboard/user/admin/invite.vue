@@ -53,6 +53,8 @@ import { H3Error } from 'h3'
 import { type InviteUserRequest } from '@@/shared/types/users/invitation/create';
 import { validateInviteUserRequest } from '@@/shared/schemas/user/invitation/create';
 
+import { type AdminInvite } from '@@/shared/types/users/invitation/create';
+
 const {
     mockUserAPIData
 } = useAuth();
@@ -82,24 +84,22 @@ async function submitInviteAdminForm() {
     }
     
     try {
-        // Create the invite request object
-        const inviteRequest: InviteUserRequest = {
-            //@ts-expect-error
-            user: {
-                email: email.value,
-                first_name: firstName.value,
-                last_name: lastName.value,
-                phone_number: phone.value,
-                data_sharing_enabled: dataSharing.value,
-                allowed_additional_profiles: (allowedClinicianProfile.value) ? ['clinician'] : undefined,
-                confirm_email: confirmEmail.value,
-                role: 'admin',
-            },
+        const user: AdminInvite = {
+            email: email.value,
+            first_name: firstName.value,
+            last_name: lastName.value,
+            phone_number: phone.value,
+            data_sharing_enabled: dataSharing.value,
+            allowed_additional_profiles: (allowedClinicianProfile.value) ? ['clinician'] : undefined,
+            confirm_email: confirmEmail.value,
+            primary_role: 'admin',
+        }
 
+        const inviteRequest: InviteUserRequest = {
+            user: user,  
             ...mockUserAPIData.value
         };
         
-        // Validate the request (but don't reassign it)
         validateInviteUserRequest(inviteRequest);
         
         // Send the validated request directly
@@ -123,6 +123,7 @@ async function submitInviteAdminForm() {
     } catch (error: unknown) {
         if (error instanceof Error) {
             formError.value = `Validation error: ${error.message}`;
+            
         } else {
             formError.value = 'An unexpected error occurred';
             console.error('Request error', error);

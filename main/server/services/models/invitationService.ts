@@ -1,7 +1,10 @@
-import type { MinimalUserInvitation, UserInvitation } from "@@/shared/types/users/invitation";
 import { DatabaseService } from "../databaseService";
-import { validateMinimalUserInvitation, validateUserInvitation } from "@@/shared/schemas/user/invitation";
 import type { DBTransaction } from "~~/server/types/db";
+
+import type { MinimalUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
+
+import { validateMinimalUserInvitation } from "@@/shared/schemas/v1/user/invitation/minimal";
+
 
 
 export class InvitationService {
@@ -67,29 +70,5 @@ export class InvitationService {
         }
 
         return validateMinimalUserInvitation(invitation[0]);
-    }
-
-    public static async getInvitationByTokenTransaction(token: string, transaction: DBTransaction): Promise<UserInvitation> {
-        const invitation = await transaction.query<UserInvitation>(`
-            SELECT 
-                ui.*,
-                r.name as role,
-                r2.name as inviter_role_name
-            FROM private.user_invitation ui
-            JOIN private.role r ON ui.role_id = r.id
-            JOIN private.user u ON ui.invited_by = u.id
-            JOIN private.role r2 ON u.role_id = r2.id
-            WHERE ui.invitation_token = $1
-            LIMIT 1
-        `, [token]);
-
-        if (invitation.length === 0 || !invitation[0]) {
-            throw createError({
-                statusCode: 404,
-                message: 'Invitation not found',
-            });
-        }
-
-        return validateUserInvitation(invitation[0]);
     }
 }

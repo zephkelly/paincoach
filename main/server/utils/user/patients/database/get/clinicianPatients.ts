@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 
 import { type DBTransaction } from "~~/server/types/db";
-import { type PatientUser, type UserRole } from "@@/shared/types/users";
+import { type PatientUser, type Role } from "@@/shared/types/users";
 import { type SecureSessionData } from '#auth-utils';
 
 type PatientInfoClinicianView = PatientUser & { relationship_start_date: Date, relationship_id: string }
@@ -61,7 +61,7 @@ export async function getAdminUsersClinicianPatients(
     db: DBTransaction,
     paginationParams: PaginationParams,
     currentId: string,
-    secureSession: { id: string, role: UserRole }
+    secureSession: { id: string, role: Role }
 ): Promise<AdminPatientInfoClinicianView[] | PatientInfoClinicianView[]> {
     const page = paginationParams.page;
     const limit = paginationParams.limit

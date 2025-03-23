@@ -1,4 +1,4 @@
-import { type UserRole } from "@@/shared/types/users"
+import { type Role } from "@@/shared/types/users"
 import { type DBMinimalUser } from "@@/shared/types/users/minimal"
 
 
@@ -37,7 +37,7 @@ export const useAuth = () => {
     )
 
 
-    const mockUserData = useState<{ id: string, role: UserRole } | undefined>('mock-user-id', () => undefined)
+    const mockUserData = useState<{ id: string, role: Role } | undefined>('mock-user-id', () => undefined)
 
     const actualUserId = computed<string | undefined>(() => {
         if (!user || !user.value) return undefined
@@ -91,14 +91,14 @@ export const useAuth = () => {
 
 
     // Keep the existing mockUserRole functionality
-    const mockUserRole = useState<UserRole | undefined>('mock-user-role', () => undefined)
+    const mockUserRole = useState<Role | undefined>('mock-user-role', () => undefined)
 
-    const actualUserRole = computed<UserRole | undefined>(() => {
+    const actualUserRole = computed<Role | undefined>(() => {
         if (!user || !user.value) return undefined
         return user.value.user_role
     })
 
-    const userRole = computed<UserRole | undefined>(() => {
+    const userRole = computed<Role | undefined>(() => {
         if (isMockingLoading.value) {
             return undefined
         }
@@ -120,7 +120,7 @@ export const useAuth = () => {
         mockUserRole.value !== actualUserRole.value
     )
 
-    const setMockRole = (role: UserRole | undefined) => {
+    const setMockRole = (role: Role | undefined) => {
         if (actualUserRole.value === 'admin') {
             clearMockUserData()
             mockUserRole.value = role

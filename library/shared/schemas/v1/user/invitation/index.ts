@@ -1,0 +1,60 @@
+import { z } from "zod";
+import { createZodValidationError } from "@@/shared/utils/zod/error";
+
+import { UUIDSchema, BigIntSchema } from "@@/shared/schemas/primitives";
+import { RoleSchema } from "@@/shared/schemas/v1/role";
+
+import { DBBaseUserWithRolesSchema } from "../base";
+import { DBUserInvitationDataSchema } from "./data/index";
+
+
+
+export const RegistrationTypeSchema = z.enum(['partial', 'full']);
+export const InvitationRoleSchema = z.enum(['owner', 'admin', 'clinician', 'patient']); // TODO: Remove 'owner' from the enum after inviting lachlan
+export const InvitationStatusSchema = z.enum(['pending', 'opened', 'completed', 'expired']);
+
+
+export const DBUserInvitationSchema = DBBaseUserWithRolesSchema.pick({
+    primary_role: true,
+    roles: true,
+
+    email: true,
+    phone_number: true,
+}).extend({
+    id: BigIntSchema,
+    user_uuid: UUIDSchema,
+
+    invitation_token: UUIDSchema,
+    linked_user_id: BigIntSchema.nullish(),
+
+    invited_by: BigIntSchema,
+    status: InvitationStatusSchema,
+
+    confirm_email: z.string().email(),
+
+    expires_at: z.date(),
+    created_at: z.date(),
+    updated_at: z.date(),
+
+    role_invite_data: z.array(DBUserInvitationDataSchema).min(1).optional()
+ });
+
+export const DBUserInvitationPartialSchema = DBUserInvitationSchema.partial();
+
+
+
+export function validateUserInvitation(data: unknown): z.infer<typeof DBUserInvitationSchema> {
+    const parsedResult = DBUserInvitationSchema.safeParse(data);
+    if (!parsedResult.success) {
+        throw createZodValidationError(parsedResult.error);
+    }
+    return parsedResult.data;
+}
+
+export function validateUserInvitationPartial(data: unknown): z.infer<typeof DBUserInvitationPartialSchema> {
+    const parsedResult = DBUserInvitationPartialSchema.safeParse(data);
+    if (!parsedResult.success) {
+        throw createZodValidationError(parsedResult.error);
+    }
+    return parsedResult.data;
+}

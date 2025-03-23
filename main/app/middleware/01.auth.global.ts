@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     if (publicRoutes.includes(to.path)) {
         if (to.path === '/') {
             if (session.value && session.value.user) {
-                if (session.value.secure?.user_role === 'incomplete_user') {
+                if (session.value.user?.primary_role === 'unregistered') {
                     return navigateTo('/dashboard/user/invite')
                 }
                 else {

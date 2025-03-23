@@ -5,7 +5,7 @@ import { createUser } from '~~/server/utils/user/database/create'
 import { getUserExists } from '~~/server/utils/user/database/get/exists'
 import { DatabaseService } from '~~/server/services/databaseService'
 import { InvitationStatusSchema } from '@@/shared/schemas/user/invitation'
-import type { UserRole } from '@@/shared/types/users'
+import type { Role } from '@@/shared/types/users'
 
 
 
@@ -16,7 +16,7 @@ import type { UserRole } from '@@/shared/types/users'
  */
 export async function handleFullRegistration(
     event: H3Event,
-    desired_role: UserRole,
+    desired_role: Role,
     body: {
         invitation_token: string,
         email: string,
@@ -166,7 +166,7 @@ export async function handleFullRegistration(
 /**
  * Helper function to get role name from user ID
  */
-async function getRoleNameFromUserId(transaction: any, userId: string): Promise<UserRole> {
+async function getRoleNameFromUserId(transaction: any, userId: string): Promise<Role> {
     const result = await transaction.one(`
     SELECT r.name 
     FROM private.user u
@@ -174,5 +174,5 @@ async function getRoleNameFromUserId(transaction: any, userId: string): Promise<
     WHERE u.id = $1
   `, [userId])
 
-    return result.name as UserRole
+    return result.name as Role
 }

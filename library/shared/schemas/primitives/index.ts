@@ -5,9 +5,9 @@ import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 export const UUIDSchema = z.string().uuid();
 
-export const BigIntIDSchema = z.union([
+export const BigIntSchema = z.union([
     z.string().regex(/^\d+$/, "ID must be a valid number string"),
-    z.number().int().positive()
+    z.bigint(),
 ]).transform((val) => {
     return typeof val === 'string' ? parseInt(val, 10) : val;
 });

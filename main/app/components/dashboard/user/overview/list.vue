@@ -22,14 +22,14 @@
 </template>
 
 <script lang="ts" setup>
-import { type User, type UserRole } from '@@/shared/types/users';
+import { type User, type Role } from '@@/shared/types/users';
 
 type UserListProps = {
     title?: string,
     loading: boolean;
     users?: User[];
     showRole?: boolean;
-    listRole?: UserRole;
+    listRole?: Role;
 }
 
 const props = defineProps<UserListProps>();

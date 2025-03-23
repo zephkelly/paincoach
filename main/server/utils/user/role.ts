@@ -1,15 +1,15 @@
 import { type SecureSessionData } from "#auth-utils";
-import { type UserRole } from "@@/shared/types/users";
+import { type Role } from "@@/shared/types/users";
 
 
 /**
  * Check if the user has the specified role, will always return true
  * for admin roles unless admin is set to false
- * @param {UserRole | UserRole[]} roles
+ * @param {Role | Role[]} roles
  * @param {SecureSessionData} secureSession
  * @returns {boolean}
  */
-export function isValidRole(roles: UserRole[] | UserRole, secureSession: SecureSessionData): boolean {
+export function isValidRole(roles: Role[] | Role, secureSession: SecureSessionData): boolean {
     if (!roles) {
         if (import.meta.server) {
             if (import.meta.dev) {

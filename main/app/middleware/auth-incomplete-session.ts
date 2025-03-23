@@ -7,12 +7,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }
 
     if (session.value.user) {
-        if (session.value.user.user_role) {
-            if (session.value.user.user_role === 'admin') {
+        if (session.value.user.primary_role) {
+            if (session.value.user.primary_role === 'admin') {
                 return;
             }
 
-            if (session.value.user.user_role === 'incomplete_user') {
+            if (session.value.user.primary_role === 'incomplete_user') {
                 return;
             }
 

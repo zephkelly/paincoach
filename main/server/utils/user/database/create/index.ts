@@ -1,6 +1,6 @@
 import { type DBTransaction } from "~~/server/types/db";
 
-import { type User, type UserRole } from "~~lib/shared/types/users";
+import { type User, type Role } from "~~lib/shared/types/users";
 import { getUserById } from "../get/byId";
 
 
@@ -18,7 +18,7 @@ import { getUserById } from "../get/byId";
  */
 export async function createUser(
     transaction: DBTransaction,
-    userRole: UserRole,
+    userRole: Role,
     userData: {
         email: string;
         password_hash: string;
@@ -27,7 +27,7 @@ export async function createUser(
         phone_number?: string;
         [key: string]: any; // For role-specific fields
     },
-    creatorRole?: UserRole
+    creatorRole?: Role
 ): Promise<User> {
     // Authorization checks
     if (userRole === 'admin' && creatorRole && creatorRole !== 'admin') {
@@ -212,7 +212,7 @@ export async function createUser(
 export async function hasPermission(
     transaction: DBTransaction,
     userId: string,
-    requiredRoles: UserRole[]
+    requiredRoles: Role[]
 ): Promise<boolean> {
     const result = await transaction.query<{ role: string }>(`
         SELECT r.name as role
@@ -225,6 +225,6 @@ export async function hasPermission(
         return false;
     }
 
-    const userRole = result[0]?.role as UserRole;
+    const userRole = result[0]?.role as Role;
     return requiredRoles.includes(userRole);
 }

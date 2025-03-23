@@ -1,6 +1,6 @@
 import { type DBTransaction } from "~~/server/types/db";
 
-import { type User, type UserRole } from "~~lib/shared/types/users";
+import { type User, type Role } from "~~lib/shared/types/users";
 import { type AdminUser } from "~~lib/shared/types/users/admin";
 import { type ClinicianUser } from "~~lib/shared/types/users/clinician";
 import { type PatientUser } from "~~lib/shared/types/users/patient";
@@ -37,7 +37,7 @@ export async function getUsersByIds(
     `, [userIds]);
 
     return userResult.map(userData => {
-        const userRole = userData?.role as UserRole;
+        const userRole = userData?.role as Role;
 
         let fullUser: User;
         

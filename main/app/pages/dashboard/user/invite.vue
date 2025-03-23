@@ -142,7 +142,7 @@
                                                         :default="field.default"
                                                         :placeholder="field.placeholder"
                                                         :modelValue="getMedicationFieldValues(field.identifier, index)"
-                                                        @input="setMedicationFieldValues(field.identifier, index, $event.target.value)"
+                                                        @input="setMedicationFieldValues(field.identifier, index, (field.inputType === 'checkbox') ? $event.target.checked : $event.target.value)"
                                                         />
                                                 </li>
                                             </ul>
@@ -182,6 +182,7 @@
                                             </div>
                                             <component
                                                 v-for="field in CLINICIAN_USER_INVITE_REGISTER_FIELDS"
+                                                :class="{ 'uppercase': field.identifier === 'specialisation'}"
                                                 :key="field.identifier"
                                                 :is="getComponent(field.inputType)"
                                                 :id="field.identifier"

@@ -13,7 +13,7 @@ export async function onRequestValidateSession(event: H3Event) {
         });
     }
 
-    if ((!session.secure.verified || !session.secure.user_id || !session.secure.user_role) && !session.secure.invitation_token) {
+    if (!session.secure.verified || !session.secure.user_id || (!session.secure.user_roles || session.secure.user_roles.length === 0) && !session.secure.invitation_token) {
         throw createError({
             statusCode: 403,
             statusMessage: 'Unauthorized'

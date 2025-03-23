@@ -1,6 +1,6 @@
 import { H3Event } from 'h3'
 import { type UserSession } from '#auth-utils'
-import type { DBUser, UserRole } from '~~lib/shared/types/users'
+import type { DBUser, Role } from '~~lib/shared/types/users'
 import { validateUUID } from '~lib/schemas/primitives'
 import { DatabaseService } from '~~/server/services/databaseService'
 import { InvitationStatusSchema } from '@@/shared/schemas/user/invitation'
@@ -107,7 +107,7 @@ export async function handlePartialRegistration(
             SELECT name FROM private.role WHERE id = $1
         `, [updatedUser.role_id])
 
-        const userRole = roleResult[0].name as UserRole
+        const userRole = roleResult[0].name as Role
 
         // Set up user session
         const validatedUserId = validateUUID(updatedUser.id)

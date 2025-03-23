@@ -5,8 +5,6 @@ import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/v
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
-import type { MinimalUserInvitation } from '@@/shared/types/users/invitation/index';
-import { validateMinimalUserInvitation } from '@@/shared/schemas/user/invitation';
 import { InvitationService } from '~~/server/services/models/invitationService';
 
 
@@ -22,7 +20,7 @@ export default defineEventHandler({
             user_id: requestingUserId,
 
             isAdmin,
-            isIncompleteUser,
+            isUnregistered,
             isClinician
         } = await getPainCoachSession(event);
 
@@ -32,7 +30,7 @@ export default defineEventHandler({
 
         let invitation_token: string | undefined = undefined;
 
-        if (isIncompleteUser) {
+        if (isUnregistered) {
             invitation_token = session.secure?.invitation_token;
         }
         else {

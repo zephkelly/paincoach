@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { UserRole } from '@@/shared/types/users';
+import type { Role } from '@@/shared/types/users';
 import DashboardUserOverview from '~/components/dashboard/user/overview/index.vue';
 
 const {
@@ -28,7 +28,7 @@ const {
 
 fetch();
 
-watch(() => userRole.value, (role: UserRole | undefined) => {
+watch(() => userRole.value, (role: Role | undefined) => {
     if (role === 'patient') {
         navigateTo('/dashboard');
     }
