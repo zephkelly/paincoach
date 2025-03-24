@@ -8,11 +8,11 @@ import { DBUserInvitationSchema } from './index';
 
 
 export const LimitedUserInvitationSchema = DBUserInvitationSchema.pick({
-    primary_role: true,
-    roles: true,
+    user_uuid: true,
     email: true,
     phone_number: true,
-    user_uuid: true,
+    primary_role: true,
+    roles: true,
     invitation_token: true,
     expires_at: true,
     invitation_data: true
