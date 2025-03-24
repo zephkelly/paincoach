@@ -5,9 +5,9 @@ import { DBOwnerUserDataSchema } from "./data";
 
 
 
-export const DBOwnerUserRegistrationDataSchema = DBBaseUserRegistrationDataSchema.merge(DBOwnerUserDataSchema).omit({
-    role: true,
-}).extend({
+export const DBOwnerUserRegistrationDataSchema = DBBaseUserRegistrationDataSchema.merge(DBOwnerUserDataSchema).extend({
     role: z.literal("owner"),
 });
-export const DBOwnerUserRegistrationDataPartialSchema = DBOwnerUserRegistrationDataSchema.partial();
+export const DBOwnerUserRegistrationDataPartialSchema = DBOwnerUserRegistrationDataSchema.partial().extend({
+    role: z.literal("owner"),
+});

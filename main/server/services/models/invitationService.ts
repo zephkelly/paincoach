@@ -11,21 +11,21 @@ export class InvitationService {
     public static async getMinimalInvitationByToken(token: string): Promise<MinimalUserInvitation> {
         const invitation = await DatabaseService.getInstance().query<MinimalUserInvitation>(`
             SELECT 
-                ui.user_id,
+                ui.user_uuid,
                 ui.email,
                 ui.phone_number,
-                r.name as role,
+                ui.primary_role,
+                ui.roles,
                 ui.invitation_token,
                 u.first_name as inviter_name,
-                r2.name as inviter_role_name,
+                r.name as inviter_role_name,
                 u.profile_url as inviter_profile_url,
                 ui.expires_at,
                 ui.registration_type,
                 ui.registration_data
             FROM private.user_invitation ui
-            JOIN private.role r ON ui.role_id = r.id
             JOIN private.user u ON ui.invited_by = u.id
-            JOIN private.role r2 ON u.role_id = r2.id
+            JOIN private.role r ON u.role_id = r.id
             WHERE ui.invitation_token = $1
             LIMIT 1
         `, [token]);
@@ -43,21 +43,21 @@ export class InvitationService {
     public static async getMinimalInvitationByTokenTransaction(token: string, transaction: DBTransaction): Promise<MinimalUserInvitation> {
         const invitation = await transaction.query<MinimalUserInvitation>(`
             SELECT 
-                ui.user_id,
+                ui.user_uuid,
                 ui.email,
                 ui.phone_number,
-                r.name as role,
+                ui.primary_role,
+                ui.roles,
                 ui.invitation_token,
                 u.first_name as inviter_name,
-                r2.name as inviter_role_name,
+                r.name as inviter_role_name,
                 u.profile_url as inviter_profile_url,
                 ui.expires_at,
                 ui.registration_type,
                 ui.registration_data
             FROM private.user_invitation ui
-            JOIN private.role r ON ui.role_id = r.id
             JOIN private.user u ON ui.invited_by = u.id
-            JOIN private.role r2 ON u.role_id = r2.id
+            JOIN private.role r ON u.role_id = r.id
             WHERE ui.invitation_token = $1
             LIMIT 1
         `, [token]);

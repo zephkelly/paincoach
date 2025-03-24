@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { InvitationRoleSchema } from "..";
+import { RoleSchema } from "../../../role";
 
 
 
 export const DBBaseUserInvitationDataSchema = z.object({
-    role: InvitationRoleSchema,
+    role: RoleSchema,
 });

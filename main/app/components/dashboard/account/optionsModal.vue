@@ -13,7 +13,7 @@
                     <p class="initial">{{ userInitial }}</p>
                 </div>
                 <div class="details">
-                    <p class="name">{{ user?.name }}</p>
+                    <p class="name">{{ user?.first_name }}</p>
                 </div>
             </div>
 
@@ -54,7 +54,7 @@ const emit = defineEmits<{
 const isMobileView = computed(() => window.innerWidth < 500);
 
 const userInitial = computed(() => {
-    return user.value?.name.charAt(0).toUpperCase() ?? '';
+    return user.value?.first_name.charAt(0).toUpperCase() ?? '';
 });
 
 const navigateToProfile = () => {

@@ -1,5 +1,5 @@
 import { Role } from "~~lib/shared/types/users";
-import { UserInvitePartial } from '@@/shared/schemas/user/invitation/create'
+import { DBUserInvitationPartial } from "@@/shared/types/v1/user/invitation";
 
 
 
@@ -8,7 +8,7 @@ declare module '#auth-utils' {
         user_uuid: string;
         first_name: string;
         // Change from single role to array
-        user_roles: Role[];
+        roles: Role[];
         // Add primary role concept
         primary_role: Role;
         verified: boolean;
@@ -17,10 +17,11 @@ declare module '#auth-utils' {
    
     interface SecureSessionData {
         user_id: string;
+        user_uuid: string;
         email: string;
         verified: boolean;
         // Change from single role to array
-        user_roles: Role[];
+        roles: Role[];
         // Add primary role
         primary_role: Role;
        
@@ -32,7 +33,7 @@ declare module '#auth-utils' {
        
         secure: SecureSessionData;
         registration_data?: UserInvitePartial;
-        additional_profiles?: Role[];
+        
         verified: boolean;
         logged_in_at: Date;
         version: number;

@@ -1,8 +1,8 @@
 <template>
     <li class="user-info-list-item" :class="{ role: showRole }">
-        <NuxtLink class="link-wrapper flex-row" :to="`/dashboard/user/id/${props.userInfo?.id}`">
+        <NuxtLink class="link-wrapper flex-row" :to="`/dashboard/user/id/${props.userInfo?.uuid}`">
             <div class="user-info-list-item-profile" :class="{ placeholder: props.userInfo && !props.userInfo.profile_url}">
-                <DashboardUserProfileImage :id="props.userInfo?.id" :firstName="props.userInfo?.first_name" :profileUrl="props.userInfo?.profile_url" :loading="loading" />
+                <DashboardUserProfileImage :id="props.userInfo?.uuid" :firstName="props.userInfo?.first_name" :profileUrl="props.userInfo?.profile_url" :loading="loading" />
             </div>
             <div class="user-info-list-item-details flex-row">
                 <div class="user-name-wrapper detail-wrapper name">
@@ -11,7 +11,7 @@
                 </div>
                 <div v-if="showRole" class="user-role-wrapper detail-wrapper role">
                     <div v-if="loading" class="skeleton-component skeleton-component-panel" />
-                    <DashboardAccountRoleChip :userRole="userInfo?.role" :owner="userInfo?.role === 'admin' && userInfo.owner" paneled />
+                    <DashboardAccountRoleChip :userRole="userInfo?.primary_role" paneled />
                 </div>
                 <div class="user-email-wrapper detail-wrapper email">
                     <p>{{ props.userInfo?.email }}</p>
@@ -22,12 +22,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { User } from '@@/shared/types/users';
-import { type DBMinimalUser } from '~~lib/shared/types/users/minimal';
+import type { User } from '~~lib/shared/types/v1/user';
+import { type MinimalUser } from '~~lib/shared/types/v1/user/minimal';
 
 type UserInfoListItemProps = {
     loading: boolean,
-    userInfo: DBMinimalUser | undefined
+    userInfo: MinimalUser | undefined
     hideLastName?: boolean
     showRole?: boolean
 }

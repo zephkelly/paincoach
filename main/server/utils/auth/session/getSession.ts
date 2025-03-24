@@ -1,7 +1,6 @@
 import { H3Event } from 'h3'
 import type { UserSession, SecureSessionData, User } from '#auth-utils';
 import { type AllRoles } from '@@/shared/types/v1/role';
-import { isValidRole } from '../../user/role';
 
 
 
@@ -13,7 +12,7 @@ export async function getPainCoachSession(event: H3Event) {
     const user_id: string = secureSession.user_id;
     
     // Get all user roles
-    const roles: AllRoles[] = secureSession.user_roles;
+    const roles: AllRoles[] = secureSession.roles;
     
     // Get primary role - prefer primary_role if available, fall back to user_role
     const primaryRole: AllRoles = secureSession.primary_role;
@@ -41,11 +40,6 @@ export async function getPainCoachSession(event: H3Event) {
     const hasClinicianRole = roles.includes('clinician');
     const hasPatientRole = roles.includes('patient');
     
-    // Legacy isRole function (for backward compatibility)
-    function isRole(roleToCheck: AllRoles | AllRoles[]) {
-        return isValidRole(roleToCheck, secureSession);
-    }
-    
     return {
         session,
         secureSession,
@@ -67,11 +61,6 @@ export async function getPainCoachSession(event: H3Event) {
          * @returns {boolean}
          */
         hasRole,
-        
-        /**
-         * Check if this role is valid for the user
-         */
-        isRole,
         
         /**
          * Check if the user's primary role is admin

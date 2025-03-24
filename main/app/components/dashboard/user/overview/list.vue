@@ -12,7 +12,7 @@
             <div class="list-header-item email">Email</div>
         </div>
         <ul class="flex-col">
-            <DashboardUserOverviewListItem v-for="user in users" :key="user.id" :userInfo="user" :loading="loading" :showRole="showRole"/>
+            <DashboardUserOverviewListItem v-for="user in users" :userInfo="user" :loading="loading" :showRole="showRole"/>
         </ul>
         <div class="empty-list" v-if="!users || users.length === 0">
             <p v-if="listRole === undefined">No users found</p>
@@ -22,7 +22,8 @@
 </template>
 
 <script lang="ts" setup>
-import { type User, type Role } from '@@/shared/types/users';
+import { type Role } from '~~lib/shared/types/v1/role';
+import { type User } from '~~lib/shared/types/v1/user';
 
 type UserListProps = {
     title?: string,

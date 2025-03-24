@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type AdminUser } from '~~lib/shared/types/users/admin'
+import { type AdminUser } from '~~lib/shared/types/v1/user/role/admin'
 
 type Props = {
     users: AdminUser[];

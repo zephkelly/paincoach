@@ -2,15 +2,14 @@ import { z } from "zod";
 import { createZodValidationError } from "@@/shared/utils/zod/error";
 
 import { UUIDSchema, BigIntSchema } from "@@/shared/schemas/primitives";
-import { RoleSchema } from "@@/shared/schemas/v1/role";
 
 import { DBBaseUserWithRolesSchema } from "../base";
-import { DBUserInvitationDataSchema } from "./data/index";
+import { DBUserInvitationDataSchema } from "./data";
 
 
 
-export const RegistrationTypeSchema = z.enum(['partial', 'full']);
 export const InvitationRoleSchema = z.enum(['owner', 'admin', 'clinician', 'patient']); // TODO: Remove 'owner' from the enum after inviting lachlan
+export const RegistrationTypeSchema = z.enum(['partial', 'full']);
 export const InvitationStatusSchema = z.enum(['pending', 'opened', 'completed', 'expired']);
 
 
@@ -36,14 +35,14 @@ export const DBUserInvitationSchema = DBBaseUserWithRolesSchema.pick({
     created_at: z.date(),
     updated_at: z.date(),
 
-    role_invite_data: z.array(DBUserInvitationDataSchema).min(1).optional()
- });
+    invitation_data: DBUserInvitationDataSchema
+});
 
 export const DBUserInvitationPartialSchema = DBUserInvitationSchema.partial();
 
 
 
-export function validateUserInvitation(data: unknown): z.infer<typeof DBUserInvitationSchema> {
+export function validateDBUserInvitation(data: unknown): z.infer<typeof DBUserInvitationSchema> {
     const parsedResult = DBUserInvitationSchema.safeParse(data);
     if (!parsedResult.success) {
         throw createZodValidationError(parsedResult.error);
@@ -51,7 +50,7 @@ export function validateUserInvitation(data: unknown): z.infer<typeof DBUserInvi
     return parsedResult.data;
 }
 
-export function validateUserInvitationPartial(data: unknown): z.infer<typeof DBUserInvitationPartialSchema> {
+export function validateDBUserInvitationPartial(data: unknown): z.infer<typeof DBUserInvitationPartialSchema> {
     const parsedResult = DBUserInvitationPartialSchema.safeParse(data);
     if (!parsedResult.success) {
         throw createZodValidationError(parsedResult.error);

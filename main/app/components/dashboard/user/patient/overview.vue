@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type PatientUser } from '~~lib/shared/types/users/patient'
+import { type PatientUser } from '@@/shared/types/v1/user/role/patient';
 
 const {
     ready,

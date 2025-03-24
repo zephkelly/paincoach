@@ -50,10 +50,9 @@
 
 <script lang="ts" setup>
 import { H3Error } from 'h3'
-import { type InviteUserRequest } from '@@/shared/types/users/invitation/create';
-import { validateInviteUserRequest } from '@@/shared/schemas/user/invitation/create';
+import { type CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
+import { validateCreateUserInvitationRequest } from '@@/shared/schemas/v1/user/invitation/create';
 
-import { type AdminInvite } from '@@/shared/types/users/invitation/create';
 
 const {
     mockUserAPIData
@@ -84,40 +83,40 @@ async function submitInviteAdminForm() {
     }
     
     try {
-        const user: AdminInvite = {
-            email: email.value,
-            first_name: firstName.value,
-            last_name: lastName.value,
-            phone_number: phone.value,
-            data_sharing_enabled: dataSharing.value,
-            allowed_additional_profiles: (allowedClinicianProfile.value) ? ['clinician'] : undefined,
-            confirm_email: confirmEmail.value,
-            primary_role: 'admin',
-        }
+        // const user: AdminInvite = {
+        //     email: email.value,
+        //     first_name: firstName.value,
+        //     last_name: lastName.value,
+        //     phone_number: phone.value,
+        //     data_sharing_enabled: dataSharing.value,
+        //     allowed_additional_profiles: (allowedClinicianProfile.value) ? ['clinician'] : undefined,
+        //     confirm_email: confirmEmail.value,
+        //     primary_role: 'admin',
+        // }
 
-        const inviteRequest: InviteUserRequest = {
-            user: user,  
-            ...mockUserAPIData.value
-        };
+        // const inviteRequest: CreateUserInvitationRequest = {
+        //     user: user,  
+        //     ...mockUserAPIData.value
+        // };
         
-        validateInviteUserRequest(inviteRequest);
+        // validateCreateUserInvitationRequest(inviteRequest);
         
-        // Send the validated request directly
-        const response = await $fetch('/api/v1/auth/invite', {
-            method: 'POST',
-            body: inviteRequest // Send the request object directly
-        });
+        // // Send the validated request directly
+        // const response = await $fetch('/api/v1/auth/invite', {
+        //     method: 'POST',
+        //     body: inviteRequest // Send the request object directly
+        // });
         
-        console.log('Admin added successfully');
+        // console.log('Admin added successfully');
         
-        // Reset form
-        firstName.value = '';
-        lastName.value = '';
-        phone.value = '';
-        email.value = '';
-        confirmEmail.value = '';
-        dataSharing.value = false;
-        allowedClinicianProfile.value = false;
+        // // Reset form
+        // firstName.value = '';
+        // lastName.value = '';
+        // phone.value = '';
+        // email.value = '';
+        // confirmEmail.value = '';
+        // dataSharing.value = false;
+        // allowedClinicianProfile.value = false;
         
         // You could add success message or redirect here
     } catch (error: unknown) {

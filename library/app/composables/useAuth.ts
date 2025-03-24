@@ -1,5 +1,5 @@
-import { type Role } from "@@/shared/types/users"
-import { type DBMinimalUser } from "@@/shared/types/users/minimal"
+import type { Role, AllRoles } from "@@/shared/types/v1/role"
+import { type MinimalUser } from "@@/shared/types/v1/user/minimal"
 
 
 
@@ -63,15 +63,15 @@ export const useAuth = () => {
         if (actualUserRole.value === 'admin' && userId) {
             console.log('Fetching mock user data for', userId)
             try {
-                const response = await $fetch<DBMinimalUser>(`/api/v1/auth/${userId}`, {
+                const response = await $fetch<MinimalUser>(`/api/v1/auth/${userId}`, {
                     method: 'GET',
                 })
 
                 if (response) {
                     console.log('Setting mock user data to', response)
                     mockUserData.value = {
-                        id: response.id,
-                        role: response.role,
+                        id: response.uuid,
+                        role: response.primary_role,
                     }
 
                     if (isMockingLoading.value) {
@@ -98,7 +98,7 @@ export const useAuth = () => {
         return user.value.user_role
     })
 
-    const userRole = computed<Role | undefined>(() => {
+    const userRole = computed<AllRoles | undefined>(() => {
         if (isMockingLoading.value) {
             return undefined
         }
@@ -144,7 +144,7 @@ export const useAuth = () => {
     const isAdminUser = computed(() => userRole.value === 'admin')
     const isClinicianUser = computed(() => userRole.value === 'clinician')
     const isPatientUser = computed(() => userRole.value === 'patient')
-    const isIncompleteUser = computed(() => userRole.value === 'incomplete_user')
+    const isIncompleteUser = computed(() => userRole.value === 'unregistered')
 
     const error = computed(() =>
         loggedIn.value && !user.value || loggedIn.value && !session.value

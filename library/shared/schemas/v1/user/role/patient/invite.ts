@@ -1,13 +1,11 @@
 import { z } from "zod";
-
-import { DBBaseUserInvitationDataSchema } from "@@/shared/schemas/v1/user/invitation/data/base";
-import { DBPatientUserDataSchema } from "./data";
-
+import { DBPatientUserDataSchema } from "@@/shared/schemas/v1/user/role/patient/data";
+import { DBBaseUserInvitationDataSchema } from "../../invitation/data/base";
 
 
-export const DBPatientUserInvitationDataSchema = DBBaseUserInvitationDataSchema.merge(DBPatientUserDataSchema).omit({
-    role: true,
-}).extend({
+export const DBPatientUserInvitationDataSchema = DBBaseUserInvitationDataSchema.merge(DBPatientUserDataSchema).extend({
     role: z.literal("patient"),
 });
-export const DBPatientUserInvitationDataPartialSchema = DBPatientUserInvitationDataSchema.partial();
+export const DBPatientUserInvitationDataPartialSchema = DBPatientUserInvitationDataSchema.partial().extend({
+    role: z.literal("patient"),
+}); 

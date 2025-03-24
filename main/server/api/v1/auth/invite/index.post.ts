@@ -5,8 +5,8 @@ import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/v
 
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
-import { type InviteUserRequest } from '@@/shared/types/users/invitation/create';
-import { validateInviteUserRequest } from '@@/shared/schemas/user/invitation/create';
+import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
+import { validateCreateUserInvitationRequest } from '@@/shared/schemas/v1/user/invitation/create';
 
 import { DatabaseService } from '~~/server/services/databaseService';
 import { createPatientInvitation } from '~~/server/utils/auth/handlers/invite/patient';
@@ -25,14 +25,14 @@ export default defineEventHandler({
             secureSession
         } = await getPainCoachSession(event);
 
-        const body = await readBody<InviteUserRequest>(event);
+        const body = await readBody<CreateUserInvitationRequest>(event);
 
         const transaction = await DatabaseService.getInstance().createTransaction();
 
         try {
-            const validatedData = validateInviteUserRequest(body);
+            const validatedData = validateCreateUserInvitationRequest(body);
 
-            const desiredRole = validatedData.user.role;
+            const desiredRole = validatedData.primary_role;
 
             if (desiredRole === 'patient') {
                 return createPatientInvitation(transaction, validatedData, secureSession);

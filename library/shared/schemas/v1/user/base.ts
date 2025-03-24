@@ -85,6 +85,21 @@ export const DBBaseUserWithRolesSchema = DBBaseUserSchema.extend({
 });
 
 
+export const BaseUserSchema = DBBaseUserSchema.omit({
+    verified: true,
+    password_hash: true,
+    registration_complete: true,
+    data_sharing_enabled: true,
+    last_data_sharing_consent_date: true,
+    last_data_sharing_revocation_date: true,
+    updated_at: true,
+    version: true
+});
+
+export const BaseUserWithRolesSchema = BaseUserSchema.extend({
+    roles: z.array(RoleSchema).min(1, 'User must have at least one role'),
+});
+
 
 export function validateUserStatus(data: unknown): z.infer<typeof DBUserStatusSchema> {
     const parsedResult = DBUserStatusSchema.safeParse(data);

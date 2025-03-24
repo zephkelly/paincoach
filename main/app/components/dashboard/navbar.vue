@@ -9,7 +9,7 @@
         <div class="content-main">
             <Authenticator>
                 <template #default="{ user, userRole }">
-                    <DashboardAccountRoleChip :userRole="userRole.value" :owner="user.value?.owner" />
+                    <DashboardAccountRoleChip :userRole="userRole.value" />
                 </template>
             </Authenticator>
         </div>

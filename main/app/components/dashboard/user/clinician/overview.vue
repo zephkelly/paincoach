@@ -9,8 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { MinimalUserInfo } from '@@/shared/types/users/minimal';
-import { type ClinicianUser } from '~~lib/shared/types/users/clinician'
+import { type ClinicianUser } from '@@/shared/types/v1/user/role/clinician';
 
 type Props = {
     users?: ClinicianUser[];

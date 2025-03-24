@@ -1,37 +1,62 @@
 import { z } from 'zod';
 
-import { 
+import { DBBaseUserSchema } from '../../base';
+
+import {
     DBOwnerUserInvitationDataSchema,
-    DBOwnerUserInvitationDataPartialSchema
-} from "../../role/owner/invite";
+    DBOwnerUserInvitationDataPartialSchema,
+} from '@@/shared/schemas/v1/user/role/owner/invite';
 
-import { 
+import {
     DBAdminUserInvitationDataSchema,
-    DBAdminUserInvitationDataPartialSchema
-} from "../../role/admin/invite";
+    DBAdminUserInvitationDataPartialSchema,
+} from '@@/shared/schemas/v1/user/role/admin/invite';
 
-import { 
+import {
     DBClinicianUserInvitationDataSchema,
-    DBClinicianUserInvitationDataPartialSchema
-} from "../../role/clinician/invite";
+    DBClinicianUserInvitationDataPartialSchema,
+} from '@@/shared/schemas/v1/user/role/clinician/invite';
 
-import { 
+import {
     DBPatientUserInvitationDataSchema,
-    DBPatientUserInvitationDataPartialSchema
-} from "../../role/patient/invite";
+    DBPatientUserInvitationDataPartialSchema,
+} from '@@/shared/schemas/v1/user/role/patient/invite';
 
 
 
-export const DBUserInvitationDataSchema = z.discriminatedUnion('role', [
+
+export const DBUserInvitationRoleDataSchema = z.discriminatedUnion('role', [
     DBOwnerUserInvitationDataSchema,
     DBAdminUserInvitationDataSchema,
     DBClinicianUserInvitationDataSchema,
     DBPatientUserInvitationDataSchema
 ]);
 
-export const DBUserInvitationDataPartialSchema = z.discriminatedUnion('role', [
+export const DBUserRoleInvitationRoleDataPartialSchema = z.discriminatedUnion('role', [
     DBOwnerUserInvitationDataPartialSchema,
     DBAdminUserInvitationDataPartialSchema,
     DBClinicianUserInvitationDataPartialSchema,
     DBPatientUserInvitationDataPartialSchema
 ]);
+
+export const DBUserInvitationDataSchema = z.object({
+    ...DBBaseUserSchema.pick({
+        first_name: true,
+        last_name: true,
+        title: true,
+        profile_url: true,
+        data_sharing_enabled: true
+    }).shape,
+    role_data: z.array(DBUserInvitationRoleDataSchema).min(1).optional()
+});
+
+export const DBUserInvitationDataPartialSchema = z.object({
+    ...DBBaseUserSchema.pick({
+        first_name: true,
+        last_name: true,
+        title: true,
+        profile_url: true,
+        data_sharing_enabled: true
+    }).partial().shape,
+    role_data: z.array(DBUserRoleInvitationRoleDataPartialSchema).min(1).optional()
+});

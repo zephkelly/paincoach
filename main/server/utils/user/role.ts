@@ -1,15 +1,16 @@
 import { type SecureSessionData } from "#auth-utils";
-import { type Role } from "@@/shared/types/users";
+import { type Role } from "@@/shared/types/v1/role";
+
 
 
 /**
- * Check if the user has the specified role, will always return true
- * for admin roles unless admin is set to false
- * @param {Role | Role[]} roles
- * @param {SecureSessionData} secureSession
- * @returns {boolean}
+ * Check if the user has the specified role(s)
+ * Will check primary_role first, then check the roles array if not found in primary
+ * @param {SecureSessionData} secureSession - User session data
+ * @param {Role | Role[]} roles - Role or array of roles to check against
+ * @returns {boolean} - True if user has the role, false otherwise
  */
-export function isValidRole(roles: Role[] | Role, secureSession: SecureSessionData): boolean {
+export function hasRole(secureSession: SecureSessionData, roles: Role[] | Role): boolean {
     if (!roles) {
         if (import.meta.server) {
             if (import.meta.dev) {
@@ -26,13 +27,25 @@ export function isValidRole(roles: Role[] | Role, secureSession: SecureSessionDa
             }
         }
         else if (import.meta.client || import.meta.browser) {
-            console.error('isRole: No roles provided')
+            console.error('isRole: No roles provided');
+            return false;
+        }
+        return false;
+    }
+    
+    const rolesToCheck = Array.isArray(roles) ? roles : [roles];
+    
+    if (rolesToCheck.includes(secureSession.primary_role)) {
+        return true;
+    }
+    
+    if (secureSession.roles && Array.isArray(secureSession.roles)) {
+        for (const role of rolesToCheck) {
+            if (secureSession.roles.includes(role)) {
+                return true;
+            }
         }
     }
-
-    if (Array.isArray(roles)) {
-        return roles.includes(secureSession.user_role);
-    }
-
-    return roles.includes(secureSession.user_role);
+    
+    return false;
 }

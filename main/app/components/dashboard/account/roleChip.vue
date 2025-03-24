@@ -1,20 +1,20 @@
 <template>
-    <div v-if="userRole !== 'incomplete_user'" class="chip" :class="{
+    <div v-if="userRole !== 'unregistered'" class="chip" :class="{
+        owner: userRole === 'owner',
         admin: userRole === 'admin',
         clinician: userRole === 'clinician',
         patient: userRole === 'patient',
         skeleton: userRole === undefined,
         'has-default-slot': hasDefaultSlot,
-        'owner': userRole === 'admin' && owner,
     }">
     
         <div class="chip-main" :class="{ 
             'loading-skeleton skeleton-component skeleton-component-panel skeleton-component-border': userRole === undefined,
-            'owner-shimmer': userRole === 'admin' && owner,
+            'owner-shimmer': userRole === 'owner',
             'paneled': paneled === true
         }">
             <TransitionGroup name="fade" tag="div" class="transition-wrapper">
-                <template v-if="userRole === 'admin' && owner">
+                <template v-if="userRole === 'owner'">
                     <div class="chip-content-wrapper owner" :class="{ 'has-slot': hasDefaultSlot }">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
                         <slot v-if="hasDefaultSlot" name="default"></slot>
@@ -48,12 +48,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Role } from '@@/shared/types/users';
+import type { AllRoles } from '@@/shared/types/v1/role';
 import { useSlots, computed } from 'vue';
 
 interface ChipProps {
-    userRole: Role | undefined;
-    owner?: boolean;
+    userRole: AllRoles | undefined;
     paneled?: boolean;
 }
 

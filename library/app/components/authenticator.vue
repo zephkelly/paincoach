@@ -54,8 +54,7 @@
 <script setup lang="ts">
 //@ts-expect-error
 import { type User, type UserSession } from '#auth-utils';
-import type { Role } from '@@/shared/types/users';
-import { computed } from 'vue';
+import type { Role } from '@@/shared/types/v1/role';
 
 type AuthenticatorProps = {
     flex?: 'vertical' | 'horizontal'

@@ -30,7 +30,7 @@
   onMounted(() => {
     observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0]?.isIntersecting) {
             isVisible.value = true
             emit('visible', true)
             observer?.disconnect() // Stop observing once visible

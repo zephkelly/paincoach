@@ -10,7 +10,7 @@ import { DatabaseService } from '~~/server/services/databaseService';
 import { InvitationService } from '~~/server/services/models/invitationService';
 
 import type { UserRegister } from '@@/shared/types/users/register/index';
-import { validateUserRegister } from '@@/shared/schemas/user/register';
+import { validateUserRegister } from '@@/shared/schemas/v1/user/registration';
 
 
 
@@ -43,55 +43,10 @@ export default defineEventHandler({
             }
             
 
-            const validatedInvitation = await InvitationService.getInvitationByTokenTransaction(invitation_token, transaction);
+            const validatedInvitation = await InvitationService.getMinimalInvitationByTokenTransaction(invitation_token, transaction);
             
-            const allowedPrimaryProfile = validatedInvitation.role;
-            const invitedEmail = validatedInvitation.email;
-            const invitedPhoneNumber = validatedInvitation.phone_number;
-            const allowedAdditionalProfiles = validatedInvitation.registration_data?.allowed_additional_profiles;
-
-            const isAdminAndInvitedAsOwner = 
-                validatedInvitation.inviter_role_name === 'admin' &&
-                validatedInvitation.role === 'admin' &&
-                //@ts-expect-error
-                validatedInvitation.registration_data?.owner;
-
-            // Ensure request is valid in the context of the invitation
-            if ((validatedInvitation.role === 'admin' || validatedInvitation.role === 'clinician') && validatedInvitation.inviter_role_name !== 'admin') {
-                throw createError({
-                    statusCode: 400,
-                    message: 'Invalid request',
-                });
-            }
-
-            if (validatedInvitation.role === 'patient') {
-
-                if (validatedInvitation.inviter_role_name === 'clinician') {
-
-                }
-
-                throw createError({
-                    statusCode: 400,
-                    message: 'Invalid request',
-                });
-            }
-
-            if (allowedPrimaryProfile !== validatedRegisterRequest.role) {
-                throw createError({
-                    statusCode: 400,
-                    message: 'Invalid request',
-                });
-            }
-
-            if (invitedEmail !== validatedRegisterRequest.email || invitedPhoneNumber !== validatedRegisterRequest.phone_number) {
-                throw createError({
-                    statusCode: 400,
-                    message: 'Invalid request',
-                });
-            }
-
-            transaction.commit();
-
+            // const allowedPrimaryProfile = validatedInvitation.primary_role;
+            
 
             console.log('Validated registration request:', validatedRegisterRequest);
             console.log('Validated invitation:', validatedInvitation);

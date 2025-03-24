@@ -5,9 +5,9 @@ import { DBClinicianUserDataSchema } from "./data";
 
 
 
-export const DBClinicianUserRegistrationDataSchema = DBBaseUserRegistrationDataSchema.merge(DBClinicianUserDataSchema).omit({
-    role: true,
-}).extend({
-    role: z.literal("owner"),
+export const DBClinicianUserRegistrationDataSchema = DBBaseUserRegistrationDataSchema.merge(DBClinicianUserDataSchema).extend({
+    role: z.literal("clinician"),
 });
-export const DBClinicianUserRegistrationDataPartialSchema = DBClinicianUserRegistrationDataSchema.partial();
+export const DBClinicianUserRegistrationDataPartialSchema = DBClinicianUserRegistrationDataSchema.partial().extend({
+    role: z.literal("clinician"),
+});

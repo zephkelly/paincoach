@@ -1,7 +1,7 @@
 import { H3Error } from "h3";
 import { DatabaseService } from "~~/server/services/databaseService";
 
-import { validateDBUserInvitation } from '@@/shared/schemas/user/invitation'
+import { validateDBUserInvitation } from '@@/shared/schemas/v1/user/invitation';
 
 
 
@@ -41,6 +41,8 @@ export default defineEventHandler(async (event) => {
 
         const invitation = invitationResult[0];
         
+        const validatedInvitation = validateDBUserInvitation(invitation);
+
         if (invitation.effective_status === 'expired' && invitation.status !== 'expired') {
             const transaction = await db.createTransaction();
             try {
@@ -69,8 +71,6 @@ export default defineEventHandler(async (event) => {
                 statusMessage: 'Invitation has already been used'
             });
         }
-
-        const validatedInvitation = validateDBUserInvitation(invitation);
 
         if (validatedInvitation.status === 'opened') {
             const incompleteSession = await getUserSession(event);
@@ -107,18 +107,21 @@ export default defineEventHandler(async (event) => {
 
             const temporarySession = await replaceUserSession(event, {
                 secure: {
-                    user_id: validatedInvitation.user_id,
-                    user_role: 'incomplete_user',
+                    user_id: null, // BigInt internal
+                    user_uuid: validatedInvitation.user_uuid, // UUID external
+                    primary_role: 'unregistered',
+                    roles: ['unregistered'],
                     email: validatedInvitation.email,
                     verified: false,
 
                     invitation_token: token,
                 },
                 user: {
-                    user_id: validatedInvitation.user_id,
-                    first_name: validatedInvitation.registration_data?.first_name || '',
+                    user_uuid: validatedInvitation.user_uuid,
+                    first_name: validatedInvitation.role_invite_data?.first_name || '',
                     verified: false,
-                    user_role: 'incomplete_user',
+                    primary_role: 'unregistered',
+                    roles: ['unregistered'],
 
                 },
                 registration_data: validatedInvitation.registration_data || {},
