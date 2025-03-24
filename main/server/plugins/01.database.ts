@@ -12,7 +12,7 @@ export default defineNitroPlugin(async (nitroApp: any) => {
 
         if (import.meta.dev) {
             await createTables(databaseServiceInstance)
-    
+
             await seedPermissions(databaseServiceInstance)
         }
     }
@@ -163,6 +163,14 @@ async function createTables(db: DatabaseService) {
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (role_id, permission_id)
         );
+
+        CREATE TABLE IF NOT EXISTS private.user_permission (
+            user_id BIGINT REFERENCES private.user(id) ON DELETE CASCADE,
+            permission_id BIGINT REFERENCES private.permission(id) ON DELETE CASCADE,
+            granted_by BIGINT REFERENCES private.user(id),
+            granted_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (user_id, permission_id)
+        );
     `);
 
     await db.query(`
@@ -225,10 +233,11 @@ async function seedPermissions(db: DatabaseService) {
         ('owner', 'System owner with full access'),
         ('admin', 'Administrator with management access'),
         ('clinician', 'Healthcare provider'),
-        ('patient', 'End user patient')
+        ('patient', 'End user patient'),
+        ('app', 'Ability to access the application')
         ON CONFLICT (name) DO NOTHING;
     `);
-   
+
     // Insert permissions with clinician-patient relationship
     await db.query(`
         INSERT INTO private.permission (name, description, resource_type, action)
@@ -268,11 +277,16 @@ async function seedPermissions(db: DatabaseService) {
         ('View Clinician Patient Full', 'View complete data for clinician''s own patients', 'user:clinician-patient', 'view:full'),
         ('View Clinician Patient Limited', 'View limited data for clinician''s own patients', 'user:clinician-patient', 'view:limited'),
         ('View Clinician Patient Basic', 'View basic data for clinician''s own patients', 'user:clinician-patient', 'view:basic'),
-        ('Manage Clinician Patient', 'Manage clinician''s own patients', 'user:clinician-patient', 'manage')
+        ('Manage Clinician Patient', 'Manage clinician''s own patients', 'user:clinician-patient', 'manage'),
         
+        -- App permissions
+        ('Use Pain App', 'Ability to use the pain management app', 'app', 'pain:use'),
+        ('Use Mood App', 'Ability to use the mood tracking app', 'app', 'mood:use'),
+        ('Use Marriage App', 'Ability to use the marriage counseling app', 'app', 'marriage:use')
+
         ON CONFLICT (name) DO NOTHING;
     `);
-   
+
     // Owner permissions (can do everything)
     await db.query(`
         INSERT INTO private.role_permission (role_id, permission_id)
@@ -295,7 +309,7 @@ async function seedPermissions(db: DatabaseService) {
         )
         ON CONFLICT DO NOTHING;
     `);
-   
+
     // Admin permissions
     await db.query(`
         INSERT INTO private.role_permission (role_id, permission_id)
@@ -317,7 +331,7 @@ async function seedPermissions(db: DatabaseService) {
         )
         ON CONFLICT DO NOTHING;
     `);
-   
+
     // Clinician permissions - UPDATED to only manage their own patients
     await db.query(`
         INSERT INTO private.role_permission (role_id, permission_id)
@@ -339,7 +353,7 @@ async function seedPermissions(db: DatabaseService) {
         )
         ON CONFLICT DO NOTHING;
     `);
-   
+
     // Patient permissions remain the same
     await db.query(`
         INSERT INTO private.role_permission (role_id, permission_id)
@@ -355,6 +369,6 @@ async function seedPermissions(db: DatabaseService) {
         )
         ON CONFLICT DO NOTHING;
     `);
-    
+
     console.log('DatabaseService: Permissions seeded');
 }

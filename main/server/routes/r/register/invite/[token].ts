@@ -125,7 +125,7 @@ export default defineEventHandler(async (event) => {
                     roles: ['unregistered'],
 
                 },
-                registration_data: validatedInvitation.invitation_data || {},
+                invitation_data: validatedInvitation.invitation_data || {},
                 logged_in_at: new Date(),
                 verified: false,
                 version: 1,

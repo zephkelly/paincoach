@@ -22,7 +22,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
             return navigateTo('/dashboard/login')
         }
 
-        if (session.value.registration_data && to.path !== '/dashboard/user/invite') {
+        if (session.value.invitation_data && to.path !== '/dashboard/user/invite') {
             return navigateTo('/dashboard/user/invite')
         }
     }

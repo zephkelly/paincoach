@@ -13,7 +13,7 @@ import { DBEncryptedMedicationDataV1Schema } from "@@/shared/schemas/v1/medicati
 
 export const UserRegisterSchema = DBBaseUserWithRolesSchema.pick({
     primary_role: true,
-    roles: true, // This will represent the roles that the user has opted into during registration (will always be registered as their primary role)
+    roles: true,
 
     email: true,
     phone_number: true,
@@ -23,14 +23,11 @@ export const UserRegisterSchema = DBBaseUserWithRolesSchema.pick({
     last_name: true,
     title: true,
 
-    data_sharing_enabled: true,    
+    data_sharing_enabled: true,
 }).extend({
-    id: BigIntSchema,
     user_uuid: UUIDSchema,
 
     invitation_token: UUIDSchema,
-
-    confirm_email: z.string().email(),
 
     password: z.string(),
     confirm_password: z.string(),
@@ -38,7 +35,6 @@ export const UserRegisterSchema = DBBaseUserWithRolesSchema.pick({
     medications: z.array(DBEncryptedMedicationDataV1Schema).min(1).nullable().optional(),
 
     role_data: z.array(DBUserRegistrationDataSchema).min(1),
-    will_use_app: z.boolean().default(true),
 });
 
 export const UserRegisterPartialSchema = UserRegisterSchema.partial()

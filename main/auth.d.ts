@@ -31,7 +31,7 @@ declare module '#auth-utils' {
         user: User;
        
         secure: SecureSessionData;
-        registration_data?: UserInvitePartial;
+        invitation_data?: UserInvitePartial;
         
         logged_in_at: Date;
         version: number;

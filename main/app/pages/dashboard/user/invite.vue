@@ -1,6 +1,6 @@
 <template>
     <Page padBody>
-        <Authenticator>
+        <!-- <Authenticatos
             <template #loading>
                 <div>
                     <h1>Loading</h1>
@@ -14,18 +14,7 @@
                 </div>
             </template>
             <template #incomplete>
-                <!-- <div class="incomplete-registration-container">
-                    <div class="incomplete-registration-wrapper">
-                        <PagedModal
-                            v-if="isModalOpen"
-                            :pages="pages"
-                            :component-props="componentProps"
-                            v-bind="modalProps"
-                            v-on="modalEvents"
-                            height="400"
-                        />
-                    </div>
-                </div> -->
+         
                <div class="incomplete-registration-container">
                     <div class="invitation-information flex-row">
                         <DashboardUserProfileImage
@@ -205,7 +194,9 @@
                     </div>
                 </div>
             </template>
-        </Authenticator>
+        </Authenticator> -->
+    
+        <DashboardUserInviteRegister />
     </Page>
 </template>
 

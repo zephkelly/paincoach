@@ -19,6 +19,8 @@ export const LimitedUserInvitationSchema = DBUserInvitationSchema.pick({
 }).extend({
     inviter_name: z.string(),
     inviter_profile_url: z.string().url().nullable(),
+
+    expires_at: z.coerce.date(),
 });
 
 
