@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 import {
-    MinimalUserInvitationSchema,
-} from '@@/shared/schemas/v1/user/invitation/minimal';
+    LimitedUserInvitationSchema,
+} from '@@/shared/schemas/v1/user/invitation/limited';
 
 
 
-export type MinimalUserInvitation = z.infer<typeof MinimalUserInvitationSchema>;
+export type MinimalUserInvitation = z.infer<typeof LimitedUserInvitationSchema>;

@@ -11,8 +11,8 @@ import { InvitationService } from '~~/server/services/models/invitationService';
 
 export default defineEventHandler({
     onRequest: [
-        (event) => onRequestValidateSession(event),
-        (event) => onRequestValidateRole(event, ['incomplete_user', 'clinician']),
+        (event) => onRequestValidateSession(event, true),
+        (event) => onRequestValidateRole(event, ['admin', 'unregistered', 'clinician']),
     ],
     handler: async (event) => {
         const {
@@ -71,7 +71,7 @@ export default defineEventHandler({
                 }
             }
 
-            const validatedInvitation = await InvitationService.getMinimalInvitationByTokenTransaction(invitation_token, transaction);
+            const validatedInvitation = await InvitationService.getLimitedInvitationByTokenTransaction(invitation_token, transaction);
 
             transaction.commit();
 

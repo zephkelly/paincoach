@@ -17,7 +17,7 @@ import { createAdminInvitation } from '~~/server/utils/auth/handlers/invite/admi
 export default defineEventHandler({
     onRequest: [
         (event) => onRequestValidateSession(event),
-        (event) => onRequestValidateRole(event, ['clinician', 'admin']),
+        (event) => onRequestValidateRole(event, ['admin', 'clinician']),
     ],
     handler: async (event) => {
         const {
@@ -32,6 +32,13 @@ export default defineEventHandler({
         try {
             const validatedData = validateCreateUserInvitationRequest(body);
 
+            if (validatedData.email !== validatedData.confirm_email) {
+                throw createError({
+                    statusCode: 400,
+                    message: 'Emails do not match',
+                });
+            }
+
             const desiredRole = validatedData.primary_role;
 
             if (desiredRole === 'patient') {
@@ -44,11 +51,12 @@ export default defineEventHandler({
                 }
             }
             else if (desiredRole === 'admin') {
-                return createAdminInvitation(transaction, validatedData, secureSession, userSession);
+                return createAdminInvitation(event, transaction, validatedData);
             }
         }
         catch (error: unknown) {
             await transaction.rollback();
+            console.log('Rolling back transaction due to error', error);
 
             if (error instanceof H3Error) {
                 throw error;

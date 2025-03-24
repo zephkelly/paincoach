@@ -1,6 +1,6 @@
 import type { Role } from "@@/shared/types/v1/role";
-import { type MinimalUserInvitation } from "@@/shared/types/users/invitation/index";
-import { validateMinimalUserInvitation } from "@@/shared/schemas/v1/user/invitation/minimal";
+import { type MinimalUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
+import { validateLimitedUserInvitation } from "@@/shared/schemas/v1/user/invitation/limited";
 
 
 
@@ -23,7 +23,7 @@ export const useInvite = () => {
         const query = token ? `?token=${token}` : '';
         try {
             const response = await $fetch<MinimalUserInvitation>('/api/v1/auth/invite' + query);
-            const validatedUserInvitation = validateMinimalUserInvitation(response);
+            const validatedUserInvitation = validateLimitedUserInvitation(response);
             
             state.value.invitation = validatedUserInvitation;
         }

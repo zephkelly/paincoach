@@ -1,10 +1,10 @@
-import { DatabaseService } from "./databaseService";
+import { DatabaseService } from "../databaseService";
 import type { DBTransaction } from "~~/server/types/db";
 
 import type { MinimalUserWithRoles } from "@@/shared/types/v1/user/minimal";
 import { validateMinimalUsersWithRoles } from "@@/shared/schemas/v1/user/minimal";
 
-import { getMinimalUserWithRoles } from "../utils/user/database/get/byEmail";
+import { getMinimalUserWithRoles } from "../../utils/user/database/get/byEmail";
 
 
 export class UserService {

@@ -1,104 +1,68 @@
-import { H3Error } from 'h3';
+import { H3Event, H3Error } from 'h3';
 
-import { type SecureSessionData, type User } from "#auth-utils";
+import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
+
 import { type DBTransaction } from "~~/server/types/db";
-import { type InviteUserRequest } from "@@/shared/types/users/invitation/create";
+import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
 
 import { EmailService } from '~~/server/services/emailService';
 
 
 
-export async function createAdminInvitation(transaction: DBTransaction, adminData: InviteUserRequest, secureSession: SecureSessionData, userData: User) {
-    let adminId: string | undefined = undefined;
+export async function createAdminInvitation(
+    event: H3Event,
+    transaction: DBTransaction,
+    adminData: CreateUserInvitationRequest,
+) {
+    const {
+        userSession,
+        secureSession,
+        hasRole
+    } = await getPainCoachSession(event);
 
-    if (adminData.mock) {
-        if (secureSession.user_role !== 'admin') {
-            throw createError({
-                statusCode: 403,
-                message: 'Only administrators can invite other administrators',
-            });
-        }
-
-        if (adminData.mock.role) {
-            if (adminData.mock.role !== 'admin') {
-                throw createError({
-                    statusCode: 403,
-                    message: 'Only administrators can invite other administrators',
-                });
-            }
-        }
-
-        if (adminData.mock.id) {
-            const adminResult = await transaction.query<{ exists: boolean }>(`
-                SELECT EXISTS (
-                    SELECT 1 FROM private.user WHERE id = $1 AND role_id = (SELECT id FROM private.role WHERE name = 'admin')
-                )
-            `, [adminData.mock.id]);
-
-            if (!adminResult[0] || !adminResult[0].exists) {
-                throw createError({
-                    statusCode: 400,
-                    message: 'Invalid admin ID, only admins can invite other admins',
-                });
-            }
-
-            adminId = adminData.mock.id;
-        }
-    }
-    else {
-        if (secureSession.user_role !== 'admin') {
-            throw createError({
-                statusCode: 403,
-                statusMessage: 'Only administrators can invite other administrators',
-            });
-        }
-
-        adminId = secureSession.user_id;
+    let invitingUserId: number | bigint | undefined = undefined;
+    
+    if (!hasRole('admin')) {
+        throw createError({
+            statusCode: 403,
+            statusMessage: 'Only administrators can invite other administrators',
+        });
     }
 
-    const registrationType = 'full';
+    invitingUserId = secureSession.user_id;
+
     const invitationToken = crypto.randomUUID();
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
     try {
-        const roleResult = await transaction.query(`
-            SELECT id FROM private.role WHERE name = 'admin' LIMIT 1
-        `);
-
-        if (!roleResult.length) {
-            throw new Error('Admin role not found');
-        }
-
-        const adminRoleId = roleResult[0].id;
-
         // Create invitation
         const invitationResult = await transaction.query(`
             INSERT INTO private.user_invitation (
                 email,
                 phone_number,
-                user_id,
+                user_uuid,
                 invitation_token, 
                 invited_by, 
-                role_id,
-                registration_type,
+                primary_role,
+                roles,
                 expires_at,
-                registration_data,
+                invitation_data,
                 status
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending'
             ) RETURNING id
         `, [
-            adminData.user.email,
-            adminData.user.phone_number || null,
+            adminData.email,
+            adminData.phone_number || null,
             crypto.randomUUID(),
             invitationToken,
-            adminId, // Current admin's ID as the inviter
-            adminRoleId,
-            registrationType,
+            invitingUserId,
+            adminData.primary_role,
+            adminData.roles,
             expiresAt,
-            adminData.user,
+            adminData.invitation_data,
         ]);
 
         const invitationId = invitationResult[0].id;
@@ -108,10 +72,10 @@ export async function createAdminInvitation(transaction: DBTransaction, adminDat
         try {
             // Send email
             await EmailService.getInstance().sendAdminInvitationEmail(
-                adminData.user.email,
+                adminData.email,
                 invitationToken,
-                userData.first_name,
-                userData.profile_url,
+                userSession.first_name,
+                userSession.profile_url,
             );
         }
         catch (error: unknown) {
@@ -122,7 +86,6 @@ export async function createAdminInvitation(transaction: DBTransaction, adminDat
         return {
             success: true,
             invitationId,
-            registrationType,
             invitationToken,
             expiresAt
         };

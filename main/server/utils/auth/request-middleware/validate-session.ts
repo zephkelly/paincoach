@@ -3,7 +3,7 @@ import { type H3Event } from 'h3';
 
 
 
-export async function onRequestValidateSession(event: H3Event) {
+export async function onRequestValidateSession(event: H3Event, allowUnregistered: boolean = false) {
     const session = await getUserSession(event) as UserSession;
 
     if (!session || !session.secure || !session.user) {
@@ -13,10 +13,20 @@ export async function onRequestValidateSession(event: H3Event) {
         });
     }
 
-    if (!session.secure.verified || !session.secure.user_id || (!session.secure.user_roles || session.secure.user_roles.length === 0) && !session.secure.invitation_token) {
-        throw createError({
-            statusCode: 403,
-            statusMessage: 'Unauthorized'
-        });
+    if (allowUnregistered) {
+        if (!session.secure.user_uuid || (!session.secure.roles || session.secure.roles.length === 0) && !session.secure.invitation_token) {
+            throw createError({
+                statusCode: 403,
+                statusMessage: 'Unauthorized'
+            });
+        }
+    }
+    else {
+        if (!session.secure.verified || !session.secure.user_id || (!session.secure.roles || session.secure.roles.length === 0)) {
+            throw createError({
+                statusCode: 403,
+                statusMessage: 'Unauthorized'
+            });
+        }
     }
 }

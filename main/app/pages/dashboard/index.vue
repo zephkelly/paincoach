@@ -13,7 +13,6 @@
 <script lang="ts" setup>
 const {
     ready,
-    userRole,
     clearSession,
     fetchNewSession
 } = useAuth();

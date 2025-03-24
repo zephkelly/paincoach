@@ -210,67 +210,40 @@
 </template>
 
 <script lang="ts" setup>
-import DashboardUserInviteIncompleteAStep from "~/components/dashboard/user/invite/incomplete/aStep.vue";
-import DashboardUserInviteIncompleteBStep from "~/components/dashboard/user/invite/incomplete/bStep.vue";
 import { getComponent } from "~~lib/layers/ember/utils/input";
-
-// Paged modal 
-const {
-  isModalOpen,
-  currentPage,
-  openModal,
-  modalProps,
-  modalEvents
-} = usePagedModal();
-
-isModalOpen.value = true;
-
-
-const pages: Component[] = [
-    DashboardUserInviteIncompleteAStep,
-    DashboardUserInviteIncompleteBStep
-];
-
-// Optional props to pass to each component
-const componentProps: Record<number, Record<string, any>>[] = [
-  { /* props for first page */ },
-  { /* props for second page */ },
-];
-// ----------------------------
-
 
 const {
     fetchNewSession,
 } = useAuth();
 
 const {
-    state,
-    registrationState,
-    medicationState,
+//     state,
+//     registrationState,
+//     medicationState,
 
-    willUseApplication,
-    desiredUserRole,
-    canRegisterAdditionalProfiles,
+//     willUseApplication,
+//     desiredUserRole,
+//     canRegisterAdditionalProfiles,
 
-    canSubmit,
-    submitRegistration,
+//     canSubmit,
+//     submitRegistration,
     
     CLINICIAN_USER_INVITE_REGISTER_FIELDS,
-    wantsAdditionalClinicianProfile,
-    getAdditionalClinicianProfileFieldValue,
-    setAdditionalClinicianProfileFieldValue,
+//     wantsAdditionalClinicianProfile,
+//     getAdditionalClinicianProfileFieldValue,
+//     setAdditionalClinicianProfileFieldValue,
     
     setInviteData,
     
     BASE_USER_INVITE_REGISTER_FIELDS,
-    getFieldValue,
-    setFieldValue,
+//     getFieldValue,
+//     setFieldValue,
 
     MEDICATION_FIELDS,
-    takesMedication,
-    addMedication,
-    getMedicationFieldValues,
-    setMedicationFieldValues
+//     takesMedication,
+//     addMedication,
+//     getMedicationFieldValues,
+//     setMedicationFieldValues
 } = useRegister();
 
 const {
@@ -281,31 +254,31 @@ const {
 } = useInvite();
 
 
-function setWantsAdditionalClinicianProfile(value: boolean) {
-    if (value) {
-        state.value.wants_additional_profiles = ['clinician'];
-    }
-    else {
-        state.value.wants_additional_profiles = [];
-    }
-}
+// function setWantsAdditionalClinicianProfile(value: boolean) {
+//     if (value) {
+//         state.value.wants_additional_profiles = ['clinician'];
+//     }
+//     else {
+//         state.value.wants_additional_profiles = [];
+//     }
+// }
 
-// Add a ref for the profile image
-const profileImageUrl = ref<string | null>(null);
-const profileImageFile = ref<File | null>(null);
+// // Add a ref for the profile image
+// const profileImageUrl = ref<string | null>(null);
+// const profileImageFile = ref<File | null>(null);
 
-// Handle profile image change
-const handleProfileImageChange = (file: File) => {
-    profileImageFile.value = file;
+// // Handle profile image change
+// const handleProfileImageChange = (file: File) => {
+//     profileImageFile.value = file;
     
-    // You can also add the file to your form data here
-    // For example, if you have a formData ref:
-    // formData.value.profileImage = file;
+//     // You can also add the file to your form data here
+//     // For example, if you have a formData ref:
+//     // formData.value.profileImage = file;
     
-    // Or you could store it in some other way to be submitted with the form
-    // For example, you might want to add it to your register data
-    // setFieldValue('profileImage', file);
-};
+//     // Or you could store it in some other way to be submitted with the form
+//     // For example, you might want to add it to your register data
+//     // setFieldValue('profileImage', file);
+// };
 
 
 
@@ -318,69 +291,69 @@ onMounted(async () => {
 })
 
 const usersFirstName = computed(() => {
-    if (invitationData.value?.registration_data?.first_name) {
-        return invitationData.value?.registration_data?.first_name;
+    if (invitationData.value?.invitation_data?.first_name) {
+        return invitationData.value?.invitation_data?.first_name;
     }
     else {
         return undefined;
     }
 })
 
-const isPartiallyCompleted = computed(() => {
-    if (invitationData.value?.registration_type) {
-        return true;
-    }
-    else {
-        return false;
-    }
-});
+// const isPartiallyCompleted = computed(() => {
+//     if (invitationData.value?.registration_type) {
+//         return true;
+//     }
+//     else {
+//         return false;
+//     }
+// });
 
-const isFullyCompleted = computed(() => {
-    if (invitationData.value?.registration_data) {
-        return true;
-    }
-    else {
-        return false;
-    }
-});
+// const isFullyCompleted = computed(() => {
+//     if (invitationData.value?.registration_data) {
+//         return true;
+//     }
+//     else {
+//         return false;
+//     }
+// });
 
-const isNotCompleted = computed(() => {
-    if (!isPartiallyCompleted.value && !isFullyCompleted.value) {
-        return true;
-    }
-    else {
-        return false;
-    }
-});
+// const isNotCompleted = computed(() => {
+//     if (!isPartiallyCompleted.value && !isFullyCompleted.value) {
+//         return true;
+//     }
+//     else {
+//         return false;
+//     }
+// });
 
-const medicationsMaxHeightStyle = computed(() => {
-    if (state.value.user.medications && state.value.user.medications.length > 0) {
-        return {
-            maxHeight: `${state.value.user.medications.length * 400}px`
-        }
-    }
-    else {
-        return {
-            maxHeight: '0px'
-        }
-    }
-}); 
+// const medicationsMaxHeightStyle = computed(() => {
+//     if (state.value.user.medications && state.value.user.medications.length > 0) {
+//         return {
+//             maxHeight: `${state.value.user.medications.length * 400}px`
+//         }
+//     }
+//     else {
+//         return {
+//             maxHeight: '0px'
+//         }
+//     }
+// }); 
 
-const userProfileImageInput = ref<HTMLInputElement | null>(null);
-function triggerOpenImageInput() {
-    alert('Uploading profile images is currently not supported');
-    // userProfileImageInput.value?.click();
-}
+// const userProfileImageInput = ref<HTMLInputElement | null>(null);
+// function triggerOpenImageInput() {
+//     alert('Uploading profile images is currently not supported');
+//     // userProfileImageInput.value?.click();
+// }
 
-onMounted(async () => {
-    if (import.meta.server) return;
-    await fetchNewSession();
-});
+// onMounted(async () => {
+//     if (import.meta.server) return;
+//     await fetchNewSession();
+// });
 
-definePageMeta({
-    layout: 'app',
-    middleware: ['auth-incomplete-session']
-});
+// definePageMeta({
+//     layout: 'app',
+//     middleware: ['auth-incomplete-session']
+// });
 </script>
 
 <style lang="scss" scoped>
@@ -649,7 +622,7 @@ definePageMeta({
                 opacity: 0;
     
                 &.active {
-                    max-height: v-bind(medicationsMaxHeightStyle);
+                    // max-height: v-bind(medicationsMaxHeightStyle);
                     opacity: 1;
                 }
 

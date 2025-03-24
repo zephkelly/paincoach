@@ -4,7 +4,7 @@ import { onRequestValidateSession } from "~~/server/utils/auth/request-middlewar
 
 export default defineEventHandler({
     onRequest: [
-        (event) => onRequestValidateSession(event),
+        async (event) => await onRequestValidateSession(event),
     ],
     handler: async (event) => {
         const clearedSession = await clearUserSession(event);

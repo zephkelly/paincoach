@@ -9,7 +9,7 @@ export async function getPainCoachSession(event: H3Event) {
     const secureSession = session.secure as SecureSessionData;
     const userSession = session.user as User;
     
-    const user_id: string = secureSession.user_id;
+    const user_id: number | bigint = secureSession.user_id;
     
     // Get all user roles
     const roles: AllRoles[] = secureSession.roles;

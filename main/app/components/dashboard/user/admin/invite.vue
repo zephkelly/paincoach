@@ -50,9 +50,8 @@
 
 <script lang="ts" setup>
 import { H3Error } from 'h3'
-import { type CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
 import { validateCreateUserInvitationRequest } from '@@/shared/schemas/v1/user/invitation/create';
-
+import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
 
 const {
     mockUserAPIData
@@ -83,16 +82,24 @@ async function submitInviteAdminForm() {
     }
     
     try {
-        // const user: AdminInvite = {
-        //     email: email.value,
-        //     first_name: firstName.value,
-        //     last_name: lastName.value,
-        //     phone_number: phone.value,
-        //     data_sharing_enabled: dataSharing.value,
-        //     allowed_additional_profiles: (allowedClinicianProfile.value) ? ['clinician'] : undefined,
-        //     confirm_email: confirmEmail.value,
-        //     primary_role: 'admin',
-        // }
+        const createUserInviteRequest: CreateUserInvitationRequest = {
+            roles: allowedClinicianProfile.value ? ['admin', 'clinician'] : ['admin'],
+            primary_role: 'admin',
+            email: email.value,
+            confirm_email: confirmEmail.value,
+            phone_number: phone.value,
+
+            invitation_data: {
+                first_name: firstName.value,
+                last_name: lastName.value,
+                data_sharing_enabled: dataSharing.value,
+
+                role_data: undefined
+            }
+        };
+
+        const validatedCreateUserInviteRequest = validateCreateUserInvitationRequest(createUserInviteRequest);
+
 
         // const inviteRequest: CreateUserInvitationRequest = {
         //     user: user,  
@@ -102,12 +109,12 @@ async function submitInviteAdminForm() {
         // validateCreateUserInvitationRequest(inviteRequest);
         
         // // Send the validated request directly
-        // const response = await $fetch('/api/v1/auth/invite', {
-        //     method: 'POST',
-        //     body: inviteRequest // Send the request object directly
-        // });
+        const response = await $fetch('/api/v1/auth/invite', {
+            method: 'POST',
+            body: validatedCreateUserInviteRequest
+        });
         
-        // console.log('Admin added successfully');
+        console.log('Admin added successfully');
         
         // // Reset form
         // firstName.value = '';

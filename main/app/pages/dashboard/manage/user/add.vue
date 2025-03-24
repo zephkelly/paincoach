@@ -13,15 +13,17 @@ import DashboardUserAdminInvite from '~/components/dashboard/user/admin/invite.v
 
 const {
     ready,
-    userRole
+    userRoles,
+    primaryRole,
+    hasRole
 } = useAuth();
 
-watch(() => userRole.value, (role) => {
-    if (role === 'patient') {
+watch(() => userRoles.value, (role) => {
+    if (primaryRole.value === 'patient') {
         navigateTo('/dashboard');
     }
 
-    if (role === 'clinician') {
+    if (primaryRole.value === 'clinician') {
         navigateTo('/dashboard/manage/user/patient');
     }
 }, { immediate: true });
@@ -42,16 +44,23 @@ const userTabs = [{
 ]
 
 const currentTabs = computed(() => {
-    const role = userRole.value;
+    const role = primaryRole.value;
 
-    switch(role) {
-        case 'admin':
-            return userTabs;
-        case 'clinician':
-            return []
-        default:
-            return []
+    if (hasRole('admin')) {
+        return userTabs;
     }
+    else {
+        return [];
+    }
+
+    // switch(role) {
+    //     case 'admin':
+    //         return userTabs;
+    //     case 'clinician':
+    //         return []
+    //     default:
+    //         return []
+    // }
 })
 
 definePageMeta({

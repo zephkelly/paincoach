@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    if (!session.secure.verified || !session.secure.user_id || !session.secure.user_role) {
+    if (!session.secure.verified || !session.secure.user_id || !session.secure.primary_role) {
         throw createError({
             statusCode: 403,
             statusMessage: 'Unauthorized'

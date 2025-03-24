@@ -29,8 +29,6 @@ export const DBUserInvitationSchema = DBBaseUserWithRolesSchema.pick({
     invited_by: BigIntSchema,
     status: InvitationStatusSchema,
 
-    confirm_email: z.string().email(),
-
     expires_at: z.date(),
     created_at: z.date(),
     updated_at: z.date(),

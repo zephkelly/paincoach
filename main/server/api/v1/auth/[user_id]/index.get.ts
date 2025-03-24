@@ -6,7 +6,7 @@ import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/v
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
-import { UserService } from '~~/server/services/userService';
+import { UserService } from '~~/server/services/models/userService';
 
 import { validateUUID } from '@@/shared/schemas/primitives';
 
@@ -17,7 +17,7 @@ import { type MinimalUserWithRoles } from '~~lib/shared/types/v1/user/minimal'
 export default defineEventHandler({
     onRequest: [
         (event) => onRequestValidateSession(event),
-        (event) => onRequestValidateRole(event, ['owner', 'admin'])
+        (event) => onRequestValidateRole(event, ['admin'])
     ],
     handler: async (event) => {
         const {

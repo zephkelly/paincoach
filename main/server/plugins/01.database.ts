@@ -10,7 +10,11 @@ export default defineNitroPlugin(async (nitroApp: any) => {
 
         console.log('DatabaseService: Connection established')
 
-        await createTables(databaseServiceInstance)
+        if (import.meta.dev) {
+            await createTables(databaseServiceInstance)
+    
+            await seedPermissions(databaseServiceInstance)
+        }
     }
     catch (error) {
         console.error('DatabaseService: Failed to establish database connection:', error)
@@ -137,7 +141,7 @@ async function createTables(db: DatabaseService) {
             invited_by BIGINT REFERENCES private.user(id) NOT NULL,
             primary_role TEXT REFERENCES private.role(name) NOT NULL,
             roles TEXT[] NOT NULL,
-            role_invite_data JSONB,
+            invitation_data JSONB,
             expires_at TIMESTAMPTZ NOT NULL,
             status TEXT DEFAULT 'pending', -- pending, opened, completed, expired
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -211,211 +215,146 @@ async function createTables(db: DatabaseService) {
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
     `);
+}
 
-    // await db.query(`
-
-    //     CREATE TABLE IF NOT EXISTS private.user_role (
-    //         user_id UUID REFERENCES private.user(id) ON DELETE CASCADE,
-    //         role_id UUID REFERENCES private.role(id) ON DELETE CASCADE,
-    //         is_primary BOOLEAN DEFAULT false,
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         PRIMARY KEY (user_id, role_id)
-    //     );
-
-    //     CREATE TABLE IF NOT EXISTS private.permission (
-    //         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    //         name TEXT NOT NULL UNIQUE,
-    //         description TEXT,
-    //         resource_type TEXT NOT NULL,
-    //         action TEXT NOT NULL,
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-    //     );
-
-    //     CREATE TABLE IF NOT EXISTS private.role_permission (
-    //         role_id UUID REFERENCES private.role(id) ON DELETE CASCADE,
-    //         permission_id UUID REFERENCES private.permission(id) ON DELETE CASCADE,
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         PRIMARY KEY (role_id, permission_id)
-    //     );
-
-    //     -- Base users table
-    //     CREATE TABLE IF NOT EXISTS private.user (
-    //         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    //         email TEXT NOT NULL UNIQUE,
-    //         last_email_bounced_date TIMESTAMPTZ,
-    //         verified BOOLEAN DEFAULT false,
-    //         phone_number TEXT UNIQUE,
-    //         title TEXT DEFAULT NULL,
-    //         first_name TEXT NOT NULL,
-    //         last_name TEXT,
-    //         profile_url TEXT,
-    //         password_hash TEXT,
-    //         primary_role TEXT REFERENCES private.role(name) NOT NULL,
-    //         status TEXT DEFAULT 'pending',
-    //         registration_complete BOOLEAN DEFAULT false,
-    //         data_sharing_enabled BOOLEAN DEFAULT false,
-    //         last_data_sharing_consent_date TIMESTAMPTZ,
-    //         last_data_sharing_revocation_date TIMESTAMPTZ,
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         version INT DEFAULT 1
-    //     );
-
-    //     -- Role-specific profile tables with public/private data separation
-    //     CREATE TABLE IF NOT EXISTS private.admin_profile (
-    //         user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-    //     );
-
-    //     CREATE TABLE IF NOT EXISTS private.clinician_profile (
-    //         user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
-    //         -- Public information (visible to admin and associated patients)
-    //         ahprah_registration_number TEXT NOT NULL,
-    //         specialisation TEXT,
-    //         practice_name TEXT,
-    //         -- Private information (visible only to admin)
-    //         private_data JSONB,
-    //         business_address TEXT,
-    //         abn TEXT,
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-    //     );
-
-    //     CREATE TABLE IF NOT EXISTS private.user_invitation (
-    //         id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    //         email TEXT NOT NULL,
-    //         phone_number TEXT,
-    //         user_id UUID NOT NULL,
-    //         linked_user_id UUID REFERENCES private.user(id) DEFAULT NULL, 
-    //         invitation_token TEXT NOT NULL UNIQUE,
-    //         invited_by UUID REFERENCES private.user(id) NOT NULL,
-    //         role_id UUID REFERENCES private.role(id) NOT NULL,
-    //         registration_type TEXT NOT NULL DEFAULT 'partial', -- 'partial' or 'full'
-    //         registration_data JSONB,
-    //         expires_at TIMESTAMPTZ NOT NULL,
-    //         status TEXT DEFAULT 'pending', -- pending, opened, completed, expired
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-    //     );
-
-    //     -- Clinician-Patient relationship table
-    //     CREATE TABLE IF NOT EXISTS private.clinician_patient_relationship (
-    //         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    //         clinician_id UUID REFERENCES private.clinician_profile(user_id) ON DELETE CASCADE,
-    //         patient_id UUID REFERENCES private.patient_profile(user_id) ON DELETE CASCADE,
-    //         status TEXT DEFAULT 'active',
-    //         start_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         end_date TIMESTAMPTZ,
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         UNIQUE(clinician_id, patient_id, status)
-    //     );
-
-    //     CREATE TABLE IF NOT EXISTS private.email_feedback (
-    //         feedback_id SERIAL PRIMARY KEY,
-    //         email TEXT NOT NULL,
-    //         feedback_type TEXT NOT NULL,
-    //         sub_type TEXT NOT NULL,
-    //         timestamp TIMESTAMP NOT NULL,
-    //         diagnostic TEXT,
-            
-    //         CONSTRAINT fk_email
-    //             FOREIGN KEY (email)
-    //             REFERENCES private.user(email)
-    //             ON DELETE CASCADE
-    //     );
-
-    //     CREATE TABLE IF NOT EXISTS private.mailing_list_subscription (
-    //         id SERIAL PRIMARY KEY,
-    //         email TEXT NOT NULL UNIQUE,
-    //         name TEXT,
-    //         subscription_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         unsubscription_date TIMESTAMPTZ,
-    //         is_active BOOLEAN DEFAULT TRUE,
-    //         unsubscribe_token TEXT UNIQUE,
-    //         source TEXT,
-    //         user_id UUID REFERENCES private.user(id) ON DELETE SET NULL,
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-    //     );
-    // `)
-
-    // await db.query(`
-    //     CREATE TABLE IF NOT EXISTS private.patient_profile (
-    //         user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
-    //         -- Private information (visible only to admin)
-    //         private_data JSONB,
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-    //     );
-
-    //     CREATE TABLE IF NOT EXISTS private.patient_medication (
-    //         id BIGSERIAL PRIMARY KEY,
-    //         patient_id UUID REFERENCES private.patient_profile(user_id) ON DELETE CASCADE,
-    //         clinician_id UUID REFERENCES private.clinician_profile(user_id),
-            
-    //         encrypted_medication_data JSONB NOT NULL,
-            
-    //         -- Tracking
-    //         created_by UUID REFERENCES private.user(id) NOT NULL,
-    //         updated_by UUID REFERENCES private.user(id),
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-    //     );
-
-    //     -- Medical records with privacy levels
-    //     CREATE TABLE IF NOT EXISTS private.medical_record (
-    //         id BIGSERIAL PRIMARY KEY,
-    //         patient_id UUID REFERENCES private.patient_profile(user_id),
-    //         clinician_id UUID REFERENCES private.clinician_profile(user_id),
-
-    //         record_practice_type TEXT NOT NULL, -- 'physiotherapy', 'psychology', etc.
-    //         record_type TEXT NOT NULL, -- 'app_record', etc.
-
-    //         -- Health data (visible only to patient and assigned clinician)
-    //         encrypted_data JSONB NOT NULL,
-
-    //         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    //         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-    //     );
-
-    //     ALTER TABLE private.patient_medication ENABLE ROW LEVEL SECURITY;
-    // `)
-
-
+async function seedPermissions(db: DatabaseService) {
+    // Existing role creation
     await db.query(`
         INSERT INTO private.role (name, description)
-        SELECT 'owner', 'Site owner with ability to manage all aspects of the site'
-        WHERE NOT EXISTS (SELECT 1 FROM private.role WHERE name = 'owner');
-
-        INSERT INTO private.role (name, description)
-        SELECT 'admin', 'System administrator with full access'
-        WHERE NOT EXISTS (SELECT 1 FROM private.role WHERE name = 'admin');
-
-        INSERT INTO private.role (name, description)
-        SELECT 'clinician', 'Healthcare provider with patient care access'
-        WHERE NOT EXISTS (SELECT 1 FROM private.role WHERE name = 'clinician');
-
-        INSERT INTO private.role (name, description)
-        SELECT 'patient', 'Patient with limited access to own records'
-        WHERE NOT EXISTS (SELECT 1 FROM private.role WHERE name = 'patient');
+        VALUES
+        ('owner', 'System owner with full access'),
+        ('admin', 'Administrator with management access'),
+        ('clinician', 'Healthcare provider'),
+        ('patient', 'End user patient')
+        ON CONFLICT (name) DO NOTHING;
     `);
-        //     -- Insert permissions if they don't exist
-        //     INSERT INTO private.permission (name, resource_type, action, description)
-        //     SELECT name, resource_type, action, description
-        //     FROM (VALUES
-        //         ('manage_users', 'users', 'manage', 'Can manage all user accounts'),
-        //         ('view_user_metadata', 'users', 'view', 'Can view user metadata'),
-        //         ('view_all_records_metadata', 'medical_records', 'view_metadata', 'Can view all medical records metadata'),
-        //         ('view_assigned_records', 'medical_records', 'view', 'Can view medical records of assigned patients'),
-        //         ('manage_own_records', 'medical_records', 'manage', 'Can manage own medical records'),
-        //         ('view_own_records', 'medical_records', 'view', 'Can view own medical records'),
-        //         ('manage_patient_relationships', 'relationships', 'manage', 'Can manage clinician-patient relationships')
-        //     ) AS v(name, resource_type, action, description)
-        //     WHERE NOT EXISTS (SELECT 1 FROM private.permission WHERE name = v.name);
-
-    // console.log('DatabaseService: Tables created');
+   
+    // Insert permissions with clinician-patient relationship
+    await db.query(`
+        INSERT INTO private.permission (name, description, resource_type, action)
+        VALUES
+        -- Invitation permissions
+        ('Invite Owner', 'Ability to invite owners', 'invitation', 'invite:owner'),
+        ('Invite Admin', 'Ability to invite administrators', 'invitation', 'invite:admin'),
+        ('Invite Clinician', 'Ability to invite clinicians', 'invitation', 'invite:clinician'),
+        ('Invite Patient', 'Ability to invite patients', 'invitation', 'invite:patient'),
+        
+        -- User data access permissions
+        -- Owner data access
+        ('View Owner Full', 'View complete owner user data', 'user:owner', 'view:full'),
+        ('View Owner Limited', 'View limited owner user data', 'user:owner', 'view:limited'),
+        ('View Owner Basic', 'View basic owner user data', 'user:owner', 'view:basic'),
+        ('Manage Owner', 'Manage owner user data', 'user:owner', 'manage'),
+        
+        -- Admin data access
+        ('View Admin Full', 'View complete admin user data', 'user:admin', 'view:full'),
+        ('View Admin Limited', 'View limited admin user data', 'user:admin', 'view:limited'),
+        ('View Admin Basic', 'View basic admin user data', 'user:admin', 'view:basic'),
+        ('Manage Admin', 'Manage admin user data', 'user:admin', 'manage'),
+        
+        -- Clinician data access
+        ('View Clinician Full', 'View complete clinician user data', 'user:clinician', 'view:full'),
+        ('View Clinician Limited', 'View limited clinician user data', 'user:clinician', 'view:limited'),
+        ('View Clinician Basic', 'View basic clinician user data', 'user:clinician', 'view:basic'),
+        ('Manage Clinician', 'Manage clinician user data', 'user:clinician', 'manage'),
+        
+        -- Patient data access (general)
+        ('View Patient Full', 'View complete patient user data', 'user:patient', 'view:full'),
+        ('View Patient Limited', 'View limited patient user data', 'user:patient', 'view:limited'),
+        ('View Patient Basic', 'View basic patient user data', 'user:patient', 'view:basic'),
+        ('Manage Patient', 'Manage patient user data', 'user:patient', 'manage'),
+        
+        -- Clinician-Patient relationship (for clinicians'' own patients)
+        ('View Clinician Patient Full', 'View complete data for clinician''s own patients', 'user:clinician-patient', 'view:full'),
+        ('View Clinician Patient Limited', 'View limited data for clinician''s own patients', 'user:clinician-patient', 'view:limited'),
+        ('View Clinician Patient Basic', 'View basic data for clinician''s own patients', 'user:clinician-patient', 'view:basic'),
+        ('Manage Clinician Patient', 'Manage clinician''s own patients', 'user:clinician-patient', 'manage')
+        
+        ON CONFLICT (name) DO NOTHING;
+    `);
+   
+    // Owner permissions (can do everything)
+    await db.query(`
+        INSERT INTO private.role_permission (role_id, permission_id)
+        SELECT r.id, p.id
+        FROM private.role r, private.permission p
+        WHERE r.name = 'owner' AND p.name IN (
+            -- Invite permissions
+            'Invite Owner', 'Invite Admin', 'Invite Clinician', 'Invite Patient',
+            
+            -- User data view permissions
+            'View Owner Full',
+            'View Admin Full',
+            'View Clinician Full',
+            'View Patient Full',
+            
+            -- User data manage permissions (except owners)
+            'Manage Admin',
+            'Manage Clinician',
+            'Manage Patient'
+        )
+        ON CONFLICT DO NOTHING;
+    `);
+   
+    // Admin permissions
+    await db.query(`
+        INSERT INTO private.role_permission (role_id, permission_id)
+        SELECT r.id, p.id
+        FROM private.role r, private.permission p
+        WHERE r.name = 'admin' AND p.name IN (
+            -- Invite permissions
+            'Invite Clinician', 'Invite Patient',
+            
+            -- User data view permissions
+            'View Owner Basic',
+            'View Admin Limited',
+            'View Clinician Full',
+            'View Patient Full',
+            
+            -- User data manage permissions
+            'Manage Clinician',
+            'Manage Patient'
+        )
+        ON CONFLICT DO NOTHING;
+    `);
+   
+    // Clinician permissions - UPDATED to only manage their own patients
+    await db.query(`
+        INSERT INTO private.role_permission (role_id, permission_id)
+        SELECT r.id, p.id
+        FROM private.role r, private.permission p
+        WHERE r.name = 'clinician' AND p.name IN (
+            -- Invite permissions
+            'Invite Patient',
+            
+            -- User data view permissions
+            'View Owner Basic',
+            'View Admin Basic',
+            'View Clinician Basic',
+            'View Patient Basic', -- Changed from FULL to BASIC
+            
+            -- Clinician-Patient relationship (for their own patients)
+            'View Clinician Patient Full',
+            'Manage Clinician Patient'
+        )
+        ON CONFLICT DO NOTHING;
+    `);
+   
+    // Patient permissions remain the same
+    await db.query(`
+        INSERT INTO private.role_permission (role_id, permission_id)
+        SELECT r.id, p.id
+        FROM private.role r, private.permission p
+        WHERE r.name = 'patient' AND p.name IN (
+            -- Only basic view permissions
+            'View Owner Basic',
+            'View Admin Basic',
+            'View Clinician Basic'
+            -- No patient view permissions
+            -- No management permissions
+        )
+        ON CONFLICT DO NOTHING;
+    `);
+    
+    console.log('DatabaseService: Permissions seeded');
 }

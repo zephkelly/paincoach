@@ -43,7 +43,7 @@ export default defineEventHandler({
             }
             
 
-            const validatedInvitation = await InvitationService.getMinimalInvitationByTokenTransaction(invitation_token, transaction);
+            const validatedInvitation = await InvitationService.getLimitedInvitationByTokenTransaction(invitation_token, transaction);
             
             // const allowedPrimaryProfile = validatedInvitation.primary_role;
             

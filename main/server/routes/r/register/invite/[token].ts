@@ -2,7 +2,8 @@ import { H3Error } from "h3";
 import { DatabaseService } from "~~/server/services/databaseService";
 
 import { validateDBUserInvitation } from '@@/shared/schemas/v1/user/invitation';
-
+import type { DBUserInvitation } from '@@/shared/types/v1/user/invitation';
+import type { InvitationStatus } from "@@/shared/types/v1/user/invitation";
 
 
 export default defineEventHandler(async (event) => {
@@ -18,16 +19,14 @@ export default defineEventHandler(async (event) => {
     const db = DatabaseService.getInstance();
     
     try {
-        const invitationResult = await db.query(`
+        const invitationResult = await db.query<DBUserInvitation & { effective_status: InvitationStatus }>(`
             SELECT 
                 i.*,
-                r.name as role,
                 CASE 
                     WHEN i.expires_at < NOW() THEN 'expired'
                     ELSE i.status 
                 END AS effective_status
             FROM private.user_invitation i
-            JOIN private.role r ON i.role_id = r.id
             WHERE i.invitation_token = $1
             LIMIT 1
         `, [token]);
@@ -43,14 +42,14 @@ export default defineEventHandler(async (event) => {
         
         const validatedInvitation = validateDBUserInvitation(invitation);
 
-        if (invitation.effective_status === 'expired' && invitation.status !== 'expired') {
+        if (validatedInvitation.status === 'pending' && invitation?.effective_status === 'expired') {
             const transaction = await db.createTransaction();
             try {
                 await transaction.query(`
                     UPDATE private.user_invitation 
                     SET status = 'expired' 
                     WHERE id = $1
-                `, [invitation.id]);
+                `, [validatedInvitation.id]);
                 
                 await transaction.commit();
                 
@@ -58,13 +57,14 @@ export default defineEventHandler(async (event) => {
                     statusCode: 410,
                     statusMessage: 'Invitation has expired'
                 });
-            } catch (txError) {
+            }
+            catch (txError) {
                 await transaction.rollback();
                 throw txError;
             }
         }
 
-        if (invitation.status === 'completed') {
+        if (validatedInvitation.status === 'completed') {
             // we actually want to redirect to a looks like you've already registered page
             throw createError({
                 statusCode: 409,
@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
             if (!incompleteSession) {
                 throw createError({
                     statusCode: 403,
-                    statusMessage: 'This invitation has already been used'
+                    statusMessage: 'This invitation has already been opened'
                 });
             }
 
@@ -87,8 +87,8 @@ export default defineEventHandler(async (event) => {
 
             if (invitation_token !== token) {
                 throw createError({
-                    statusCode: 403,
-                    statusMessage: 'This invitation has already been used'
+                    statusCode: 400,
+                    message: 'Malformed session, invitation tokens do not match'
                 });
             }
 
@@ -107,6 +107,7 @@ export default defineEventHandler(async (event) => {
 
             const temporarySession = await replaceUserSession(event, {
                 secure: {
+                    //@ts-expect-error
                     user_id: null, // BigInt internal
                     user_uuid: validatedInvitation.user_uuid, // UUID external
                     primary_role: 'unregistered',
@@ -118,13 +119,13 @@ export default defineEventHandler(async (event) => {
                 },
                 user: {
                     user_uuid: validatedInvitation.user_uuid,
-                    first_name: validatedInvitation.role_invite_data?.first_name || '',
+                    first_name: validatedInvitation.invitation_data?.first_name || '',
                     verified: false,
                     primary_role: 'unregistered',
                     roles: ['unregistered'],
 
                 },
-                registration_data: validatedInvitation.registration_data || {},
+                registration_data: validatedInvitation.invitation_data || {},
                 logged_in_at: new Date(),
                 verified: false,
                 version: 1,
