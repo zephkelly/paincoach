@@ -7,23 +7,22 @@ declare module '#auth-utils' {
     interface User {
         user_uuid: string;
         first_name: string;
-        // Change from single role to array
-        roles: Role[];
-        // Add primary role concept
+
         primary_role: Role;
-        verified: boolean;
+        roles: Role[];
+
         profile_url?: string;
+        verified: boolean;
     }
    
     interface SecureSessionData {
-        user_id: string;
+        user_id: number | bigint;
         user_uuid: string;
         email: string;
-        verified: boolean;
-        // Change from single role to array
-        roles: Role[];
-        // Add primary role
+
         primary_role: Role;
+        roles: Role[];
+        verified: boolean;
        
         invitation_token?: string;
     }
@@ -34,7 +33,6 @@ declare module '#auth-utils' {
         secure: SecureSessionData;
         registration_data?: UserInvitePartial;
         
-        verified: boolean;
         logged_in_at: Date;
         version: number;
         id: string; // session id

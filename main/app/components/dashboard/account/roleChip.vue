@@ -86,17 +86,17 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
 
     &.admin, &.owner {
         width: 76px;
-        min-width: 76px;
+        min-width: 77px;
     }
 
     &.clinician {
         width: 90px;
-        min-width: 90px;
+        min-width: 91px;
     }
 
     &.patient {
         width: 81px;
-        min-width: 81px;
+        min-width: 82px;
     }
     
     &.has-default-slot {
@@ -116,13 +116,6 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
                 }
             }
         }
-    }
-    
-    &.owner {
-        .chip-content-wrapper {
-            position: relative;
-        }
-
     }
 }
 
@@ -229,7 +222,7 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
         position: absolute;
         margin-left: -2px;
 
-        &.admin {
+        &.admin, &.owner {
             svg {
                 height: 0.85rem;
             }

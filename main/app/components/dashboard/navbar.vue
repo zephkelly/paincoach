@@ -8,20 +8,19 @@
         </div>
         <div class="content-main">
             <Authenticator>
-                <template #default="{ user, userRole }">
-                    <DashboardAccountRoleChip :userRole="userRole.value" />
+                <template #default="{ user, primaryRole }">
+                    <DashboardAccountRoleChip :userRole="primaryRole.value" />
                 </template>
             </Authenticator>
         </div>
-
-        <div v-if="isAdminUser">
+        <div v-if="isPrivilegedUser">
             <EButton @click="adminTogglesOpen = !adminTogglesOpen">Open</EButton>
             <div class="admin" v-show="adminTogglesOpen">
                 <EButton @click="test()">Test</EButton>
                 <input type="text" v-model="userIDRef">
                 <EButton @click="submitUserId">Maillist</EButton>
-                <EButton @click="setMockRole('clinician')">View clinician</EButton>
-                <EButton @click="setMockRole('patient')">View patient</EButton>
+                <EButton @click="setMockRoles(['clinician'])">View clinician</EButton>
+                <EButton @click="setMockRoles(['patient'])">View patient</EButton>
                 <EButton @click="toggleMockLoading()">Toggle Load</EButton>
                 <EButton @click="clearMocks()">Clear Mocks</EButton>
                 <EButton @click="logout()">Clear Session</EButton>
@@ -67,11 +66,11 @@ const {
 } = useAppSidebar();
 
 const {
-    setMockRole,
+    setMockRoles,
     clearMocks,
     toggleMockLoading,
     clearSession,
-    isAdminUser,
+    isPrivilegedUser,
 } = useAuth();
 
 

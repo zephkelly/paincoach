@@ -89,3 +89,10 @@ export function validateMinimalUserWithRoles(data: any) {
     }
     return parsedResult.data;
 }
+export function validateMinimalUsersWithRoles(data: any[]) {
+    const parsedResult = MinimalUserWithRolesSchema.array().safeParse(data);
+    if (!parsedResult.success) {
+        throw createZodValidationError(parsedResult.error);
+    }
+    return parsedResult.data;
+}

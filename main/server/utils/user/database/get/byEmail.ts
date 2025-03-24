@@ -3,7 +3,10 @@ import { type DBTransaction } from "~~/server/types/db";
 
 import type { Role } from "@@/shared/types/v1/role";
 
-import type { MinimalUser, MinimalUserWithRoles } from "@@/shared/types/v1/user/minimal";
+import type { DBUserWithRoles } from "@@/shared/types/v1/user";
+import { validateDBUserWithRoles } from "@@/shared/schemas/v1/user";
+
+import type { MinimalUserWithRoles } from "@@/shared/types/v1/user/minimal";
 import { validateMinimalUserWithRoles } from "@@/shared/schemas/v1/user/minimal";
 
 
@@ -28,7 +31,7 @@ import { validateMinimalUserWithRoles } from "@@/shared/schemas/v1/user/minimal"
  * @param email User email
  * @returns User with role information or undefined if not found
  */
-export async function getUser(
+export async function getMinimalUserWithRoles(
     db: DBTransaction,
     email: string,
 ): Promise<MinimalUserWithRoles | undefined> {
@@ -51,12 +54,18 @@ export async function getUser(
                 u.status,
                 u.created_at,
                 u.primary_role,
-                array_agg(DISTINCT r.name ORDER BY (r.name = u.primary_role) DESC) AS roles
+                COALESCE(
+                    (SELECT array_agg(role_name ORDER BY (role_name = u.primary_role) DESC)
+                     FROM (
+                        SELECT DISTINCT r.name as role_name
+                        FROM private.user_role ur2
+                        JOIN private.role r ON ur2.role_id = r.id
+                        WHERE ur2.user_id = u.id
+                     ) AS distinct_roles),
+                    ARRAY[]::text[]
+                ) AS roles
             FROM private.user u
-            LEFT JOIN private.user_role ur ON u.id = ur.user_id
-            LEFT JOIN private.role r ON ur.role_id = r.id
             WHERE u.email = $1
-            GROUP BY u.id, u.primary_role
             `, [email]);
        
         if (userResult.length === 0) {
@@ -78,13 +87,68 @@ export async function getUser(
     }
 }
 
+/**
+ * Gets a user by email with their roles and role-specific profile data
+ * @param db Database connection or transaction
+ * @param email User email
+ * @returns User with role information or undefined if not found
+ */
+export async function getDBUserWithRoles(
+    db: DBTransaction,
+    email: string,
+): Promise<DBUserWithRoles | undefined> {
+    try {
+        if (!email) {
+            throw createError({
+                statusCode: 400,
+                statusMessage: 'Email is required'
+            });
+        }
+
+        // Get basic user data
+        const userResult = await db.query<DBUserWithRoles>(`
+            SELECT
+                u.*,
+                COALESCE(
+                    (SELECT array_agg(role_name ORDER BY (role_name = u.primary_role) DESC)
+                     FROM (
+                        SELECT DISTINCT r.name as role_name
+                        FROM private.user_role ur2
+                        JOIN private.role r ON ur2.role_id = r.id
+                        WHERE ur2.user_id = u.id
+                     ) AS distinct_roles),
+                    ARRAY[]::text[]
+                ) AS roles
+            FROM private.user u
+            WHERE u.email = $1
+            `, [email]);
+       
+        if (userResult.length === 0) {
+            return undefined;
+        }
+       
+        // Filter out null values from roles array (in case user has no roles)
+        return validateDBUserWithRoles(userResult[0]);
+    }
+    catch (error: any) {
+        if (error.statusCode) {
+            throw error; // Re-throw HTTP errors
+        }
+
+        throw createError({
+            statusCode: 500,
+            statusMessage: `Error getting user: ${error.message}`
+        });
+    }
+}
+
 // /**
 //  * Gets a user by email with their roles and role-specific profile data
 //  * @param db Database connection or transaction
 //  * @param email User email
 //  * @returns User with role-specific data or undefined if not found
 //  */
-// export async function getDBUser(
+// export async function getDBUserWithRoles(
 //     db: DBTransaction,
 //     email: string,
 // ): Promise<DBUser | undefined> {

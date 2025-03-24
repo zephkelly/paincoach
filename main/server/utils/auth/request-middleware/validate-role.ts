@@ -2,8 +2,6 @@ import { type H3Event } from 'h3';
 import type { SecureSessionData, UserSession } from '#auth-utils';
 import type { Role } from '@@/shared/types/v1/role';
 
-import { isValidRole } from '~~/server/utils/user/role';
-
 
 /**
  * Middleware to validate if the user has one of the allowed roles

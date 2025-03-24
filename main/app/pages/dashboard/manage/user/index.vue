@@ -18,7 +18,8 @@ import DashboardUserOverview from '~/components/dashboard/user/overview/index.vu
 
 const {
     ready,
-    userRole
+    userRoles,
+    primaryRole
 } = useAuth();
 
 const {
@@ -28,12 +29,12 @@ const {
 
 fetch();
 
-watch(() => userRole.value, (role: AllRoles | undefined) => {
-    if (role === 'patient') {
+watch(() => userRoles.value, (roles: AllRoles[] | undefined) => {
+    if (primaryRole.value === 'patient') {
         navigateTo('/dashboard');
     }
 
-    if (role === 'clinician') {
+    if (primaryRole.value === 'clinician') {
         navigateTo('/dashboard/manage/user/patient');
     }
 }, { immediate: true });
@@ -46,7 +47,7 @@ const adminUserTabs = [{
 ]
 
 const currentTabs = computed(() => {
-    const role = userRole.value;
+    const role = primaryRole.value;
 
     switch(role) {
         case 'admin':

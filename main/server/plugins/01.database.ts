@@ -388,6 +388,10 @@ async function createTables(db: DatabaseService) {
 
     await db.query(`
         INSERT INTO private.role (name, description)
+        SELECT 'owner', 'Site owner with ability to manage all aspects of the site'
+        WHERE NOT EXISTS (SELECT 1 FROM private.role WHERE name = 'owner');
+
+        INSERT INTO private.role (name, description)
         SELECT 'admin', 'System administrator with full access'
         WHERE NOT EXISTS (SELECT 1 FROM private.role WHERE name = 'admin');
 
@@ -398,8 +402,7 @@ async function createTables(db: DatabaseService) {
         INSERT INTO private.role (name, description)
         SELECT 'patient', 'Patient with limited access to own records'
         WHERE NOT EXISTS (SELECT 1 FROM private.role WHERE name = 'patient');
-
-        `);
+    `);
         //     -- Insert permissions if they don't exist
         //     INSERT INTO private.permission (name, resource_type, action, description)
         //     SELECT name, resource_type, action, description

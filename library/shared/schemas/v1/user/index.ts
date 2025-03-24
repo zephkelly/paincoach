@@ -67,6 +67,14 @@ export const DBUserWithRolesSchema = z.discriminatedUnion('primary_role', [
     DBPatientUserWithRolesSchema
 ]);
 
+export function validateDBUserWithRoles(data: unknown): z.infer<typeof DBUserWithRolesSchema> {
+    const parsedResult = DBUserWithRolesSchema.safeParse(data);
+    if (!parsedResult.success) {
+        throw createZodValidationError(parsedResult.error);
+    }
+    return parsedResult.data;
+}
+
 
 
 export const UserSchema = z.discriminatedUnion('primary_role', [
