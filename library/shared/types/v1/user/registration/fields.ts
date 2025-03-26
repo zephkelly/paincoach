@@ -1,9 +1,13 @@
 import { type InputField } from "@@/layers/ember/types/input"
 import type { DBEncryptedMedicationDataV1 } from "@@/shared/types/v1/medication/v1"
 
+import type { UserRegisterPartial } from ".";
 
 
-export const BASE_USER_INVITE_REGISTER_FIELDS: InputField[] = [
+export type RegisterInputField = InputField & {
+    identifier: keyof UserRegisterPartial;
+}
+export const BASE_USER_INVITE_REGISTER_FIELDS: RegisterInputField[] = [
     {
         inputType: 'email',
         label: 'Email',
@@ -47,7 +51,7 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: InputField[] = [
         identifier: 'confirm_password',
         tabindex: 1,
         required: true,
-    },
+    }
 ];
 
 export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: InputField[] = [
@@ -87,49 +91,31 @@ export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: InputField[] = [
 type MedicalInputField = InputField & {
     identifier: keyof DBEncryptedMedicationDataV1;
 }
-export const MEDICATION_FIELDS: MedicalInputField[] = [
-    {
-        inputType: 'text',
-        label: 'Medication Name',
-        identifier: 'medication_name',
-        tabindex: 1,
-        required: true,
-    },
-    {
-        inputType: 'text',
-        label: 'Dosage',
-        identifier: 'dosage',
-        tabindex: 1,
-        required: true,
-    },
-    {
-        inputType: 'number',
-        label: 'Frequency',
-        identifier: 'frequency',
-        tabindex: 1,
-        required: true,
-        placeholder: 'in hours (eg. 6 = every 6 hours)',
-    },
-    {
-        inputType: 'date',
-        label: 'Start Date',
-        identifier: 'start_date',
-        tabindex: 1,
-        required: true,
-    },
-    {
-        inputType: 'date',
-        label: 'End Date',
-        identifier: 'end_date',
-        tabindex: 1,
-        required: false,
-    },
-    {
-        inputType: 'checkbox',
-        label: 'Ongoing',
-        identifier: 'is_on_going',
-        tabindex: 1,
-        required: false,
-        default: true
-    },
-]
+export const MEDICATION_FIELDS: {
+    base: MedicalInputField[]
+} = {
+    base: [
+        {
+            inputType: 'text',
+            label: 'Medication Name',
+            identifier: 'medication_name',
+            tabindex: 1,
+            required: true,
+        },
+        {
+            inputType: 'text',
+            label: 'Dosage',
+            identifier: 'dosage',
+            tabindex: 1,
+            required: true,
+        },
+        {
+            inputType: 'number',
+            label: 'Frequency',
+            identifier: 'frequency',
+            tabindex: 1,
+            required: true,
+            placeholder: 'in hours (eg. 6 = every 6 hours)',
+        }
+    ]
+}

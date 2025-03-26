@@ -1,5 +1,5 @@
 <template>
-    <div class="input-wrapper" :class="[{ 'readonly': readonly }, type]">
+    <div class="input-wrapper e-input" :class="[{ 'readonly': readonly }, type]">
         <label v-if="label" :for="id" class="input-label">{{ label }}</label>
         <input
             :checked="type === 'checkbox' ? !!modelValue : undefined"

@@ -1,15 +1,15 @@
 import { DatabaseService } from "../databaseService";
 import type { DBTransaction } from "~~/server/types/db";
 
-import type { MinimalUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
+import type { LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
 
 import { validateLimitedUserInvitation } from "@@/shared/schemas/v1/user/invitation/limited";
 
 
 
 export class InvitationService {
-    public static async getLimitedInvitationByTokenTransaction(token: string, transaction: DBTransaction): Promise<MinimalUserInvitation> {
-        const invitation = await transaction.query<MinimalUserInvitation>(`
+    public static async getLimitedInvitationByTokenTransaction(token: string, transaction: DBTransaction): Promise<LimitedUserInvitation> {
+        const invitation = await transaction.query<LimitedUserInvitation>(`
             SELECT 
                 ui.user_uuid,
                 ui.email,

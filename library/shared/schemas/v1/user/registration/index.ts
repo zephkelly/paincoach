@@ -7,7 +7,7 @@ import { DBBaseUserWithRolesSchema } from "@@/shared/schemas/v1/user/base";
 
 import { DBUserRegistrationDataSchema } from "@@/shared/schemas/v1/user/registration/data";
 
-import { DBEncryptedMedicationDataV1Schema } from "@@/shared/schemas/v1/medication/v1";
+import { CreateEncryptedPainMedicationDataV1RequestSchema, CreateEncryptedPainMedicationDataV1RequestPartialSchema } from "@@/shared/schemas/v1/medication/v1";
 
 
 
@@ -32,12 +32,15 @@ export const UserRegisterSchema = DBBaseUserWithRolesSchema.pick({
     password: z.string(),
     confirm_password: z.string(),
 
-    medications: z.array(DBEncryptedMedicationDataV1Schema).min(1).nullable().optional(),
+    will_use_app: z.boolean(),
+    medications: z.array(CreateEncryptedPainMedicationDataV1RequestSchema).min(1).nullable().optional(),
 
     role_data: z.array(DBUserRegistrationDataSchema).min(1),
 });
 
-export const UserRegisterPartialSchema = UserRegisterSchema.partial()
+export const UserRegisterPartialSchema = UserRegisterSchema.partial().extend({
+    medications: z.array(CreateEncryptedPainMedicationDataV1RequestPartialSchema).min(1).nullable().optional(),
+})
 
 export function validateUserRegister(data: unknown): z.infer<typeof UserRegisterSchema> {
     const parsedResult = UserRegisterSchema.safeParse(data);

@@ -6,6 +6,7 @@
         patient: userRole === 'patient',
         skeleton: userRole === undefined,
         'has-default-slot': hasDefaultSlot,
+        'collapsable': collapsable,
     }">
     
         <div class="chip-main" :class="{ 
@@ -54,6 +55,7 @@ import { useSlots, computed } from 'vue';
 interface ChipProps {
     userRole: AllRoles | undefined;
     paneled?: boolean;
+    collapsable?: boolean;
 }
 
 defineProps<ChipProps>();
@@ -113,6 +115,68 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
                     border-right: 1px solid var(--border-5-color);
                     padding-right: 0.5rem;
                     margin-right: 0.28rem;
+                }
+            }
+        }
+    }
+
+    &.collapsable {
+        width: 28px;
+        min-width: 28px;
+        transition:
+            width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+            min-width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+        .chip-content-wrapper {
+            margin-left: 0px;
+            gap: 0;
+            transition: margin-left 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+            svg {
+                margin-right: 0;
+            }
+
+            .role-name {
+                max-width: 0;
+                opacity: 0;
+                overflow: hidden;
+                transition: max-width 0.15s cubic-bezier(0.075, 0.82, 0.165, 1),
+                    opacity 0.25s cubic-bezier(0.075, 0.82, 0.165, 1);
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        &:hover {
+            .chip-content-wrapper {
+                margin-left: -2px;
+                // gap: 0.25rem;
+
+                svg {
+                    margin-right: 0.25rem;
+                }
+            }
+
+            &.admin, &.owner {
+                width: 76px;
+                min-width: 77px;
+            }
+
+            &.clinician {
+                width: 90px;
+                min-width: 91px;
+            }
+
+            &.patient {
+                width: 81px;
+                min-width: 82px;
+            }
+
+            .chip-content-wrapper {
+                .role-name {
+                    max-width: 150px;
+                    opacity: 1;
+                    margin-right: 0;
                 }
             }
         }
@@ -218,9 +282,13 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
     .chip-content-wrapper {
         display: flex;
         align-items: center;
-        gap: 0.25rem;
+        // gap: 0.25rem;
         position: absolute;
         margin-left: -2px;
+
+        svg {
+            margin-right: 0.25rem;
+        }
 
         &.admin, &.owner {
             svg {

@@ -6,4 +6,4 @@ import {
 
 
 
-export type MinimalUserInvitation = z.infer<typeof LimitedUserInvitationSchema>;
+export type LimitedUserInvitation = z.infer<typeof LimitedUserInvitationSchema>;

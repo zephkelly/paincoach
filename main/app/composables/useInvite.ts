@@ -1,49 +1,41 @@
 import type { Role } from "@@/shared/types/v1/role";
-import { type MinimalUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
+import { type LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
 import { validateLimitedUserInvitation } from "@@/shared/schemas/v1/user/invitation/limited";
 
 
 
-export const useInvite = () => {
-    const state = useState<{
-        fetching: boolean;
-        invitation: MinimalUserInvitation | undefined | null;
-    }>('invitation_form', () => ({
-        fetching: false,
-        invitation: null
-    }));
+export const useInvite = async () => {
+    const {
+        data: invitationData,
+        status: invitationStatus,
+        error: invitationError,
+    } = await useFetch('/api/v1/auth/invite');
 
-    const invitation = computed(() => state.value.invitation);
-    const loaded = computed(() => state.value.invitation !== null && state.value.invitation !== undefined && !state.value.fetching);
-    const fetching = computed(() => state.value.fetching);
+    const invitation = computed(() => validateLimitedUserInvitation(invitationData.value));
+    const loaded = computed(() => invitation !== null && invitation !== undefined);
+    const fetching = computed(() => invitationStatus.value === 'pending');
 
-    const invitationComputed = computed(() => state.value.invitation);
+    // Computed invitation information
+    const inviterFirstName = computed(() => invitation.value.inviter_name);
+    const inviterProfileImageUrl = computed(() => invitation.value.inviter_profile_url);
 
-    async function fetch(token?: string) {
-        const query = token ? `?token=${token}` : '';
-        try {
-            const response = await $fetch<MinimalUserInvitation>('/api/v1/auth/invite' + query);
-            const validatedUserInvitation = validateLimitedUserInvitation(response);
-            
-            state.value.invitation = validatedUserInvitation;
-        }
-        catch (error) {
-            console.error(error);
-        }
-    }
+    const inviteeFirstName = computed(() => invitation.value.invitation_data.first_name);
+    const inviteeRoles = computed(() => invitation.value.roles);
+    const inviteePrimaryRole = computed(() => invitation.value.primary_role);
+    const inviteeAdditionalRoles = computed(() => invitation.value.roles.filter((role: Role) => role !== invitation.value.primary_role));
 
-    async function clear() {
-        state.value.invitation = null
-    }
 
     return {
-        state,
-
+        invitation,
         loaded,
         fetching,
-        invitation: invitationComputed,
 
-        fetch,
-        clear
+        inviterFirstName,
+        inviterProfileImageUrl,
+
+        inviteeFirstName,
+        inviteeRoles,
+        inviteePrimaryRole,
+        inviteeAdditionalRoles,
     }
 }

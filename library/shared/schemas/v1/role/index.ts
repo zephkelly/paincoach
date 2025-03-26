@@ -4,8 +4,25 @@ import { BigIntSchema, UUIDSchema } from "../../primitives";
 
 
 
-export const RoleSchema = z.enum(['owner', 'admin', 'clinician', 'patient', 'app']);
-export const AllRolesSchema = z.enum(['owner', 'admin', 'clinician', 'patient', 'unregistered']);
+export const RoleSchema = z.enum([
+    'owner',
+    'admin',
+    'clinician',
+    'patient',
+    'app'
+]);
+
+export const AllRolesSchema = z.enum([
+    'owner',
+    'admin',
+
+    'clinician',
+    'patient',
+
+    'app',
+
+    'unregistered'
+]);
 
 export const DBRoleSchema = z.object({
     id: BigIntSchema,

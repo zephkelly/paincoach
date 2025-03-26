@@ -6,54 +6,37 @@ export const MedicationReasonSchema = z.enum([
 
 const VALID_DOSE_UNITS = ['mg', 'g', 'mcg', 'mL', 'L', 'IU', 'mEq'] as const;
 
-const FREQUENCY_MAP = {
-  '4': 'every 4 hours',
-  '6': 'every 6 hours',
-  '8': 'every 8 hours', 
-  '12': 'every 12 hours',
-  '24': 'once daily',
-  '168': 'once weekly',
-  
-  // Special cases
-  '24-am': 'every morning',
-  '24-pm': 'every evening',
-  '24-night': 'every night',
-  '12-twice': 'twice daily',
-  '8-three': 'three times daily',
-  '6-four': 'four times daily',
-  'meals': 'with meals',
-  'prn': 'as needed'
-} as const;
-
 const DoseUnitSchema = z.enum(VALID_DOSE_UNITS);
 
-const FrequencyKeySchema = z.enum(Object.keys(FREQUENCY_MAP) as [keyof typeof FREQUENCY_MAP, ...Array<keyof typeof FREQUENCY_MAP>]);
-
-const FrequencySchema = z.object({
-    key: FrequencyKeySchema,
-    display: z.string().optional(),
-}).transform(data => ({
-    ...data,
-    display: FREQUENCY_MAP[data.key]
-}));
+const FrequencySchema = z.number();
 
 const DosageSchema = z.object({
-    original: z.string(),
+    original: z.string().refine(
+        (val) => {
+            const hasInvalidChars = /[^a-zA-Z0-9\s.]/g.test(val);
+            if (hasInvalidChars) return false;
+
+            return true
+        },
+        {
+            message: "Please enter a valid dosage (e.g., '0.5mg', '500mg', '10mL')",
+        }
+    ),
     normalized: z.string().optional(),
     value: z.number().optional(),
     unit: DoseUnitSchema.optional(),
 }).transform(data => {
     const normalized = data.original.replace(/^(\d+(?:\.\d+)?)\s+(mg|g|mcg|mL|L|IU|mEq)$/i, '$1$2');
+
     const match = normalized.match(/^(\d+(?:\.\d+)?)(mg|g|mcg|mL|L|IU|mEq)$/i);
+
     let value: number | undefined = undefined;
     let unit: z.infer<typeof DoseUnitSchema> | undefined = undefined;
-    
+
     if (match && match[1] && match[2]) {
         value = parseFloat(match[1]);
-
         unit = DoseUnitSchema.parse(match[2]);
     }
-    
     return {
         original: data.original,
         normalized,
@@ -74,19 +57,16 @@ export const DBEncryptedMedicationDataV1Schema = z.object({
     start_date: z.date(),
     end_date: z.date().nullable().optional(),
     is_on_going: z.boolean(),
- 
+
     medication_name: z.string().min(2, "Medication name must be at least 2 characters"),
-  
+
     dosage: z.union([
         z.string().transform(str => DosageSchema.parse({ original: str })),
         DosageSchema
     ]),
-  
-    frequency: z.union([
-        FrequencyKeySchema.transform(key => FrequencySchema.parse({ key })),
-        FrequencySchema
-    ]),
-  
+
+    frequency: FrequencySchema,
+
     reason: MedicationReasonSchema,
     notes: z.string().optional(),
 });
@@ -97,3 +77,53 @@ export const DBEncryptedMedicationV1Schema = z.object({
     version: z.literal(1),
     data: DBEncryptedMedicationDataV1Schema,
 }).strict();
+
+
+
+export const CreateEncryptedPainMedicationDataV1RequestSchema = DBEncryptedMedicationDataV1Schema.pick({
+    start_date: true,
+    end_date: true,
+    is_on_going: true,
+    medication_name: true,
+    dosage: true,
+    frequency: true,
+    reason: true,
+}).extend({
+    start_date: z.coerce.date(),
+    end_date: z.coerce.date().nullable().optional(),
+    reason: z.literal('pain'),
+})
+export function validateCreateEncryptedPainMedicationDataV1Request(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestSchema> {
+    const parsedResult = CreateEncryptedPainMedicationDataV1RequestSchema.safeParse(data);
+    if (!parsedResult.success) {
+        throw parsedResult.error;
+    }
+    return parsedResult.data;
+}
+export function validateCreateEncryptedPainMedicationDataV1Requests(data: unknown[]): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestSchema>[] {
+    const parsedResult = z.array(CreateEncryptedPainMedicationDataV1RequestSchema).safeParse(data);
+    if (!parsedResult.success) {
+        throw parsedResult.error;
+    }
+    return parsedResult.data;
+}
+
+export const CreateEncryptedPainMedicationDataV1RequestPartialSchema = CreateEncryptedPainMedicationDataV1RequestSchema.partial().extend({
+    reason: z.literal('pain').optional().default('pain'),
+    is_on_going: z.boolean().optional().default(true),
+});
+export function validateCreateEncryptedPainMedicationDataV1RequestPartial(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestPartialSchema> {
+    const parsedResult = CreateEncryptedPainMedicationDataV1RequestPartialSchema.safeParse(data);
+    if (!parsedResult.success) {
+        throw parsedResult.error;
+    }
+    return parsedResult.data;
+}
+export function validateCreateEncryptedPainMedicationDataV1RequestsPartial(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestPartialSchema>[] {
+    const parsedResult = z.array(CreateEncryptedPainMedicationDataV1RequestPartialSchema).safeParse(data);
+    if (!parsedResult.success) {
+        console.log(parsedResult.error);
+        throw parsedResult.error;
+    }
+    return parsedResult.data;
+}
