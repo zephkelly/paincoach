@@ -20,7 +20,11 @@ export const CreateUserInvitationRequestPartialSchema = CreateUserInvitationRequ
 
 
 export function validateCreateUserInvitationRequest(data: unknown): z.infer<typeof CreateUserInvitationRequestSchema> {
-    const parsedResult = CreateUserInvitationRequestSchema.safeParse(data);
+    const parsedResult = CreateUserInvitationRequestSchema.refine(
+        (val) => val.email === val.confirm_email, {
+            message: 'Emails do not match',
+        }
+    ).safeParse(data);
     if (!parsedResult.success) {
         throw parsedResult.error;
     }

@@ -140,7 +140,7 @@ async function createTables(db: DatabaseService) {
         CREATE TABLE IF NOT EXISTS private.user_invitation (
             id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
             user_uuid UUID NOT NULL DEFAULT uuid_generate_v7() UNIQUE,
-            email TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
             phone_number TEXT,
             linked_user_id UUID REFERENCES private.user(id) DEFAULT NULL, 
             invitation_token TEXT NOT NULL DEFAULT uuid_generate_v7() UNIQUE,

@@ -19,7 +19,7 @@ export const useUsers = async () => {
     })))
 
     const {
-        userRole,
+        userRoles,
         isMockingUser,
         mockUserAPIData
     } = useAuth();
@@ -44,7 +44,7 @@ export const useUsers = async () => {
                 state.value.clinicianUsers = fetchedUsers.users.clinician
                 state.value.patientUsers = fetchedUsers.users.patient
             }
-            else if (userRole.value === 'admin') {
+            else if (userRoles.value?.includes('admin')) {
                 fetchedUsers = await $fetch<AllUsersGetResponse>('/api/v1/user/info?roles=all&page=0&limit=10');
 
                 state.value.adminUsers = fetchedUsers.users.admin;
@@ -62,7 +62,7 @@ export const useUsers = async () => {
         }
     }
 
-    watch(() => userRole.value, (oldRole, newRole) => {
+    watch(() => userRoles.value, (oldRole, newRole) => {
 
         console.log('Mock user role changed, fetching users');
         fetch();

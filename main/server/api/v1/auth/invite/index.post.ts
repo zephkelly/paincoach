@@ -8,6 +8,7 @@ import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
 
 import { InvitationService } from '~~/server/services/invitation';
+import { validateCreateUserInvitationRequest } from '@@/shared/schemas/v1/user/invitation/create';
 
 
 
@@ -29,10 +30,11 @@ export default defineEventHandler({
             permissions
         } = await getPainCoachSession(event);
 
-        const body = await readBody<CreateUserInvitationRequest>(event);
+        const unvalidatedInvitation = await readBody<CreateUserInvitationRequest>(event);
+        const validatedInvitation = validateCreateUserInvitationRequest(unvalidatedInvitation);
 
         await InvitationService.createInvitation(
-            body,
+            validatedInvitation,
             session,
             permissions,
         );
