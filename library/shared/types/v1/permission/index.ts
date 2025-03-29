@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { PermissionSchema } from '@@/shared/schemas/v1/permission';
+import { PERMISSIONS, PermissionSchema } from '@@/shared/schemas/v1/permission';
 
 
-export type Permission = z.infer<typeof PermissionSchema>;
+type ExtractPermissionValues<T> = T extends string ? T : T extends object ? ExtractPermissionValues<T[keyof T]> : never;
+export type Permission = ExtractPermissionValues<typeof PERMISSIONS>;

@@ -1,95 +1,57 @@
 import { H3Error } from 'h3';
 
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
-import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/validate-role';
-import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
+import { onRequestValidatePermission } from '~~/server/utils/auth/request-middleware/validate-permission';
 
-import { DatabaseService } from '~~/server/services/databaseService';
-import { InvitationService } from '~~/server/services/models/invitationService';
+import { PERMISSIONS } from '@@/shared/schemas/v1/permission';
+
+import { InvitationService } from '~~/server/services/invitation';
 
 
 
 export default defineEventHandler({
     onRequest: [
         (event) => onRequestValidateSession(event, true),
-        (event) => onRequestValidateRole(event, ['admin', 'unregistered', 'clinician']),
+        (event) => onRequestValidatePermission(event, [
+            PERMISSIONS.INVITATION.VIEW.OWN,
+            PERMISSIONS.INVITATION.VIEW.ALL,
+            PERMISSIONS.INVITATION.VIEW.CLINICIAN_PATIENT,
+        ]),
     ],
     handler: async (event) => {
         const {
             session,
-            user_id: requestingUserId,
-
-            isAdmin,
-            isUnregistered,
-            isClinician
+            permissions
         } = await getPainCoachSession(event);
 
-        const query = getQuery(event);
-
-        const token = query.token as string;
-
-        let invitation_token: string | undefined = undefined;
-
-        if (isUnregistered) {
-            invitation_token = session.secure?.invitation_token;
-        }
-        else {
-            if (!isAdmin && !isClinician) {
-                throw createError({
-                    statusCode: 403,
-                    message: 'Only invited users and invitees can access invitations'
-                });
-            }
-
-            invitation_token = token;
-        }
-
-        if (!invitation_token) {
-            throw createError({
-                statusCode: 400,
-                message: 'Invalid request',
-            });
-        }
-
-        const transaction = await DatabaseService.getInstance().createTransaction();
-
         try {
-            if (isClinician) {
-                const clinicianInvitation = await transaction.query<{ exists: boolean }>(`
-                    SELECT EXISTS (
-                        SELECT 1 FROM private.user_invitation WHERE invitation_token = $1 AND invited_by = $2
-                    )
-                `, [invitation_token, requestingUserId]);
+            let token: string | undefined = getQuery(event).token as string | undefined;
 
-                if (!clinicianInvitation[0] || !clinicianInvitation[0].exists) {
-                    await transaction.rollback();
+            if (!token) {
+                //@ts-expect-error
+                token = session.secure?.invitation_token;
 
+                if (!token) {
                     throw createError({
-                        statusCode: 403,
-                        message: 'You are not authorised to view this invitation',
+                        statusCode: 400,
+                        message: 'Missing token',
                     });
                 }
             }
 
-            const validatedInvitation = await InvitationService.getLimitedInvitationByTokenTransaction(invitation_token, transaction);
-
-            transaction.commit();
-
-            return validatedInvitation;
+            return await InvitationService.getInvitation(token, session, permissions);
         }
         catch (error: unknown) {
-            await transaction.rollback();
-
             if (error instanceof H3Error) {
                 throw error;
             }
-
-            console.error('GET: /api/v1/auth/invite:', error);
-
-            throw createError({
-                statusCode: 500,
-                message: 'Internal server error',
-            });
+            else {
+                console.error('Error fetching invitation:', error);
+                throw createError({
+                    statusCode: 500,
+                    message: 'Internal Server Error',
+                });
+            }
         }
     }
 })

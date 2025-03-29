@@ -1,71 +1,81 @@
-import { H3Error } from 'h3';
-
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
-import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/validate-role';
+import { onRequestRejectRole } from '~~/server/utils/auth/request-middleware/role-reject';
+
+import { PERMISSIONS } from '@@/shared/schemas/v1/permission';
 
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
-import { validateCreateUserInvitationRequest } from '@@/shared/schemas/v1/user/invitation/create';
 
-import { DatabaseService } from '~~/server/services/databaseService';
-import { createPatientInvitation } from '~~/server/utils/auth/handlers/invite/patient';
-import { createAdminInvitation } from '~~/server/utils/auth/handlers/invite/admin';
+import { InvitationService } from '~~/server/services/invitation';
 
 
 
 export default defineEventHandler({
     onRequest: [
         (event) => onRequestValidateSession(event),
-        (event) => onRequestValidateRole(event, ['admin', 'clinician']),
+        (event) => onRequestRejectRole(event, 'unregistered'),
+        (event) => onRequestValidatePermission(event, [
+            PERMISSIONS.INVITATION.INVITE.OWNER,
+            PERMISSIONS.INVITATION.INVITE.ADMIN,
+            PERMISSIONS.INVITATION.INVITE.CLINICIAN,
+            PERMISSIONS.INVITATION.INVITE.PATIENT,
+            PERMISSIONS.INVITATION.INVITE.APP
+        ])
     ],
     handler: async (event) => {
         const {
-            userSession,
-            secureSession
+            session,
+            permissions
         } = await getPainCoachSession(event);
 
         const body = await readBody<CreateUserInvitationRequest>(event);
 
-        const transaction = await DatabaseService.getInstance().createTransaction();
+        await InvitationService.createInvitation(
+            body,
+            session,
+            permissions,
+        );
 
-        try {
-            const validatedData = validateCreateUserInvitationRequest(body);
+        // const transaction = await DatabaseService.getInstance().createTransaction();
 
-            if (validatedData.email !== validatedData.confirm_email) {
-                throw createError({
-                    statusCode: 400,
-                    message: 'Emails do not match',
-                });
-            }
+        // try {
+        //     const validatedData = validateCreateUserInvitationRequest(body);
 
-            const desiredRole = validatedData.primary_role;
+        //     if (validatedData.email !== validatedData.confirm_email) {
+        //         throw createError({
+        //             statusCode: 400,
+        //             message: 'Emails do not match',
+        //         });
+        //     }
 
-            if (desiredRole === 'patient') {
-                return createPatientInvitation(transaction, validatedData, secureSession);
-            }
-            else if (desiredRole === 'clinician') {
-                // return createClinicianInvitation(validatedData, secureSession);
-                return {
-                    message: 'Not implemented yet',
-                }
-            }
-            else if (desiredRole === 'admin') {
-                return createAdminInvitation(event, transaction, validatedData);
-            }
-        }
-        catch (error: unknown) {
-            await transaction.rollback();
-            console.log('Rolling back transaction due to error', error);
+        //     const desiredRole = validatedData.primary_role;
 
-            if (error instanceof H3Error) {
-                throw error;
-            }
+        //     if (desiredRole === 'patient') {
+        //         return createPatientInvitation(transaction, validatedData, secureSession);
+        //     }
+        //     else if (desiredRole === 'clinician') {
+        //         // return createClinicianInvitation(validatedData, secureSession);
+        //         return {
+        //             message: 'Not implemented yet',
+        //         }
+        //     }
+        //     else if (desiredRole === 'admin') {
+        //         return createAdminInvitation(event, transaction, validatedData);
+        //     }
+        // }
+        // catch (error: unknown) {
+        //     await transaction.rollback();
+        //     console.log('Rolling back transaction due to error', error);
 
-            throw createError({
-                statusCode: 500,
-                message: 'Internal server error',
-            });
-        }
+        //     if (error instanceof H3Error) {
+        //         throw error;
+        //     }
+
+        //     throw createError({
+        //         statusCode: 500,
+        //         message: 'Internal server error',
+        //     });
+        // }
     }
 })

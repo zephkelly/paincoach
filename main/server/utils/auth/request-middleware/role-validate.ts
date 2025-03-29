@@ -1,6 +1,9 @@
 import { type H3Event } from 'h3';
-import type { SecureSessionData, UserSession } from '#auth-utils';
-import type { AllRoles, Role } from '@@/shared/types/v1/role';
+import type { SecureSessionData } from '#auth-utils';
+import type { AllRoles } from '@@/shared/types/v1/role';
+
+import { getUserSessionContext } from '../session/getSession';
+
 
 
 /**
@@ -14,7 +17,7 @@ export async function onRequestValidateRole(
     allowedRoles: AllRoles[] | AllRoles,
     requireAll: boolean = false
 ) {
-    const secureSession = (await getUserSession(event)).secure as SecureSessionData;
+    const secureSession = (await getUserSessionContext(event)).session?.secure as SecureSessionData;
     
     // Make sure the user has roles
     if (!secureSession.roles || secureSession.roles.length === 0) {

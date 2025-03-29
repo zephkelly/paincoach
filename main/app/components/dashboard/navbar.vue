@@ -17,6 +17,7 @@
             <EButton @click="adminTogglesOpen = !adminTogglesOpen">Open</EButton>
             <div class="admin" v-show="adminTogglesOpen">
                 <EButton @click="test()">Test</EButton>
+                <EButton @click="test2()">Test2</EButton>
                 <input type="text" v-model="userIDRef">
                 <EButton @click="submitUserId">Maillist</EButton>
                 <EButton @click="setMockRoles(['clinician'])">View clinician</EButton>
@@ -35,6 +36,11 @@ import { EButton } from '#components';
 
 const adminTogglesOpen = ref(false);
 
+const {
+    permissions,
+    permissionsMap
+} = await usePermissions();
+
 const userIDRef = ref('');
 async function submitUserId() {
     const userData = await $fetch(`/api/v1/mailing-list`, {
@@ -48,7 +54,17 @@ async function submitUserId() {
 
 async function test() {
     try {
-        const response = await $fetch('/api/v1/user?roles=all&page=0&limit=10');
+        const response = await $fetch('/api/v1/auth/invite?token=e3647f31-feef-4f33-b2d2-85dcc908968a');
+        console.log(response);
+    }
+    catch(error) {
+        console.error(error);
+    }
+}
+
+async function test2() {
+    try {
+        const response = await $fetch('/api/v1/auth/permissions');
         console.log(response);
     }
     catch(error) {

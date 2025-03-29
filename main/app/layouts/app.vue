@@ -9,6 +9,11 @@
     </div>
 </template>
 
+<script lang="ts" setup>
+console.log('app.vue');
+await usePermissions();
+</script>
+
 <style lang="scss" scoped>
 .dashboard-container {
     display: flex;

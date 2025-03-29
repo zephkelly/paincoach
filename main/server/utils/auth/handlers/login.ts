@@ -38,7 +38,7 @@ export async function handleLoginCredentials(
 
         const session: UserSession = {
             user: {
-                user_uuid: user.uuid,
+                public_id: user.public_id,
                 first_name: user.first_name,
 
                 primary_role: user.primary_role,
@@ -48,8 +48,9 @@ export async function handleLoginCredentials(
                 profile_url: user.profile_url || undefined,
             },
             secure: {
-                user_id: user.id,
-                user_uuid: user.uuid,
+                id: user.id,
+                public_id: user.public_id,
+                
                 email: user.email,
                 primary_role: user.primary_role,
                 roles: user.roles,

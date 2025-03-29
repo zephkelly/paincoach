@@ -1,6 +1,6 @@
 import { type DBTransaction } from "~~/server/types/db";
 
-import { type User, type Role } from "~~lib/shared/types/users";
+// import { type User, type Role } from "~~lib/shared/types/users";
 import { getUserById } from "../get/byId";
 
 
@@ -202,29 +202,29 @@ export async function createUser(
     }
 }
 
-/**
- * Helper function to check if a user has permission to perform an action
- * @param transaction Database transaction
- * @param userId User ID requesting the action
- * @param requiredRoles Array of roles allowed to perform the action
- * @returns True if user has permission, false otherwise
- */
-export async function hasPermission(
-    transaction: DBTransaction,
-    userId: string,
-    requiredRoles: Role[]
-): Promise<boolean> {
-    const result = await transaction.query<{ role: string }>(`
-        SELECT r.name as role
-        FROM private.user u
-        JOIN private.role r ON u.role_id = r.id
-        WHERE u.id = $1
-    `, [userId]);
+// /**
+//  * Helper function to check if a user has permission to perform an action
+//  * @param transaction Database transaction
+//  * @param userId User ID requesting the action
+//  * @param requiredRoles Array of roles allowed to perform the action
+//  * @returns True if user has permission, false otherwise
+//  */
+// export async function hasPermission(
+//     transaction: DBTransaction,
+//     userId: string,
+//     requiredRoles: Role[]
+// ): Promise<boolean> {
+//     const result = await transaction.query<{ role: string }>(`
+//         SELECT r.name as role
+//         FROM private.user u
+//         JOIN private.role r ON u.role_id = r.id
+//         WHERE u.id = $1
+//     `, [userId]);
 
-    if (result.length === 0) {
-        return false;
-    }
+//     if (result.length === 0) {
+//         return false;
+//     }
 
-    const userRole = result[0]?.role as Role;
-    return requiredRoles.includes(userRole);
-}
+//     const userRole = result[0]?.role as Role;
+//     return requiredRoles.includes(userRole);
+// }

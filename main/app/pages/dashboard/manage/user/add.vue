@@ -65,7 +65,6 @@ const currentTabs = computed(() => {
 
 definePageMeta({
     layout: 'app',
-    middleware: 'manage-users-redirect'
 });
 </script>
 

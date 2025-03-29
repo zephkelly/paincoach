@@ -43,7 +43,7 @@ export const DBUserInvitationDataSchema = z.object({
     ...DBBaseUserSchema.pick({
         first_name: true,
         last_name: true,
-        title: true,
+        // title: true,
         profile_url: true,
         data_sharing_enabled: true
     }).shape,
@@ -54,7 +54,7 @@ export const DBUserInvitationDataPartialSchema = z.object({
     ...DBBaseUserSchema.pick({
         first_name: true,
         last_name: true,
-        title: true,
+        // title: true,
         profile_url: true,
         data_sharing_enabled: true
     }).partial().shape,

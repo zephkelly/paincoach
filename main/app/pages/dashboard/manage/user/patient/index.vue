@@ -1,9 +1,9 @@
 <template>
-    <PageTabs :tabs="patientTabs" :loading="userRole === 'patient'">
+    <PageTabs :tabs="patientTabs" :loading="primaryRole === 'patient'">
         <template #header>
             <div class="user-patient-page-title">
                 <Transition name="fade">
-                    <h1 v-if="ready && userRole !== 'patient'">Manage Patients</h1>
+                    <h1 v-if="ready && primaryRole !== 'patient'">Manage Patients</h1>
                     <div v-else
                         class="user-patient-page-title skeleton-component skeleton-component-panel skeleton-component-border-radius"
                         :style="{ width: 350 * (0.85 + Math.random() * 0.15) + 'px'}"
@@ -17,12 +17,10 @@
 <script lang="ts" setup>
 const {
     ready,
-    userRole
+    primaryRole
 } = useAuth();
 
-watch(() => userRole.value, (role) => {
-    const route = useRoute();
-
+watch(() => primaryRole.value, (role) => {
     if (role === 'patient') {
         navigateTo('/dashboard');
     }

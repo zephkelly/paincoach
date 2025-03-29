@@ -25,7 +25,7 @@ export const UserRegisterSchema = DBBaseUserWithRolesSchema.pick({
 
     data_sharing_enabled: true,
 }).extend({
-    user_uuid: UUIDSchema,
+    public_id: UUIDSchema,
 
     invitation_token: UUIDSchema,
 

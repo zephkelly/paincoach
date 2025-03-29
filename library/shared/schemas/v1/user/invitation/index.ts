@@ -20,13 +20,13 @@ export const DBUserInvitationSchema = DBBaseUserWithRolesSchema.pick({
     email: true,
     phone_number: true,
 }).extend({
-    id: BigIntSchema,
-    user_uuid: UUIDSchema,
+    id: UUIDSchema,
+    public_user_id: UUIDSchema,
 
     invitation_token: UUIDSchema,
-    linked_user_id: BigIntSchema.nullish(),
+    linked_user_id: UUIDSchema.nullish(),
 
-    invited_by: BigIntSchema,
+    invited_by_user_id: UUIDSchema,
     status: InvitationStatusSchema,
 
     expires_at: z.date(),

@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-import { BigIntSchema } from "../../primitives";
+import { UUIDSchema } from "../../primitives";
 
 
 export const DBMailingListSubscriptionSchema = z.object({
-    id: z.number(),
+    id: UUIDSchema,
     email: z.string(),
     name: z.string().optional(),
     subscription_date: z.date(),
@@ -12,7 +12,7 @@ export const DBMailingListSubscriptionSchema = z.object({
     is_active: z.boolean().default(true),
     unsubscribe_token: z.string(),
     source: z.string(),
-    user_id: BigIntSchema.nullable().optional(),
+    user_id: UUIDSchema.nullable().optional(),
     created_at: z.date(),
     updated_at: z.date(),
 })

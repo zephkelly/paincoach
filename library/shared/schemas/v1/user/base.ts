@@ -11,8 +11,8 @@ import { RoleSchema } from '../role';
 export const DBUserStatusSchema = z.enum(['active', 'inactive', 'pending'])
 
 export const DBBaseUserSchema = z.object({
-    id: BigIntSchema,
-    uuid: UUIDSchema,
+    id: UUIDSchema,
+    public_id: UUIDSchema,
 
     primary_role: RoleSchema,
 

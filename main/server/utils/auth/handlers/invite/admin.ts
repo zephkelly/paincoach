@@ -20,7 +20,7 @@ export async function createAdminInvitation(
         hasRole
     } = await getPainCoachSession(event);
 
-    let invitingUserId: number | bigint | undefined = undefined;
+    let invitingUserId: string | undefined = undefined;
     
     if (!hasRole('admin')) {
         throw createError({
@@ -29,7 +29,7 @@ export async function createAdminInvitation(
         });
     }
 
-    invitingUserId = secureSession.user_id;
+    invitingUserId = secureSession.id as string;
 
     const invitationToken = crypto.randomUUID();
 
@@ -42,21 +42,20 @@ export async function createAdminInvitation(
             INSERT INTO private.user_invitation (
                 email,
                 phone_number,
-                user_uuid,
                 invitation_token, 
-                invited_by, 
+                invited_by_user_id, 
                 primary_role,
                 roles,
                 expires_at,
                 invitation_data,
-                status
+                status,
+                public_user_id,
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending'
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending', uuid_generate_v7()
             ) RETURNING id
         `, [
             adminData.email,
             adminData.phone_number || null,
-            crypto.randomUUID(),
             invitationToken,
             invitingUserId,
             adminData.primary_role,

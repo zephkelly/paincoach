@@ -3,7 +3,7 @@ import { H3Error, defineEventHandler } from 'h3';
 import type { PaginationParams } from '@@/shared/types/api';
 
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
-import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/validate-role';
+import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/role-validate';
 
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
@@ -25,6 +25,7 @@ import type {
 } from '@@/shared/types/v1/user/info/get';
 
 import { validateUsersWithRoles } from '@@/shared/schemas/v1/user';
+import type { SecureSessionData } from '#auth-utils';
 
 
 
@@ -61,7 +62,7 @@ export default defineEventHandler({
         const db = await DatabaseService.getInstance().createTransaction();
 
         try {
-            if (hasRole(secureSession, ['owner', 'admin'])) {
+            if (hasRole(secureSession as SecureSessionData, ['owner', 'admin'])) {
                 const allfetchedUsers = await getAllUsers(db, paginationParams);
                 const validatedUsers = validateUsersWithRoles(allfetchedUsers);
 
@@ -105,7 +106,8 @@ export default defineEventHandler({
                 return adminUsersResponse
             }
             else {
-                const id = secureSession.user_id;
+                const id = secureSession.id as string;
+
                 const patientUsers = await getUsersClinicianPatients(db, paginationParams, id);
                 const validatedPatientUsers = validateUsersWithRoles(patientUsers) as PatientUserWithRoles[];
 

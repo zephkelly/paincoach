@@ -8,7 +8,7 @@ import { DBUserInvitationSchema } from './index';
 
 
 export const LimitedUserInvitationSchema = DBUserInvitationSchema.pick({
-    user_uuid: true,
+    public_user_id: true,
     email: true,
     phone_number: true,
     primary_role: true,

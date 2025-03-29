@@ -106,24 +106,23 @@ export default defineEventHandler(async (event) => {
             await clearUserSession(event);
 
             const temporarySession = await replaceUserSession(event, {
+                user: {
+                    public_id: validatedInvitation.public_user_id,
+                    first_name: validatedInvitation.invitation_data?.first_name || '',
+                    verified: false,
+                    primary_role: 'unregistered',
+                    roles: ['unregistered'],
+                },
                 secure: {
                     //@ts-expect-error
-                    user_id: null, // BigInt internal
-                    user_uuid: validatedInvitation.user_uuid, // UUID external
+                    id: null, // Internal
+                    public_id: validatedInvitation.public_user_id, // UUID external
                     primary_role: 'unregistered',
                     roles: ['unregistered'],
                     email: validatedInvitation.email,
                     verified: false,
 
                     invitation_token: token,
-                },
-                user: {
-                    user_uuid: validatedInvitation.user_uuid,
-                    first_name: validatedInvitation.invitation_data?.first_name || '',
-                    verified: false,
-                    primary_role: 'unregistered',
-                    roles: ['unregistered'],
-
                 },
                 invitation_data: validatedInvitation.invitation_data || {},
                 logged_in_at: new Date(),

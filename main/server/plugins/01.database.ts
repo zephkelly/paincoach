@@ -13,7 +13,7 @@ export default defineNitroPlugin(async (nitroApp: any) => {
         if (import.meta.dev) {
             await createTables(databaseServiceInstance)
 
-            await seedPermissions(databaseServiceInstance)
+            // await seedPermissions(databaseServiceInstance)
         }
     }
     catch (error) {
@@ -100,8 +100,14 @@ async function createTables(db: DatabaseService) {
             uuid UUID NOT NULL DEFAULT uuid_generate_v7() UNIQUE,
             name TEXT NOT NULL UNIQUE,
             description TEXT,
+            -- Core components of the permission string
             resource_type TEXT NOT NULL,
+            resource_subtype TEXT,
             action TEXT NOT NULL,
+            action_subtype TEXT,
+            access_level TEXT NOT NULL,
+            access_level_subtype TEXT,
+            -- Metadata
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
@@ -109,8 +115,8 @@ async function createTables(db: DatabaseService) {
 
     await db.query(`
         CREATE TABLE IF NOT EXISTS private.user (
-            id BIGSERIAL PRIMARY KEY,
-            uuid UUID NOT NULL DEFAULT uuid_generate_v7() UNIQUE,
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+            public_id UUID NOT NULL DEFAULT uuid_generate_v7() UNIQUE,
             email TEXT NOT NULL UNIQUE,
             last_email_bounced_date TIMESTAMPTZ,
             verified BOOLEAN DEFAULT false,
@@ -132,13 +138,13 @@ async function createTables(db: DatabaseService) {
         );
 
         CREATE TABLE IF NOT EXISTS private.user_invitation (
-            id BIGSERIAL PRIMARY KEY,
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
             user_uuid UUID NOT NULL DEFAULT uuid_generate_v7() UNIQUE,
             email TEXT NOT NULL,
             phone_number TEXT,
-            linked_user_id BIGINT REFERENCES private.user(id) DEFAULT NULL, 
+            linked_user_id UUID REFERENCES private.user(id) DEFAULT NULL, 
             invitation_token TEXT NOT NULL DEFAULT uuid_generate_v7() UNIQUE,
-            invited_by BIGINT REFERENCES private.user(id) NOT NULL,
+            invited_by_user_id UUID REFERENCES private.user(id) NOT NULL,
             primary_role TEXT REFERENCES private.role(name) NOT NULL,
             roles TEXT[] NOT NULL,
             invitation_data JSONB,
@@ -149,7 +155,7 @@ async function createTables(db: DatabaseService) {
         );
 
         CREATE TABLE IF NOT EXISTS private.user_role (
-            user_id BIGINT REFERENCES private.user(id) ON DELETE CASCADE,
+            user_id UUID REFERENCES private.user(id) ON DELETE CASCADE,
             role_id BIGINT REFERENCES private.role(id) ON DELETE CASCADE,
             is_primary BOOLEAN DEFAULT false,
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -165,9 +171,9 @@ async function createTables(db: DatabaseService) {
         );
 
         CREATE TABLE IF NOT EXISTS private.user_permission (
-            user_id BIGINT REFERENCES private.user(id) ON DELETE CASCADE,
+            user_id UUID REFERENCES private.user(id) ON DELETE CASCADE,
             permission_id BIGINT REFERENCES private.permission(id) ON DELETE CASCADE,
-            granted_by BIGINT REFERENCES private.user(id),
+            granted_by UUID REFERENCES private.user(id),
             granted_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (user_id, permission_id)
         );
@@ -175,7 +181,7 @@ async function createTables(db: DatabaseService) {
 
     await db.query(`
         CREATE TABLE IF NOT EXISTS private.clinician_profile (
-            user_id BIGINT PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
+            user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
             -- Public information (visible to admin and associated patients)
             ahprah_registration_number TEXT NOT NULL,
             specialisation TEXT,
@@ -188,7 +194,7 @@ async function createTables(db: DatabaseService) {
         );
 
         CREATE TABLE IF NOT EXISTS private.patient_profile (
-            user_id BIGINT PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
+            user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
@@ -196,7 +202,7 @@ async function createTables(db: DatabaseService) {
 
     await db.query(`
         CREATE TABLE IF NOT EXISTS private.email_feedback (
-            feedback_id SERIAL PRIMARY KEY,
+            feedback_id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
             email TEXT NOT NULL,
             feedback_type TEXT NOT NULL,
             sub_type TEXT NOT NULL,
@@ -210,7 +216,7 @@ async function createTables(db: DatabaseService) {
         );
 
         CREATE TABLE IF NOT EXISTS private.mailing_list_subscription (
-            id BIGINT PRIMARY KEY,
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
             email TEXT NOT NULL UNIQUE,
             name TEXT,
             subscription_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -218,7 +224,7 @@ async function createTables(db: DatabaseService) {
             is_active BOOLEAN DEFAULT TRUE,
             unsubscribe_token TEXT UNIQUE,
             source TEXT,
-            user_id BIGINT REFERENCES private.user(id) ON DELETE SET NULL,
+            user_id UUID REFERENCES private.user(id) ON DELETE SET NULL,
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
@@ -226,7 +232,7 @@ async function createTables(db: DatabaseService) {
 }
 
 async function seedPermissions(db: DatabaseService) {
-    // Existing role creation
+    // Ensure roles exist first
     await db.query(`
         INSERT INTO private.role (name, description)
         VALUES
@@ -238,54 +244,336 @@ async function seedPermissions(db: DatabaseService) {
         ON CONFLICT (name) DO NOTHING;
     `);
 
-    // Insert permissions with clinician-patient relationship
-    await db.query(`
-        INSERT INTO private.permission (name, description, resource_type, action)
-        VALUES
-        -- Invitation permissions
-        ('Invite Owner', 'Ability to invite owners', 'invitation', 'invite:owner'),
-        ('Invite Admin', 'Ability to invite administrators', 'invitation', 'invite:admin'),
-        ('Invite Clinician', 'Ability to invite clinicians', 'invitation', 'invite:clinician'),
-        ('Invite Patient', 'Ability to invite patients', 'invitation', 'invite:patient'),
-        
-        -- User data access permissions
-        -- Owner data access
-        ('View Owner Full', 'View complete owner user data', 'user:owner', 'view:full'),
-        ('View Owner Limited', 'View limited owner user data', 'user:owner', 'view:limited'),
-        ('View Owner Basic', 'View basic owner user data', 'user:owner', 'view:basic'),
-        ('Manage Owner', 'Manage owner user data', 'user:owner', 'manage'),
-        
-        -- Admin data access
-        ('View Admin Full', 'View complete admin user data', 'user:admin', 'view:full'),
-        ('View Admin Limited', 'View limited admin user data', 'user:admin', 'view:limited'),
-        ('View Admin Basic', 'View basic admin user data', 'user:admin', 'view:basic'),
-        ('Manage Admin', 'Manage admin user data', 'user:admin', 'manage'),
-        
-        -- Clinician data access
-        ('View Clinician Full', 'View complete clinician user data', 'user:clinician', 'view:full'),
-        ('View Clinician Limited', 'View limited clinician user data', 'user:clinician', 'view:limited'),
-        ('View Clinician Basic', 'View basic clinician user data', 'user:clinician', 'view:basic'),
-        ('Manage Clinician', 'Manage clinician user data', 'user:clinician', 'manage'),
-        
-        -- Patient data access (general)
-        ('View Patient Full', 'View complete patient user data', 'user:patient', 'view:full'),
-        ('View Patient Limited', 'View limited patient user data', 'user:patient', 'view:limited'),
-        ('View Patient Basic', 'View basic patient user data', 'user:patient', 'view:basic'),
-        ('Manage Patient', 'Manage patient user data', 'user:patient', 'manage'),
-        
-        -- Clinician-Patient relationship (for clinicians'' own patients)
-        ('View Clinician Patient Full', 'View complete data for clinician''s own patients', 'user:clinician-patient', 'view:full'),
-        ('View Clinician Patient Limited', 'View limited data for clinician''s own patients', 'user:clinician-patient', 'view:limited'),
-        ('View Clinician Patient Basic', 'View basic data for clinician''s own patients', 'user:clinician-patient', 'view:basic'),
-        ('Manage Clinician Patient', 'Manage clinician''s own patients', 'user:clinician-patient', 'manage'),
-        
-        -- App permissions
-        ('Use Pain App', 'Ability to use the pain management app', 'app', 'pain:use'),
-        ('Use Mood App', 'Ability to use the mood tracking app', 'app', 'mood:use'),
-        ('Use Marriage App', 'Ability to use the marriage counseling app', 'app', 'marriage:use')
+    // Helper function to insert permissions with the new structure
+    async function insertPermission(
+        name: string,
+        description: string,
+        resourceType: string,
+        action: string,
+        accessLevel: string,
+        resourceSubtype?: string,
+        actionSubtype?: string,
+        accessLevelSubtype?: string
+    ) {
+        await db.query(`
+            INSERT INTO private.permission (
+                name, 
+                description, 
+                resource_type, 
+                resource_subtype, 
+                action, 
+                action_subtype, 
+                access_level, 
+                access_level_subtype
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            ON CONFLICT (name) DO UPDATE SET
+                description = EXCLUDED.description,
+                resource_type = EXCLUDED.resource_type,
+                resource_subtype = EXCLUDED.resource_subtype,
+                action = EXCLUDED.action,
+                action_subtype = EXCLUDED.action_subtype,
+                access_level = EXCLUDED.access_level,
+                access_level_subtype = EXCLUDED.access_level_subtype;
+        `, [
+            name, 
+            description, 
+            resourceType, 
+            resourceSubtype || null, 
+            action, 
+            actionSubtype || null, 
+            accessLevel, 
+            accessLevelSubtype || null
+        ]);
+    }
 
-        ON CONFLICT (name) DO NOTHING;
-    `);
+    // Insert invitation permissions
+    await insertPermission(
+        'Invite Owner', 
+        'Ability to invite owners', 
+        'invitation', 
+        'invite', 
+        'full', 
+        'owner'
+    );
+    
+    await insertPermission(
+        'Invite Admin', 
+        'Ability to invite administrators', 
+        'invitation', 
+        'invite', 
+        'full', 
+        'admin'
+    );
+    
+    await insertPermission(
+        'Invite Clinician', 
+        'Ability to invite clinicians', 
+        'invitation', 
+        'invite', 
+        'full', 
+        'clinician'
+    );
+    
+    await insertPermission(
+        'Invite Patient', 
+        'Ability to invite patients', 
+        'invitation', 
+        'invite', 
+        'full', 
+        'patient'
+    );
+
+    await insertPermission(
+        'Invite App User', 
+        'Ability to invite users with app access', 
+        'invitation', 
+        'invite', 
+        'full', 
+        'app'
+    );
+    
+    await insertPermission(
+        'View All Invitations',
+        'Ability to view all invitations in the system',
+        'invitation',
+        'view',
+        'full'
+    );
+
+    await insertPermission(
+        'View Clinician-Patient Invitations',
+        'Ability for clinicians to view invitations they sent to patients',
+        'invitation',
+        'view',
+        'limited',
+        'clinician-patient'
+    );
+      
+    await insertPermission(
+        'View Own Invitation',
+        'Ability to view your own invitation with session ID',
+        'invitation',
+        'view',
+        'limited',
+        undefined,
+        undefined,
+        'personal'
+    );
+
+    // Insert user data access permissions - Owner
+    await insertPermission(
+        'View Owner Full', 
+        'View complete owner user data', 
+        'user', 
+        'view', 
+        'full', 
+        'owner'
+    );
+    
+    await insertPermission(
+        'View Owner Limited', 
+        'View limited owner user data', 
+        'user', 
+        'view', 
+        'limited', 
+        'owner'
+    );
+    
+    await insertPermission(
+        'View Owner Basic', 
+        'View basic owner user data', 
+        'user', 
+        'view', 
+        'basic', 
+        'owner'
+    );
+    
+    await insertPermission(
+        'Manage Owner', 
+        'Manage owner user data', 
+        'user', 
+        'manage', 
+        'full', 
+        'owner'
+    );
+
+    // Insert user data access permissions - Admin
+    await insertPermission(
+        'View Admin Full', 
+        'View complete admin user data', 
+        'user', 
+        'view', 
+        'full', 
+        'admin'
+    );
+    
+    await insertPermission(
+        'View Admin Limited', 
+        'View limited admin user data', 
+        'user', 
+        'view', 
+        'limited', 
+        'admin'
+    );
+    
+    await insertPermission(
+        'View Admin Basic', 
+        'View basic admin user data', 
+        'user', 
+        'view', 
+        'basic', 
+        'admin'
+    );
+    
+    await insertPermission(
+        'Manage Admin', 
+        'Manage admin user data', 
+        'user', 
+        'manage', 
+        'full', 
+        'admin'
+    );
+
+    // Insert user data access permissions - Clinician
+    await insertPermission(
+        'View Clinician Full', 
+        'View complete clinician user data', 
+        'user', 
+        'view', 
+        'full', 
+        'clinician'
+    );
+    
+    await insertPermission(
+        'View Clinician Limited', 
+        'View limited clinician user data', 
+        'user', 
+        'view', 
+        'limited', 
+        'clinician'
+    );
+    
+    await insertPermission(
+        'View Clinician Basic', 
+        'View basic clinician user data', 
+        'user', 
+        'view', 
+        'basic', 
+        'clinician'
+    );
+    
+    await insertPermission(
+        'Manage Clinician', 
+        'Manage clinician user data', 
+        'user', 
+        'manage', 
+        'full', 
+        'clinician'
+    );
+
+    // Insert user data access permissions - Patient
+    await insertPermission(
+        'View Patient Full', 
+        'View complete patient user data', 
+        'user', 
+        'view', 
+        'full', 
+        'patient'
+    );
+    
+    await insertPermission(
+        'View Patient Limited', 
+        'View limited patient user data', 
+        'user', 
+        'view', 
+        'limited', 
+        'patient'
+    );
+    
+    await insertPermission(
+        'View Patient Basic', 
+        'View basic patient user data', 
+        'user', 
+        'view', 
+        'basic', 
+        'patient'
+    );
+    
+    await insertPermission(
+        'Manage Patient', 
+        'Manage patient user data', 
+        'user', 
+        'manage', 
+        'full', 
+        'patient'
+    );
+
+    // Insert clinician-patient relationship permissions
+    await insertPermission(
+        'View Clinician Patient Full', 
+        'View complete data for clinician\'s own patients', 
+        'user', 
+        'view', 
+        'full', 
+        'clinician-patient'
+    );
+    
+    await insertPermission(
+        'View Clinician Patient Limited', 
+        'View limited data for clinician\'s own patients', 
+        'user', 
+        'view', 
+        'limited', 
+        'clinician-patient'
+    );
+    
+    await insertPermission(
+        'View Clinician Patient Basic', 
+        'View basic data for clinician\'s own patients', 
+        'user', 
+        'view', 
+        'basic', 
+        'clinician-patient'
+    );
+    
+    await insertPermission(
+        'Manage Clinician Patient', 
+        'Manage clinician\'s own patients', 
+        'user', 
+        'manage', 
+        'full', 
+        'clinician-patient'
+    );
+
+    // Insert app permissions
+    await insertPermission(
+        'Use Pain App', 
+        'Ability to use the pain management app', 
+        'app', 
+        'use', 
+        'full', 
+        'pain'
+    );
+    
+    await insertPermission(
+        'Use Mood App', 
+        'Ability to use the mood tracking app', 
+        'app', 
+        'use', 
+        'full', 
+        'mood'
+    );
+    
+    await insertPermission(
+        'Use Marriage App', 
+        'Ability to use the marriage counseling app', 
+        'app', 
+        'use', 
+        'full', 
+        'marriage'
+    );
+
 
     // Owner permissions (can do everything)
     await db.query(`
@@ -305,7 +593,10 @@ async function seedPermissions(db: DatabaseService) {
             -- User data manage permissions (except owners)
             'Manage Admin',
             'Manage Clinician',
-            'Manage Patient'
+            'Manage Patient',
+            
+            -- App permissions
+            'Use Pain App', 'Use Mood App', 'Use Marriage App'
         )
         ON CONFLICT DO NOTHING;
     `);
@@ -327,12 +618,15 @@ async function seedPermissions(db: DatabaseService) {
             
             -- User data manage permissions
             'Manage Clinician',
-            'Manage Patient'
+            'Manage Patient',
+            
+            -- App permissions
+            'Use Pain App', 'Use Mood App', 'Use Marriage App'
         )
         ON CONFLICT DO NOTHING;
     `);
 
-    // Clinician permissions - UPDATED to only manage their own patients
+    // Clinician permissions
     await db.query(`
         INSERT INTO private.role_permission (role_id, permission_id)
         SELECT r.id, p.id
@@ -345,16 +639,19 @@ async function seedPermissions(db: DatabaseService) {
             'View Owner Basic',
             'View Admin Basic',
             'View Clinician Basic',
-            'View Patient Basic', -- Changed from FULL to BASIC
+            'View Patient Basic',
             
-            -- Clinician-Patient relationship (for their own patients)
+            -- Clinician-Patient relationship permissions
             'View Clinician Patient Full',
-            'Manage Clinician Patient'
+            'Manage Clinician Patient',
+            
+            -- App permissions
+            'Use Pain App', 'Use Mood App', 'Use Marriage App'
         )
         ON CONFLICT DO NOTHING;
     `);
 
-    // Patient permissions remain the same
+    // Patient permissions
     await db.query(`
         INSERT INTO private.role_permission (role_id, permission_id)
         SELECT r.id, p.id
@@ -363,12 +660,48 @@ async function seedPermissions(db: DatabaseService) {
             -- Only basic view permissions
             'View Owner Basic',
             'View Admin Basic',
-            'View Clinician Basic'
-            -- No patient view permissions
-            -- No management permissions
+            'View Clinician Basic',
+            
+            -- App permissions
+            'Use Pain App', 'Use Mood App'
         )
         ON CONFLICT DO NOTHING;
     `);
 
-    console.log('DatabaseService: Permissions seeded');
+    await db.query(`
+        INSERT INTO private.role_permission (role_id, permission_id)
+        SELECT r.id, p.id
+        FROM private.role r, private.permission p
+        WHERE r.name IN ('owner', 'admin', 'clinician') AND p.name = 'Invite App User'
+        ON CONFLICT DO NOTHING;
+    `);
+
+
+    await db.query(`
+        INSERT INTO private.role_permission (role_id, permission_id)
+        SELECT r.id, p.id
+        FROM private.role r, private.permission p
+        WHERE r.name IN ('owner', 'admin') AND p.name = 'View All Invitations'
+        ON CONFLICT DO NOTHING;
+      `);
+      
+      // Clinicians can view their own patient invitations
+      await db.query(`
+        INSERT INTO private.role_permission (role_id, permission_id)
+        SELECT r.id, p.id
+        FROM private.role r, private.permission p
+        WHERE r.name = 'clinician' AND p.name = 'View Clinician-Patient Invitations'
+        ON CONFLICT DO NOTHING;
+      `);
+      
+      // All users can view their own invitations
+      await db.query(`
+        INSERT INTO private.role_permission (role_id, permission_id)
+        SELECT r.id, p.id
+        FROM private.role r, private.permission p
+        WHERE r.name IN ('owner', 'admin', 'clinician', 'patient') AND p.name = 'View Own Invitation'
+        ON CONFLICT DO NOTHING;
+      `);
+
+    console.log('DatabaseService: Permissions seeded with new structure');
 }

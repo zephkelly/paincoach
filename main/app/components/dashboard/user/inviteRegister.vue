@@ -32,7 +32,7 @@
                                     v-for="role in inviteeRoles"
                                     :userRole="role"
                                     paneled
-                                    :collapsable="(inviteeRoles.length > 1) && (role !== inviteePrimaryRole)"
+                                    :collapsable="(inviteeRoles && inviteeRoles.length > 1) && (role !== inviteePrimaryRole)"
                                     class="user-role"
                                 />
                             </div>
@@ -52,7 +52,7 @@
                             :default="field.default"
                             v-model="state[field.identifier]"
                         />
-                        <EInput v-if="!inviteeRoles.includes('patient')"
+                        <EInput v-if="!inviteeRoles || !inviteeRoles.includes('patient')"
                             class="will-use-app-input"
                             id="will_use_app"
                             type="checkbox"
@@ -60,7 +60,7 @@
                             v-model="state['will_use_app']"
                             :required="false"
                         />
-                        <EInput v-if="!inviteeRoles.includes('patient')"
+                        <EInput v-if="!inviteeRoles || !inviteeRoles.includes('patient')"
                             class="requires-medication-input"
                             :class="{ collapsed: !state['will_use_app']}"
                             id="requires_medication"
@@ -69,7 +69,7 @@
                             v-model="userRequiresMedication"
                             :required="false"
                         />
-                        <div v-if="inviteeRoles.includes('patient')"
+                        <div v-if="!inviteeRoles || inviteeRoles.includes('patient')"
                             id="patient-medications-section"
                             class="patient-medications-section"
                         />
@@ -97,14 +97,14 @@
                             :required="field.required"
                             :tabindex="field.tabindex"
                             :default="field.default"
-                            v-model="state[field.identifier]"
+
                         />
                     </div>
                 </div>
                 
             </div>
 
-            <div v-if="!inviteeRoles.includes('patient')" 
+            <div v-if="!inviteeRoles || !inviteeRoles.includes('patient')" 
                 class="form-section medications"
                 :class="{ collapsed: !(state['will_use_app'] && userRequiresMedication) }">
 
@@ -236,7 +236,7 @@ watch(medicationsErrors, () => {
 })
 
 const medicationsTeleportTarget = computed(() => {
-    if (inviteeRoles.value.includes('patient')) {
+    if (inviteeRoles.value && inviteeRoles.value.includes('patient')) {
         return (state.value['will_use_app']) ? '#patient-medications-section' : null;
     }
     else {

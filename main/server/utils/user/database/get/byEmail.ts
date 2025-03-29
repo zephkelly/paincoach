@@ -46,7 +46,7 @@ export async function getMinimalUserWithRoles(
         // Get basic user data
         const userResult = await db.query<MinimalUserWithRoles>(`
             SELECT
-                u.uuid,
+                u.public_id,
                 u.email,
                 u.profile_url,
                 u.first_name,

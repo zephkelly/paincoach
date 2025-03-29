@@ -2,7 +2,7 @@ import { ZodError } from 'zod';
 import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 import { onRequestValidateSession } from '~~/server/utils/auth/request-middleware/validate-session';
-import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/validate-role';
+import { onRequestValidateRole } from '~~/server/utils/auth/request-middleware/role-validate';
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
 import { DatabaseService } from '~~/server/services/databaseService';
@@ -50,7 +50,7 @@ export default defineEventHandler({
 
             setResponseStatus(event, 200);
             const fetchedUserInformation: MinimalUserWithRoles = {
-                uuid: user.uuid,
+                public_id: user.public_id,
                 primary_role: user.primary_role,
                 roles: user.roles,
                 email: user.email,

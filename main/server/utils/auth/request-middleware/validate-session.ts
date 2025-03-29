@@ -1,32 +1,39 @@
-import type {UserSession } from '#auth-utils';
-import { type H3Event } from 'h3';
+import type { H3Event } from 'h3';
 
+import { getUserSessionContext } from '~~/server/utils/auth/session/getSession';
+import { validateRegisteredSessionObjectSchema, validateUnregisterdSessionObjectSchema } from '@@/shared/schemas/v1/session';
 
 
 export async function onRequestValidateSession(event: H3Event, allowUnregistered: boolean = false) {
-    const session = await getUserSession(event) as UserSession;
+    const { session } = await getUserSessionContext(event);
 
-    if (!session || !session.secure || !session.user) {
+    if (!session) {
         throw createError({
             statusCode: 401,
             statusMessage: 'Unauthorized'
         });
     }
 
-    if (allowUnregistered) {
-        if (!session.secure.user_uuid || (!session.secure.roles || session.secure.roles.length === 0) && !session.secure.invitation_token) {
-            throw createError({
-                statusCode: 403,
-                statusMessage: 'Unauthorized'
-            });
+    // Deep validate the session object
+    try {
+        if (allowUnregistered) {
+            if (session.secure?.verified) {
+                validateRegisteredSessionObjectSchema(session);
+            }
+            else {
+                validateUnregisterdSessionObjectSchema(session);
+            }
+        }
+        else {
+            validateRegisteredSessionObjectSchema(session);
         }
     }
-    else {
-        if (!session.secure.verified || !session.secure.user_id || (!session.secure.roles || session.secure.roles.length === 0)) {
-            throw createError({
-                statusCode: 403,
-                statusMessage: 'Unauthorized'
-            });
-        }
+    catch (error) {
+        console.error('Session validation error:', error);
+
+        throw createError({
+            statusCode: 400,
+            statusMessage: 'Invalid session data'
+        });
     }
 }

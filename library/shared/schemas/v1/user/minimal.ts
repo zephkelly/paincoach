@@ -5,7 +5,7 @@ import { DBBaseUserSchema, DBBaseUserWithRolesSchema } from './base';
 
 
 export const BaseMinimalUserSchema = DBBaseUserSchema.pick({
-    uuid: true,
+    public_id: true,
     primary_role: true,
     email: true,
     status: true,
@@ -16,7 +16,7 @@ export const BaseMinimalUserSchema = DBBaseUserSchema.pick({
 })
 
 export const BaseMinimalUserWithRolesSchema = DBBaseUserWithRolesSchema.pick({
-    uuid: true,
+    public_id: true,
     primary_role: true,
     roles: true,
     email: true,

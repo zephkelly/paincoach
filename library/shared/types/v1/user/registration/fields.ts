@@ -1,4 +1,5 @@
 import { type InputField } from "@@/layers/ember/types/input"
+import type { DBClinicianUserData } from "@@/shared/types/v1/user/role/clinician/data"
 import type { DBEncryptedMedicationDataV1 } from "@@/shared/types/v1/medication/v1"
 
 import type { UserRegisterPartial } from ".";
@@ -54,7 +55,11 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: RegisterInputField[] = [
     }
 ];
 
-export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: InputField[] = [
+
+export type ClinicianRegisterInputField = InputField & {
+    identifier: keyof DBClinicianUserData;
+}
+export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: ClinicianRegisterInputField[] = [
     {
         inputType: 'text',
         label: 'AHPRHA Registration Number',

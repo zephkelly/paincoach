@@ -18,7 +18,7 @@ import { ZodError } from "zod";
 
 
 
-export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation>) => {
+export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation | null>) => {
     const invitedRoles = computed(() => {
         if (!invitation.value) {
             return [];
@@ -47,16 +47,16 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation>
     });
 
     const state = useState<UserRegisterPartial>('user-register-state', () => ({
-        uuid: invitation.value.user_uuid,
-        email: invitation.value.email,
-        phone_number: invitation.value.phone_number,
-        first_name: invitation.value.invitation_data.first_name,
-        last_name: invitation.value.invitation_data.last_name,
-        data_sharing_enabled: invitation.value.invitation_data.data_sharing_enabled,
-        will_use_app: (invitation.value.primary_role === "patient") ? true : false,
+        public_id: invitation.value?.public_user_id,
+        email: invitation.value?.email,
+        phone_number: invitation.value?.phone_number,
+        first_name: invitation.value?.invitation_data.first_name,
+        last_name: invitation.value?.invitation_data.last_name,
+        data_sharing_enabled: invitation.value?.invitation_data.data_sharing_enabled,
+        will_use_app: (invitation.value?.primary_role === "patient") ? true : false,
 
-        primary_role: invitation.value.primary_role,
-        roles: invitation.value.roles,
+        primary_role: invitation.value?.primary_role,
+        roles: invitation.value?.roles,
 
         medications: undefined,
     }));

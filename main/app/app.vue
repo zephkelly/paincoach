@@ -29,9 +29,5 @@
 </template>
 
 <script lang="ts" setup>
-const {
-    fetchPermissions
-} = usePermissions();
 
-await fetchPermissions();
 </script>

@@ -11,18 +11,24 @@ export const useInvite = async () => {
         error: invitationError,
     } = await useFetch('/api/v1/auth/invite');
 
-    const invitation = computed(() => validateLimitedUserInvitation(invitationData.value));
+    const invitation = computed(() => {
+        if (invitationStatus.value !== 'success') {
+            return null;
+        }
+
+        return validateLimitedUserInvitation(invitationData.value)
+    });
     const loaded = computed(() => invitation !== null && invitation !== undefined);
     const fetching = computed(() => invitationStatus.value === 'pending');
 
     // Computed invitation information
-    const inviterFirstName = computed(() => invitation.value.inviter_name);
-    const inviterProfileImageUrl = computed(() => invitation.value.inviter_profile_url);
+    const inviterFirstName = computed(() => invitation.value?.inviter_name);
+    const inviterProfileImageUrl = computed(() => invitation.value?.inviter_profile_url);
 
-    const inviteeFirstName = computed(() => invitation.value.invitation_data.first_name);
-    const inviteeRoles = computed(() => invitation.value.roles);
-    const inviteePrimaryRole = computed(() => invitation.value.primary_role);
-    const inviteeAdditionalRoles = computed(() => invitation.value.roles.filter((role: Role) => role !== invitation.value.primary_role));
+    const inviteeFirstName = computed(() => invitation.value?.invitation_data.first_name);
+    const inviteeRoles = computed(() => invitation.value?.roles);
+    const inviteePrimaryRole = computed(() => invitation.value?.primary_role);
+    const inviteeAdditionalRoles = computed(() => invitation.value?.roles.filter((role: Role) => role !== invitation.value?.primary_role));
 
 
     return {
