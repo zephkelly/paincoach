@@ -31,6 +31,7 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: RegisterInputField[] = [
         identifier: 'title',
         tabindex: 1,
         required: true,
+        default: null,
         options: [
             { label: 'Prof', value: 'Prof' },
             { label: 'Dr', value: 'Dr' },
@@ -88,7 +89,7 @@ export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: ClinicianRegisterInputField[
         label: 'Specialisation',
         identifier: 'specialisation',
         tabindex: 1,
-        required: false,
+        required: true,
         default: 'physiotherapy',
         readonly: true,
     },

@@ -52,7 +52,7 @@ export function createZodValidationError(error: ZodError, includeFirstErrorOnly 
     const fieldErrors = error.format();
 
     const formattedErrors = extractZodErrors(fieldErrors, '', {}, includeFirstErrorOnly);
-
+    console.log(fieldErrors)
     if (import.meta.client) {
         throw new Error('Validation failed');
     }

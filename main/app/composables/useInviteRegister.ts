@@ -1,3 +1,4 @@
+import { H3Error } from "h3";
 import { ZodError } from "zod";
 import type { Role } from "@@/shared/types/v1/role";
 import type { LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
@@ -12,7 +13,6 @@ import {
 
 
 import type { UserRegisterPartial } from "@@/shared/types/v1/user/registration";
-import { validateUserRegister } from "@@/shared/schemas/v1/user/registration";
 
 import { DBUserRegistrationDataPartialSchema } from "@@/shared/schemas/v1/user/registration/data/index";
 
@@ -24,6 +24,7 @@ import {
     validateCreateEncryptedPainMedicationDataV1RequestsPartial
 } from "@@/shared/schemas/v1/medication/v1";
 
+import { userRegisterValidator } from "@@/shared/schemas/v1/user/registration/index";
 
 
 
@@ -119,14 +120,17 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         }
 
         try {
-            const validatedData = validateUserRegister(state.value);
-            console.log("Validated user register data", validatedData); 
+            const validatedData = userRegisterValidator.validate(state.value);
             return validatedData;
         }
-        catch (error: unknown) { }
+        catch (error: unknown) {
+            if (error instanceof H3Error) {
+                console.log(error.data);
+            }
+        }
             
         return null;
-    }, 600);
+    }, 1000);
 
 
     const isValid = ref(false);
@@ -146,7 +150,7 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
                 
                 try {
                     // This will throw if invalid
-                    validateUserRegister({
+                    userRegisterValidator.validate({
                         ...state.value,
                         ...fieldToValidate
                     });
@@ -172,13 +176,11 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             }
             
             // Validate the entire form
-            const validatedData = validateUserRegister(state.value);
-            console.log(validatedData);
+            const validatedData = userRegisterValidator.validate(state.value);
             formErrors.value = {}; // Clear previous errors
             isValid.value = true;
             return true;
         } catch (error: unknown) {
-            console.log("Error validating user register data", error);
             if (error instanceof ZodError) {
                 // Map all errors to their respective fields
                 formErrors.value = {};
@@ -192,26 +194,6 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             return false;
         }
     }
-
-
-    // watch(state, (newState) => {
-    //     if (!newState) {
-    //         return; // Just return without a value, as watch callbacks don't use return values
-    //     }
-        
-    //     try {
-    //         const validatedData = validateUserRegister(newState);
-    //         // Do something with the validated data if needed
-    //         console.log("Data is valid:", validatedData);
-    //     }
-    //     catch (error: unknown) {
-    //         console.log("Error validating user register data", error);
-    //         if (error instanceof ZodError) {
-    //             console.error("Error validating user register data", error);
-    //         }
-    //     }
-    // }, { deep: true, immediate: true });
-
 
     const medicationsErrors = ref<Map<number, Map<string, string | undefined>>>(new Map(new Map()));
 

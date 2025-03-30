@@ -51,6 +51,8 @@
                             :tabindex="field.tabindex"
                             :default="field.default"
                             :options="field.options"
+                            :identifier="field.identifier"
+                            :validator="userRegisterValidator"
                             @blur="validate(undefined)"
                             v-model="state[field.identifier]"
                         />
@@ -82,8 +84,11 @@
             <div class="form-section clinician-profile">
                 <div class="form-inner">
                     <div class="form-header">
-                        <h2>Additional Clinician Profile</h2>
-                        <p>Enter your clinician's information</p>
+                        <div class="title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor"><path d="M20 22v-3c0-2.828 0-4.243-.879-5.121C18.243 13 16.828 13 14 13l-2 2l-2-2c-2.828 0-4.243 0-5.121.879C4 14.757 4 16.172 4 19v3m12-9v5.5"/><path d="M8.5 13v4m0 0a2 2 0 0 1 2 2v1m-2-3a2 2 0 0 0-2 2v1m9-13.5v-1a3.5 3.5 0 1 0-7 0v1a3.5 3.5 0 1 0 7 0m1.25 12.75a.75.75 0 1 1-1.5 0a.75.75 0 0 1 1.5 0"/></g></svg>
+                            <h2>Clinician Profile</h2>
+                        </div>
+                        <p>This information may be used for verification purposes</p>
                     </div>
                     <div class="form-content">
                         <component
@@ -100,6 +105,8 @@
                             :tabindex="field.tabindex"
                             :default="field.default"
                             :options="field.options"
+                            :identifier="field.identifier"
+                            :validator="userRegisterValidator"
                             @blur="validate(undefined)"
                             :modelValue="getRoleField('clinician', field.identifier)"
                             @update:modelValue="setRoleField('clinician', field.identifier, $event)"
@@ -252,8 +259,8 @@ const {
     validatedRegistrationData
 } = useInviteRegister(invitation);
 
+import { userRegisterValidator } from '@@/shared/schemas/v1/user/registration';
 
-console.log(validatedRegistrationData.value)
 
 watch(medicationsErrors, () => {
     console.log(medicationsErrors.value)
@@ -446,7 +453,7 @@ const medicationsSectionMaxHeight = computed(() => {
         gap: 0.5rem;
         height: 20px;
         font-size: 1.25rem;
-        margin-bottom: 0.8rem;
+        margin-bottom: 0.5rem;
 
         svg {
             height: 100%;
@@ -456,18 +463,13 @@ const medicationsSectionMaxHeight = computed(() => {
     }
 
     p {
+        font-size: 0.9rem;
         color: var(--text-6-color);
     }
 }
 
 :deep() {
     .e-input {
-        max-height: 55px;
-        opacity: 1;
-        transition:
-            max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
-            opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
-
         &.checkbox {
             max-height: 22px;
         }
@@ -494,7 +496,7 @@ const medicationsSectionMaxHeight = computed(() => {
         p {
             font-family: var(--serif-font-stack);
             font-style: italic;
-            color: var(--text-5-color);
+            color: var(--text-6-color);
             opacity: 0.6;
             
         }

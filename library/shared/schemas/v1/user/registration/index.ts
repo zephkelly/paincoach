@@ -8,6 +8,7 @@ import { DBBaseUserWithRolesSchema } from "@@/shared/schemas/v1/user/base";
 import { DBUserRegistrationDataSchema, DBUserRegistrationDataPartialSchema } from "@@/shared/schemas/v1/user/registration/data";
 
 import { CreateEncryptedPainMedicationDataV1RequestSchema, CreateEncryptedPainMedicationDataV1RequestPartialSchema } from "@@/shared/schemas/v1/medication/v1";
+import { createSchemaValidator } from '@@/shared/utils/zod/new';
 
 
 
@@ -27,8 +28,10 @@ export const UserRegisterSchema = DBBaseUserWithRolesSchema.pick({
 }).extend({
     public_id: UUIDSchema,
 
-    password: z.string(),
-    confirm_password: z.string(),
+    password: z.string().min(1, 'Password is required')
+        .max(255, 'Password must be less than 255 characters'),
+    confirm_password: z.string().min(1, 'Confirm password is required')
+        .max(255, 'Confirm password must be less than 255 characters'),
 
     will_use_app: z.boolean(),
     medications: z.array(CreateEncryptedPainMedicationDataV1RequestSchema).min(1).nullable().optional(),
@@ -48,6 +51,8 @@ export function validateUserRegister(data: unknown): z.infer<typeof UserRegister
     }
     return parsedResult.data;
 }
+
+export const userRegisterValidator = createSchemaValidator(UserRegisterSchema);
 
 export function validateUserRegisterPartial(data: unknown): z.infer<typeof UserRegisterPartialSchema> {
     const parsedResult = UserRegisterPartialSchema.safeParse(data);
