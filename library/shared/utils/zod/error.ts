@@ -53,15 +53,11 @@ export function createZodValidationError(error: ZodError, includeFirstErrorOnly 
 
     const formattedErrors = extractZodErrors(fieldErrors, '', {}, includeFirstErrorOnly);
 
-    console.log('Zod validation failed formatted:', formattedErrors);
-
     if (import.meta.client) {
         throw new Error('Validation failed');
     }
 
     if (import.meta.dev) {
-        console.log('Zod validation failed:', error);
-
         return createError({
             statusCode: 400,
             statusMessage: 'Bad Request',

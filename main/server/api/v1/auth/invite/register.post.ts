@@ -6,24 +6,21 @@ import { PERMISSIONS } from '@@/shared/schemas/v1/permission';
 
 import { getPainCoachSession } from '~~/server/utils/auth/session/getSession';
 
-import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
 
 import { InvitationService } from '~~/server/services/invitation';
-import { validateCreateUserInvitationRequest } from '@@/shared/schemas/v1/user/invitation/create';
+import type { UserRegister } from '@@/shared/types/v1/user/registration';
+import { validateUserRegister } from '@@/shared/schemas/v1/user/registration';
 
 
 
 export default defineEventHandler({
     onRequest: [
         (event) => onRequestValidateSession(event),
-        (event) => onRequestRejectRole(event, 'unregistered'),
-        (event) => onRequestValidatePermission(event, [
-            PERMISSIONS.INVITATION.INVITE.OWNER,
-            PERMISSIONS.INVITATION.INVITE.ADMIN,
-            PERMISSIONS.INVITATION.INVITE.CLINICIAN,
-            PERMISSIONS.INVITATION.INVITE.PATIENT,
-            PERMISSIONS.INVITATION.INVITE.APP
-        ])
+        (event) => onRequestValidatePermission(event, {
+            invitation: [
+                PERMISSIONS.INVITATION.VIEW.OWN.BASIC,
+            ]
+        }),
     ],
     handler: async (event) => {
         try {
@@ -32,15 +29,12 @@ export default defineEventHandler({
                 permissions
             } = await getPainCoachSession(event);
     
-            const unvalidatedInvitation = await readBody<CreateUserInvitationRequest>(event);
-            const validatedInvitation = validateCreateUserInvitationRequest(unvalidatedInvitation);
-    
-            await InvitationService.createAndEmailInvitation(
-                validatedInvitation,
-                session,
-                permissions,
-            );
-        }
+            const body = await readBody<UserRegister>(event);
+
+            const validatedUserRegistrationRequest = validateUserRegister(body);
+
+            
+        }   
         catch (error: unknown) {
             if (error instanceof H3Error) {
                 throw error;

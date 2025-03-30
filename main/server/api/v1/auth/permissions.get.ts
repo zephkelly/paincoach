@@ -1,36 +1,21 @@
-import { H3Error } from 'h3';
 import { onRequestValidateSession } from "~~/server/utils/auth/request-middleware/validate-session";
-import { PermissionRepository } from "~~/server/repositories/permission";
+import { onRequestValidatePermission } from '~~/server/utils/auth/request-middleware/validate-permission';
+
+import { PERMISSIONS } from '@@/shared/schemas/v1/permission';
+import type { Permission } from '@@/shared/types/v1/permission';
 
 export default defineEventHandler({
     onRequest: [
         async (event) => await onRequestValidateSession(event),
+        async (event) => await onRequestValidatePermission(event, [
+            PERMISSIONS.USER.VIEW.OWN.BASIC,
+            PERMISSIONS.USER.VIEW.OWN.LIMITED,
+            PERMISSIONS.USER.VIEW.OWN.FULL,
+        ]),
     ],
     handler: async (event) => {
-        try {
-            const { secureSession } = await getPainCoachSession(event);
-            
-            if (!secureSession || !secureSession.id) {
-                throw createError({
-                    statusCode: 401,
-                    message: 'Unauthorized',
-                });
-            }
+        const permissions: Permission[] = event.context.paincoach.user.permissions as Permission[];
 
-            const permissions = await PermissionRepository.getPermissions(event, secureSession.id);
-            
-            return permissions;
-        }
-        catch (error: unknown) {
-            if (error instanceof H3Error) {
-                throw error;
-            }
-
-            console.error('Error getting permissions', error);
-            throw createError({
-                statusCode: 500,
-                message: 'Internal Server Error',
-            });
-        }
+        return permissions
     }
 });

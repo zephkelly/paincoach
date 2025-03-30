@@ -5,7 +5,7 @@ import { UUIDSchema, BigIntSchema } from "@@/shared/schemas/primitives";
 
 import { DBBaseUserWithRolesSchema } from "@@/shared/schemas/v1/user/base";
 
-import { DBUserRegistrationDataSchema } from "@@/shared/schemas/v1/user/registration/data";
+import { DBUserRegistrationDataSchema, DBUserRegistrationDataPartialSchema } from "@@/shared/schemas/v1/user/registration/data";
 
 import { CreateEncryptedPainMedicationDataV1RequestSchema, CreateEncryptedPainMedicationDataV1RequestPartialSchema } from "@@/shared/schemas/v1/medication/v1";
 
@@ -27,8 +27,6 @@ export const UserRegisterSchema = DBBaseUserWithRolesSchema.pick({
 }).extend({
     public_id: UUIDSchema,
 
-    invitation_token: UUIDSchema,
-
     password: z.string(),
     confirm_password: z.string(),
 
@@ -40,6 +38,7 @@ export const UserRegisterSchema = DBBaseUserWithRolesSchema.pick({
 
 export const UserRegisterPartialSchema = UserRegisterSchema.partial().extend({
     medications: z.array(CreateEncryptedPainMedicationDataV1RequestPartialSchema).min(1).nullable().optional(),
+    role_data: z.array(DBUserRegistrationDataPartialSchema).min(1),
 })
 
 export function validateUserRegister(data: unknown): z.infer<typeof UserRegisterSchema> {

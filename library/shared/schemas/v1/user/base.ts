@@ -9,6 +9,17 @@ import { RoleSchema } from '../role';
 
 
 export const DBUserStatusSchema = z.enum(['active', 'inactive', 'pending'])
+export const DBUserTitleSchema = z.enum([
+    'Prof',
+    'Dr',
+    'Mr',
+    'Mrs',
+    'Ms',
+    'Miss',
+    'No Title',
+]);
+
+
 
 export const DBBaseUserSchema = z.object({
     id: UUIDSchema,
@@ -30,24 +41,20 @@ export const DBBaseUserSchema = z.object({
 
     first_name: z.string()
         .min(1, 'First name is required')
-        .max(255, 'First name must be less than 255 characters'),
+        .max(35, 'First name must be less than 35 characters'),
 
     last_name: z.string()
         .min(1, 'Last name is required')
-        .max(255, 'Last name must be less than 255 characters')
-        .nullable(),
+        .max(50, 'Last name must be less than 50 characters')
+        .nullable().optional(),
 
-    title: z.string()
-        .min(2, 'Title must be at least 2 characters')
-        .max(255, 'Title must be less than 255 characters')
-        .nullable(),
+    title: DBUserTitleSchema.nullable().optional(),
 
     profile_url: z.string().nullable().optional(),
 
     password_hash: z.string()
         .min(1, 'Password hash is required')
-        .max(255, 'Password hash must be less than 255 characters')
-        .nullable(),
+        .max(255, 'Password hash must be less than 255 characters'),
 
     status: DBUserStatusSchema,
 

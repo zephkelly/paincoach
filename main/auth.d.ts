@@ -1,5 +1,5 @@
 import { Role } from "~~lib/shared/types/users";
-import { DBUserInvitationPartial } from "@@/shared/types/v1/user/invitation";
+import { DBUserInvitationDataPartial } from "@@/shared/types/v1/user/invitation/data";
 import type { AllRoles } from "@@/shared/types/v1/role";
 
 
@@ -39,11 +39,13 @@ declare module '#auth-utils' {
         primary_role: 'unregistered';
         roles: AllRoles[];
         verified: false;
+
+        invitation_token: string;
+        invitation_data: DBUserInvitationDataPartial;
     }
    
     interface UserSession {
         user: User;
-       
         secure: SecureSessionData;
         
         logged_in_at: Date;
@@ -54,8 +56,7 @@ declare module '#auth-utils' {
     interface UnregisteredUserSession {
         user: UnregisteredUser;
         secure: UnregisteredSecureSessionData;
-        invitation_data?: DBUserInvitationPartial;
-
+        
         logged_in_at: Date;
         version: number;
         id: string; // session id

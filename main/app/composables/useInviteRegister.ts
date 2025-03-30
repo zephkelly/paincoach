@@ -1,10 +1,21 @@
+import { ZodError } from "zod";
+import type { Role } from "@@/shared/types/v1/role";
+import type { LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
+
+import { debouncedComputed } from "@@/shared/utils/debounce/computed";
+
 import {
     BASE_USER_INVITE_REGISTER_FIELDS,
     CLINICIAN_USER_INVITE_REGISTER_FIELDS,
     MEDICATION_FIELDS
 } from "@@/shared/types/v1/user/registration/fields"
 
+
 import type { UserRegisterPartial } from "@@/shared/types/v1/user/registration";
+import { validateUserRegister } from "@@/shared/schemas/v1/user/registration";
+
+import { DBUserRegistrationDataPartialSchema } from "@@/shared/schemas/v1/user/registration/data/index";
+
 import type { CreateEncryptedPainMedicationDataV1RequestPartial } from "@@/shared/types/v1/medication/v1";
 import {
     validateCreateEncryptedPainMedicationDataV1Request,
@@ -13,8 +24,7 @@ import {
     validateCreateEncryptedPainMedicationDataV1RequestsPartial
 } from "@@/shared/schemas/v1/medication/v1";
 
-import type { LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
-import { ZodError } from "zod";
+
 
 
 
@@ -45,7 +55,7 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             requiresMedicationRef.value = value;
         }
     });
-
+    
     const state = useState<UserRegisterPartial>('user-register-state', () => ({
         public_id: invitation.value?.public_user_id,
         email: invitation.value?.email,
@@ -59,7 +69,149 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         roles: invitation.value?.roles,
 
         medications: undefined,
+
+        role_data: invitation.value?.roles.map((role) => {
+            return DBUserRegistrationDataPartialSchema.parse({
+                role: role
+            })
+        }) || []
     }));
+
+    //role specific data
+    function getRoleField<R extends Role, K extends string>(
+        roleName: R, 
+        fieldName: K
+    ): any {
+        const roleData = state.value.role_data?.find(data => data.role === roleName);
+        
+        return roleData ? (roleData as any)[fieldName] : undefined;
+    }
+      
+    function setRoleField<R extends Role, K extends string>(
+        roleName: R, 
+        fieldName: K, 
+        newValue: any
+    ): void {
+        const roleIndex = state.value.role_data?.findIndex(data => data.role === roleName);
+        
+        if (roleIndex !== undefined && roleIndex >= 0) {
+          //@ts-expect-error
+            state.value.role_data[roleIndex] = {
+                ...state.value.role_data[roleIndex],
+                [fieldName]: newValue
+            };
+        } else if (state.value.role_data) {
+            state.value.role_data.push({
+                role: roleName,
+                [fieldName]: newValue
+            } as any); // Type assertion needed
+        } else {
+            state.value.role_data = [{
+                role: roleName,
+                [fieldName]: newValue
+            } as any]; // Type assertion needed
+        }
+    }
+
+    const validatedRegistrationData = debouncedComputed(() => {
+        if (!state.value) {
+            return null;
+        }
+
+        try {
+            const validatedData = validateUserRegister(state.value);
+            console.log("Validated user register data", validatedData); 
+            return validatedData;
+        }
+        catch (error: unknown) { }
+            
+        return null;
+    }, 600);
+
+
+    const isValid = ref(false);
+    const formErrors = ref<Record<string, string>>({});
+    // Validation function to call on blur or form submission
+    function validate(fieldName?: string): boolean {
+        if (!state.value) {
+            isValid.value = false;
+            return false;
+        }
+        
+        try {
+            // If a specific field is provided, we can validate just that field
+            if (fieldName) {
+                // Create an object with just the field to validate
+                const fieldToValidate = { [fieldName]: (state.value as any)[fieldName] };
+                
+                try {
+                    // This will throw if invalid
+                    validateUserRegister({
+                        ...state.value,
+                        ...fieldToValidate
+                    });
+                    
+                    // Field is valid, remove any existing error
+                    if (formErrors.value[fieldName]) {
+                        delete formErrors.value[fieldName];
+                    }
+                    
+                    return true;
+                } catch (error: unknown) {
+                    if (error instanceof ZodError) {
+                        // Find errors related to the specific field
+                        const fieldErrors = error.errors.filter(err => err.path.includes(fieldName));
+                        
+                        if (fieldErrors.length > 0) {
+                            formErrors.value[fieldName] = fieldErrors[0]?.message as string;
+                        }
+                    }
+                    
+                    return false;
+                }
+            }
+            
+            // Validate the entire form
+            const validatedData = validateUserRegister(state.value);
+            console.log(validatedData);
+            formErrors.value = {}; // Clear previous errors
+            isValid.value = true;
+            return true;
+        } catch (error: unknown) {
+            console.log("Error validating user register data", error);
+            if (error instanceof ZodError) {
+                // Map all errors to their respective fields
+                formErrors.value = {};
+                error.errors.forEach(err => {
+                    const fieldPath = err.path.join('.');
+                    formErrors.value[fieldPath] = err.message;
+                });
+            }
+            
+            isValid.value = false;
+            return false;
+        }
+    }
+
+
+    // watch(state, (newState) => {
+    //     if (!newState) {
+    //         return; // Just return without a value, as watch callbacks don't use return values
+    //     }
+        
+    //     try {
+    //         const validatedData = validateUserRegister(newState);
+    //         // Do something with the validated data if needed
+    //         console.log("Data is valid:", validatedData);
+    //     }
+    //     catch (error: unknown) {
+    //         console.log("Error validating user register data", error);
+    //         if (error instanceof ZodError) {
+    //             console.error("Error validating user register data", error);
+    //         }
+    //     }
+    // }, { deep: true, immediate: true });
+
 
     const medicationsErrors = ref<Map<number, Map<string, string | undefined>>>(new Map(new Map()));
 
@@ -157,5 +309,11 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         removeMedication,
 
         CLINICIAN_USER_INVITE_REGISTER_FIELDS,
+
+        getRoleField,
+        setRoleField,
+
+        validate,
+        validatedRegistrationData
     }
 }

@@ -333,12 +333,29 @@ async function seedPermissions(db: DatabaseService) {
         'app'
     );
     
+    // Insert invitation view permissions with different access levels
     await insertPermission(
-        'View All Invitations',
-        'Ability to view all invitations in the system',
-        'invitation',
-        'view',
+        'View Invitations Full', 
+        'Ability to view all invitations with full details', 
+        'invitation', 
+        'view', 
         'full'
+    );
+
+    await insertPermission(
+        'View Invitations Limited', 
+        'Ability to view all invitations with limited details', 
+        'invitation', 
+        'view', 
+        'limited'
+    );
+
+    await insertPermission(
+        'View Invitations Basic', 
+        'Ability to view all invitations with basic details', 
+        'invitation', 
+        'view', 
+        'basic'
     );
 
     await insertPermission(
@@ -350,15 +367,32 @@ async function seedPermissions(db: DatabaseService) {
         'clinician-patient'
     );
       
+    // Insert permissions for users to view their own invitations
     await insertPermission(
-        'View Own Invitation',
-        'Ability to view your own invitation with session ID',
-        'invitation',
-        'view',
-        'limited',
-        undefined,
-        undefined,
-        'personal'
+        'View Own Invitation Full', 
+        'Ability to view your own invitation with full details', 
+        'invitation', 
+        'view', 
+        'full', 
+        'own'
+    );
+
+    await insertPermission(
+        'View Own Invitation Limited', 
+        'Ability to view your own invitation with limited details', 
+        'invitation', 
+        'view', 
+        'limited', 
+        'own'
+    );
+
+    await insertPermission(
+        'View Own Invitation Basic', 
+        'Ability to view your own invitation with basic details', 
+        'invitation', 
+        'view', 
+        'basic', 
+        'own'
     );
 
     // Insert user data access permissions - Owner
@@ -546,6 +580,34 @@ async function seedPermissions(db: DatabaseService) {
         'clinician-patient'
     );
 
+    // Insert permissions for users to view their own profile
+    await insertPermission(
+        'View Own User Full', 
+        'Ability to view your own user profile with full details', 
+        'user', 
+        'view', 
+        'full', 
+        'own'
+    );
+
+    await insertPermission(
+        'View Own User Limited', 
+        'Ability to view your own user profile with limited details', 
+        'user', 
+        'view', 
+        'limited', 
+        'own'
+    );
+
+    await insertPermission(
+        'View Own User Basic', 
+        'Ability to view your own user profile with basic details', 
+        'user', 
+        'view', 
+        'basic', 
+        'own'
+    );
+
     // Insert app permissions
     await insertPermission(
         'Use Pain App', 
@@ -582,13 +644,17 @@ async function seedPermissions(db: DatabaseService) {
         FROM private.role r, private.permission p
         WHERE r.name = 'owner' AND p.name IN (
             -- Invite permissions
-            'Invite Owner', 'Invite Admin', 'Invite Clinician', 'Invite Patient',
+            'Invite Owner', 'Invite Admin', 'Invite Clinician', 'Invite Patient', 'Invite App User',
+            
+            -- Invitation view permissions
+            'View Invitations Full', 'View Own Invitation Full',
             
             -- User data view permissions
             'View Owner Full',
             'View Admin Full',
             'View Clinician Full',
             'View Patient Full',
+            'View Own User Full',
             
             -- User data manage permissions (except owners)
             'Manage Admin',
@@ -608,13 +674,17 @@ async function seedPermissions(db: DatabaseService) {
         FROM private.role r, private.permission p
         WHERE r.name = 'admin' AND p.name IN (
             -- Invite permissions
-            'Invite Clinician', 'Invite Patient',
+            'Invite Clinician', 'Invite Patient', 'Invite App User',
+            
+            -- Invitation view permissions
+            'View Invitations Full', 'View Own Invitation Full',
             
             -- User data view permissions
             'View Owner Basic',
             'View Admin Limited',
             'View Clinician Full',
             'View Patient Full',
+            'View Own User Full',
             
             -- User data manage permissions
             'Manage Clinician',
@@ -633,13 +703,17 @@ async function seedPermissions(db: DatabaseService) {
         FROM private.role r, private.permission p
         WHERE r.name = 'clinician' AND p.name IN (
             -- Invite permissions
-            'Invite Patient',
+            'Invite Patient', 'Invite App User',
+            
+            -- Invitation view permissions
+            'View Clinician-Patient Invitations', 'View Own Invitation Full',
             
             -- User data view permissions
             'View Owner Basic',
             'View Admin Basic',
             'View Clinician Basic',
             'View Patient Basic',
+            'View Own User Full',
             
             -- Clinician-Patient relationship permissions
             'View Clinician Patient Full',
@@ -657,51 +731,20 @@ async function seedPermissions(db: DatabaseService) {
         SELECT r.id, p.id
         FROM private.role r, private.permission p
         WHERE r.name = 'patient' AND p.name IN (
-            -- Only basic view permissions
+            -- Invitation view permissions
+            'View Own Invitation Limited',
+            
+            -- User data view permissions
             'View Owner Basic',
             'View Admin Basic',
             'View Clinician Basic',
+            'View Own User Limited',
             
             -- App permissions
             'Use Pain App', 'Use Mood App'
         )
         ON CONFLICT DO NOTHING;
     `);
-
-    await db.query(`
-        INSERT INTO private.role_permission (role_id, permission_id)
-        SELECT r.id, p.id
-        FROM private.role r, private.permission p
-        WHERE r.name IN ('owner', 'admin', 'clinician') AND p.name = 'Invite App User'
-        ON CONFLICT DO NOTHING;
-    `);
-
-
-    await db.query(`
-        INSERT INTO private.role_permission (role_id, permission_id)
-        SELECT r.id, p.id
-        FROM private.role r, private.permission p
-        WHERE r.name IN ('owner', 'admin') AND p.name = 'View All Invitations'
-        ON CONFLICT DO NOTHING;
-      `);
-      
-      // Clinicians can view their own patient invitations
-      await db.query(`
-        INSERT INTO private.role_permission (role_id, permission_id)
-        SELECT r.id, p.id
-        FROM private.role r, private.permission p
-        WHERE r.name = 'clinician' AND p.name = 'View Clinician-Patient Invitations'
-        ON CONFLICT DO NOTHING;
-      `);
-      
-      // All users can view their own invitations
-      await db.query(`
-        INSERT INTO private.role_permission (role_id, permission_id)
-        SELECT r.id, p.id
-        FROM private.role r, private.permission p
-        WHERE r.name IN ('owner', 'admin', 'clinician', 'patient') AND p.name = 'View Own Invitation'
-        ON CONFLICT DO NOTHING;
-      `);
 
     console.log('DatabaseService: Permissions seeded with new structure');
 }

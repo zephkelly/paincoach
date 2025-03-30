@@ -2,6 +2,7 @@ import type { H3Event } from 'h3';
 
 import { getUserSessionContext } from '~~/server/utils/auth/session/getSession';
 import { validateRegisteredSessionObjectSchema, validateUnregisterdSessionObjectSchema } from '@@/shared/schemas/v1/session';
+import { ZodError } from 'zod';
 
 
 export async function onRequestValidateSession(event: H3Event, allowUnregistered: boolean = false) {
@@ -28,12 +29,14 @@ export async function onRequestValidateSession(event: H3Event, allowUnregistered
             validateRegisteredSessionObjectSchema(session);
         }
     }
-    catch (error) {
-        console.error('Session validation error:', error);
+    catch (error: unknown) {
+        if (error instanceof ZodError) {
+            console.error('Session validation error:', error.format());
+        }
+        else {
+            console.error('Session validation error:', error);
+        }
 
-        throw createError({
-            statusCode: 400,
-            statusMessage: 'Invalid session data'
-        });
+        sendRedirect(event, '/dashboard/login', 401);
     }
 }

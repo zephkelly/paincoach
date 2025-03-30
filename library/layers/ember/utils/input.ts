@@ -3,6 +3,7 @@ import { type InputType } from "@@/layers/ember/types/input";
 import EText from './../components/input.vue';
 import ENumberInput from './../components/numberInput.vue';
 import EButton from './../components/button.vue';
+import ESelect from './../components/select.vue';
 
 
 export function getComponent(input: InputType) {
@@ -11,6 +12,8 @@ export function getComponent(input: InputType) {
             return EText;
         case 'number':
             return ENumberInput;
+        case 'select':
+            return ESelect;
         case 'email':
             return EText;
         case 'password':

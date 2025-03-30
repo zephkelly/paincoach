@@ -64,10 +64,10 @@ export const getCachedPermissions = defineCachedFunction(async (event: H3Event, 
 }, {
     maxAge: 3600,
     name: FUNCTION_NAME,
-    getKey: (event: H3Event, user_id: string) => `user-${user_id}`,
-    integrity: process.env.PERMISSIONS_VERSION || '3',
+    getKey: (event: H3Event, user_id: string) => `user-permissions-${user_id}`,
+    integrity: process.env.PERMISSIONS_VERSION || '1',
 });
 
 export async function invalidateCachedPermissions (user_id: string) {
-    await invalidateNitroFunctionCache(FUNCTION_NAME, `user-${user_id}`);
+    await invalidateNitroFunctionCache(FUNCTION_NAME, `user-permissions-${user_id}`);
 }

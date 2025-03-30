@@ -3,8 +3,7 @@ import { type UserSession } from '#auth-utils'
 
 import type { DBUserWithRoles } from '@@/shared/types/v1/user'
 
-import { DatabaseService } from '~~/server/services/databaseService'
-import { getDBUserWithRoles } from '~~/server/utils/user/database/get/byEmail'
+import { UserRepository } from '~~/server/repositories/user'
 
 
 
@@ -23,16 +22,34 @@ export async function handleLoginCredentials(
             statusMessage: 'Invalid or missing credentials'
         })
     }
-    
-    const transaction = await DatabaseService.getInstance().createTransaction()
 
+    const randomString = Math.random().toString(36).substring(2, 15);
+    
     try {
-        const user: DBUserWithRoles | undefined = await getDBUserWithRoles(transaction, email);
+        const user: DBUserWithRoles | undefined = await UserRepository.getDBUserWithRoles(event, {
+            email: email,
+        });
+
+        const hashedInputPassword = await hashPassword(password);
 
         if (!user) {
+            await verifyPassword(hashedInputPassword, randomString);
+
             throw createError({
-                statusCode: 404,
-                statusMessage: 'User not found'
+                statusCode: 400,
+                statusMessage: 'Email or password is incorrect'
+            })
+        }
+
+        const storedPasswordHash = user?.password_hash;
+
+        const isValidPassword = await verifyPassword(storedPasswordHash, password);
+        if (!isValidPassword) {
+            await verifyPassword(hashedInputPassword, randomString);
+
+            throw createError({
+                statusCode: 400,
+                statusMessage: 'Email or password is incorrect'
             })
         }
 
@@ -67,7 +84,6 @@ export async function handleLoginCredentials(
         });
         
         setResponseStatus(event, 200, 'Ok')
-        transaction.commit();
         
         return {
             statusCode: 200,
@@ -77,8 +93,6 @@ export async function handleLoginCredentials(
         }
     }
     catch(error: unknown) {
-        transaction.rollback()
-
         if (error instanceof H3Error) {
             throw error
         }

@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
         
         const validatedInvitation = validateDBUserInvitation(invitation);
 
-        if (validatedInvitation.status === 'pending' && invitation?.effective_status === 'expired') {
+        if (validatedInvitation.status === 'pending' || validatedInvitation.status === 'opened' && invitation?.effective_status === 'expired') {
             const transaction = await db.createTransaction();
             try {
                 await transaction.query(`
@@ -72,28 +72,29 @@ export default defineEventHandler(async (event) => {
             });
         }
 
-        if (validatedInvitation.status === 'opened') {
-            const incompleteSession = await getUserSession(event);
+        // if (validatedInvitation.status === 'opened') {
+        //     const incompleteSession = await getUserSession(event);
 
-            if (!incompleteSession) {
-                throw createError({
-                    statusCode: 403,
-                    statusMessage: 'This invitation has already been opened'
-                });
-            }
+        //     if (!incompleteSession) {
+        //         throw createError({
+        //             statusCode: 403,
+        //             statusMessage: 'This invitation has already been opened'
+        //         });
+        //     }
 
-            const typedIncompleteSession = incompleteSession as any;
-            const { invitation_token } = typedIncompleteSession.secure;
+        //     const typedIncompleteSession = incompleteSession as any;
+        //     const { invitation_token } = typedIncompleteSession.secure;
 
-            if (invitation_token !== token) {
-                throw createError({
-                    statusCode: 400,
-                    message: 'Malformed session, invitation tokens do not match'
-                });
-            }
+        //     if (invitation_token !== token) {
+        //         console.log(`Invitation token mismatch: ${invitation_token} !== ${token}`);
+        //         throw createError({
+        //             statusCode: 400,
+        //             message: 'Malformed session, invitation tokens do not match'
+        //         });
+        //     }
 
-            return sendRedirect(event, '/dashboard/user/invite');
-        }
+        //     return sendRedirect(event, '/dashboard/user/invite');
+        // }
 
         const transaction = await db.createTransaction();
         try {
@@ -116,15 +117,15 @@ export default defineEventHandler(async (event) => {
                 secure: {
                     //@ts-expect-error
                     id: null, // Internal
-                    public_id: validatedInvitation.public_user_id, // UUID external
+                    public_id: validatedInvitation.public_user_id,
                     primary_role: 'unregistered',
                     roles: ['unregistered'],
                     email: validatedInvitation.email,
                     verified: false,
 
                     invitation_token: token,
+                    invitation_data: validatedInvitation.invitation_data || {},
                 },
-                invitation_data: validatedInvitation.invitation_data || {},
                 logged_in_at: new Date(),
                 verified: false,
                 version: 1,
@@ -132,8 +133,6 @@ export default defineEventHandler(async (event) => {
                 maxAge: 1000 * 60 * 60 * 24 * 7
             });
 
-            console.log('Temporary session:', temporarySession);
-            
             await transaction.commit();
             return sendRedirect(event, '/dashboard/user/invite');
         }

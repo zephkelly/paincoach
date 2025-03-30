@@ -1,13 +1,24 @@
+import type { H3Event } from 'h3';
 import { DatabaseService } from "~~/server/services/databaseService";
+import { invalidateNitroFunctionCache } from "~~/server/utils/cache/nitro";
 import { type LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
 import { validateLimitedUserInvitation } from "@@/shared/schemas/v1/user/invitation/limited";
 
+const FUNCTION_NAME = 'get-limited-invitation-by-token';
 
-
-export async function getLimitedInvitationByToken(token: string): Promise<LimitedUserInvitation> {
+/**
+ * Cached function to get limited invitation by token
+ *
+ * @param event - H3 event
+ * @param token - Invitation token to look up
+ * @returns Promise<LimitedUserInvitation> - Limited invitation details
+ */
+export const getCachedLimitedInvitationByToken = defineCachedFunction(
+  async (event: H3Event, token: string): Promise<LimitedUserInvitation> => {
     const db = DatabaseService.getInstance();
+    
     const invitation = await db.query<LimitedUserInvitation>(`
-        SELECT 
+        SELECT
             ui.public_user_id,
             ui.email,
             ui.phone_number,
@@ -23,13 +34,29 @@ export async function getLimitedInvitationByToken(token: string): Promise<Limite
         WHERE ui.invitation_token = $1
         LIMIT 1
     `, [token]);
-
+    
     if (invitation.length === 0 || !invitation[0]) {
         throw createError({
             statusCode: 404,
             message: 'Invitation not found',
         });
     }
-
+    
     return validateLimitedUserInvitation(invitation[0]);
+  },
+  {
+    maxAge: 3600, // Cache for 1 hour
+    name: FUNCTION_NAME,
+    getKey: (event: H3Event, token: string) => `limited-invitation-${token}`,
+    integrity: process.env.INVITATIONS_VERSION || '1',
+  }
+);
+
+/**
+ * Function to invalidate the cached invitation by token
+ * 
+ * @param token - Invitation token to invalidate in cache
+ */
+export async function invalidateCachedLimitedInvitation(token: string) {
+  await invalidateNitroFunctionCache(FUNCTION_NAME, `limited-invitation-${token}`);
 }

@@ -1,4 +1,4 @@
-import { type SecureSessionData } from "#auth-utils";
+import { type SecureSessionData, type UnregisteredSecureSessionData } from "#auth-utils";
 import { type AllRoles } from "@@/shared/types/v1/role";
 
 
@@ -6,11 +6,11 @@ import { type AllRoles } from "@@/shared/types/v1/role";
 /**
  * Check if the user has the specified role(s)
  * Will check primary_role first, then check the roles array if not found in primary
- * @param {SecureSessionData} secureSession - User session data
+ * @param {SecureSessionData | UnregisteredSecureSessionData} secureSession - User session data
  * @param {AllRoles | AllRoles[]} roles - Role or array of roles to check against
  * @returns {boolean} - True if user has the role, false otherwise
  */
-export function hasRole(secureSession: SecureSessionData, roles: AllRoles[] | AllRoles): boolean {
+export function hasRole(secureSession: SecureSessionData | UnregisteredSecureSessionData, roles: AllRoles[] | AllRoles): boolean {
     if (!roles) {
         if (import.meta.server) {
             if (import.meta.dev) {

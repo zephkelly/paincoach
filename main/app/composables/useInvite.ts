@@ -21,6 +21,17 @@ export const useInvite = async () => {
     const loaded = computed(() => invitation !== null && invitation !== undefined);
     const fetching = computed(() => invitationStatus.value === 'pending');
 
+    const error = computed(() => {
+        if (invitationStatus.value !== 'error') {
+            return null;
+        }
+        if (invitationError.value) {
+            console.log(invitationError.value);
+            return invitationError.value;
+        }
+        return new Error('Unknown error');
+    });
+
     // Computed invitation information
     const inviterFirstName = computed(() => invitation.value?.inviter_name);
     const inviterProfileImageUrl = computed(() => invitation.value?.inviter_profile_url);

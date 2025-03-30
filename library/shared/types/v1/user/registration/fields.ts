@@ -26,6 +26,21 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: RegisterInputField[] = [
         readonly: true,
     },
     {
+        inputType: 'select',
+        label: 'Title',
+        identifier: 'title',
+        tabindex: 1,
+        required: true,
+        options: [
+            { label: 'Prof', value: 'Prof' },
+            { label: 'Dr', value: 'Dr' },
+            { label: 'Mr', value: 'Mr' },
+            { label: 'Mrs', value: 'Mrs' },
+            { label: 'Miss', value: 'Ms' },
+            { label: 'No Title', value: null }
+        ]
+    },
+    {
         inputType: 'text',
         label: 'First Name',
         identifier: 'first_name',

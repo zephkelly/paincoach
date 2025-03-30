@@ -4,7 +4,7 @@ import { createZodValidationError } from '@@/shared/utils/zod/error';
 // Definition of permission components
 export const ResourceTypes = ['user', 'invitation', 'app'] as const;
 export const ResourceSubtypes = [
-    'owner', 'admin', 'clinician', 'patient', 'clinician-patient', 'app',
+    'owner', 'admin', 'clinician', 'patient', 'clinician-patient', 'own', 'app',
     'pain', 'mood', 'marriage'
 ] as const;
 export const Actions = ['view', 'manage', 'invite', 'use'] as const;
@@ -120,24 +120,48 @@ export const PERMISSIONS = {
       }),
     },
     VIEW: {
-        ALL: buildPermissionString({
+        FULL: buildPermissionString({
           resourceType: 'invitation',
           action: 'view',
           accessLevel: 'full'
         }),
+        LIMITED: buildPermissionString({
+          resourceType: 'invitation',
+          action: 'view',
+          accessLevel: 'limited'
+        }),
+        BASIC: buildPermissionString({
+          resourceType: 'invitation',
+          action: 'view',
+          accessLevel: 'basic'
+        }),
         CLINICIAN_PATIENT: buildPermissionString({
           resourceType: 'invitation',
           action: 'view',
-          resourceSubtype: 'clinician-patient', 
+          resourceSubtype: 'clinician-patient',
           accessLevel: 'limited'
         }),
-        OWN: buildPermissionString({
-          resourceType: 'invitation',
-          action: 'view',
-          accessLevel: 'limited',
-          accessLevelSubtype: 'personal'
-        }),
-      },
+        OWN: {
+            FULL: buildPermissionString({
+                resourceType: 'invitation',
+                resourceSubtype: 'own',
+                action: 'view',
+                accessLevel: 'full'
+            }),
+            LIMITED: buildPermissionString({
+                resourceType: 'invitation',
+                resourceSubtype: 'own',
+                action: 'view',
+                accessLevel: 'limited'
+            }),
+            BASIC: buildPermissionString({
+                resourceType: 'invitation',
+                resourceSubtype: 'own',
+                action: 'view',
+                accessLevel: 'basic'
+            }),
+        },
+    },
   },
   USER: {
     VIEW: {
@@ -221,26 +245,46 @@ export const PERMISSIONS = {
           accessLevel: 'basic'
         }),
       },
-      CLINICIAN_PATIENT: {
-        FULL: buildPermissionString({
-          resourceType: 'user',
-          resourceSubtype: 'clinician-patient',
-          action: 'view',
-          accessLevel: 'full'
-        }),
-        LIMITED: buildPermissionString({
-          resourceType: 'user',
-          resourceSubtype: 'clinician-patient',
-          action: 'view',
-          accessLevel: 'limited'
-        }),
-        BASIC: buildPermissionString({
-          resourceType: 'user',
-          resourceSubtype: 'clinician-patient',
-          action: 'view',
-          accessLevel: 'basic'
-        }),
-      },
+        CLINICIAN_PATIENT: {
+            FULL: buildPermissionString({
+                resourceType: 'user',
+                resourceSubtype: 'clinician-patient',
+                action: 'view',
+                accessLevel: 'full'
+            }),
+            LIMITED: buildPermissionString({
+                resourceType: 'user',
+                resourceSubtype: 'clinician-patient',
+                action: 'view',
+                accessLevel: 'limited'
+            }),
+            BASIC: buildPermissionString({
+                resourceType: 'user',
+                resourceSubtype: 'clinician-patient',
+                action: 'view',
+                accessLevel: 'basic'
+            }),
+        },
+        OWN: {
+            FULL: buildPermissionString({
+                resourceType: 'user',
+                resourceSubtype: 'own',
+                action: 'view',
+                accessLevel: 'full'
+            }),
+            LIMITED: buildPermissionString({
+                resourceType: 'user',
+                resourceSubtype: 'own',
+                action: 'view',
+                accessLevel: 'limited'
+            }),
+            BASIC: buildPermissionString({
+                resourceType: 'user',
+                resourceSubtype: 'own',
+                action: 'view',
+                accessLevel: 'basic'
+            }),
+        },
     },
     MANAGE: {
       OWNER: buildPermissionString({

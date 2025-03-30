@@ -1,6 +1,6 @@
 import type { Role, AllRoles } from "@@/shared/types/v1/role"
-import type { MinimalUserWithRoles } from "@@/shared/types/v1/user/minimal"
-// import { type MinimalUser } from "@@/shared/types/v1/user/minimal"
+import type { LimitedUserWithRoles } from "@@/shared/types/v1/user/limited"
+// import { type LimitedUser } from "@@/shared/types/v1/user/minimal"
 
 
 
@@ -63,7 +63,7 @@ export const useAuth = () => {
         if (isPrivilegedUser.value && userId) {
             console.log('Fetching mock user data for', userId)
             try {
-                const response = await $fetch<MinimalUserWithRoles>(`/api/v1/auth/${userId}`, {
+                const response = await $fetch<LimitedUserWithRoles>(`/api/v1/auth/${userId}`, {
                     method: 'GET',
                 })
 

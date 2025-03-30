@@ -23,11 +23,11 @@
 
 <script lang="ts" setup>
 import type { User } from '~~lib/shared/types/v1/user';
-import { type MinimalUser } from '~~lib/shared/types/v1/user/minimal';
+import { type LimitedUser } from '@@/shared/types/v1/user/limited';
 
 type UserInfoListItemProps = {
     loading: boolean,
-    userInfo: MinimalUser | undefined
+    userInfo: LimitedUser | undefined
     hideLastName?: boolean
     showRole?: boolean
 }

@@ -36,9 +36,10 @@ export async  function getPermissionsContext(event: H3Event, userId: string | nu
     ) {
         if (userId === null) {
             // We are an unregistered user, we only provide permission to view their own invitation
-            // in order to complete registration, this is a special case for the invitation endpoint
+            // and view their own permissions, which would be only the two permissions below
             userPermissions = [
-                PERMISSIONS.INVITATION.VIEW.OWN,
+                PERMISSIONS.INVITATION.VIEW.OWN.BASIC,
+                PERMISSIONS.USER.VIEW.OWN.BASIC
             ];
         }
         else {

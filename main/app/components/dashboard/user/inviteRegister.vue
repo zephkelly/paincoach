@@ -50,6 +50,8 @@
                             :required="field.required"
                             :tabindex="field.tabindex"
                             :default="field.default"
+                            :options="field.options"
+                            @blur="validate(undefined)"
                             v-model="state[field.identifier]"
                         />
                         <EInput v-if="!inviteeRoles || !inviteeRoles.includes('patient')"
@@ -97,14 +99,17 @@
                             :required="field.required"
                             :tabindex="field.tabindex"
                             :default="field.default"
-
+                            :options="field.options"
+                            @blur="validate(undefined)"
+                            :modelValue="getRoleField('clinician', field.identifier)"
+                            @update:modelValue="setRoleField('clinician', field.identifier, $event)"
                         />
                     </div>
                 </div>
                 
             </div>
 
-            <div v-if="!inviteeRoles || !inviteeRoles.includes('patient')" 
+            <div v-if="inviteeRoles && !inviteeRoles.includes('patient')" 
                 class="form-section medications"
                 :class="{ collapsed: !(state['will_use_app'] && userRequiresMedication) }">
 
@@ -117,6 +122,16 @@
                     </div>
                 </div>
                 <div class="form-inner" id="additional-medications-section" />
+            </div>
+
+            <div class="submit-section">
+                <EButton
+                    class="submit-button"
+                    type="submit"
+                    :disabled="validatedRegistrationData === null"
+                >
+                    Complete registration
+                </EButton>
             </div>
         </form>
 
@@ -156,6 +171,7 @@
                             :tabindex="(userRequiresMedication) ? field.tabindex : -1"
                             :default="field.default"
                             :placeholder="field.placeholder"
+                            :options="field.options"
                         />
 
                         <!-- @vue-expect-error -->
@@ -217,6 +233,8 @@ const {
 
 const {
     state,
+    userFirstName,
+
     BASE_USER_INVITE_REGISTER_FIELDS,
 
     MEDICATION_FIELDS,
@@ -227,9 +245,15 @@ const {
     removeMedication,
 
     CLINICIAN_USER_INVITE_REGISTER_FIELDS,
+    getRoleField,
+    setRoleField,
 
-    userFirstName,
+    validate,
+    validatedRegistrationData
 } = useInviteRegister(invitation);
+
+
+console.log(validatedRegistrationData.value)
 
 watch(medicationsErrors, () => {
     console.log(medicationsErrors.value)
@@ -311,6 +335,12 @@ const medicationsSectionMaxHeight = computed(() => {
         max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
             padding 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
             opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+            
+        &:not(.base) {
+            margin-top: -3.5rem;
+            z-index: 1;
+        }
 
         &.collapsed {
             max-height: 0px;
@@ -398,40 +428,35 @@ const medicationsSectionMaxHeight = computed(() => {
             gap: 0.5rem;
         }
 
-        &:not(.base) {
-            margin-top: -3.5rem;
-            z-index: 1;
+    }
+}
+.form-header {
+    margin-top: 2.5rem;
 
-            .form-header {
-                margin-top: 2.5rem;
+    .disclaimer {
+        margin-bottom: 2.5rem;
+        font-size: 0.9rem;
+        font-family: var(--serif-font-stack);
+        font-style: italic;
+    }
 
-                .disclaimer {
-                    margin-bottom: 2.5rem;
-                    font-size: 0.9rem;
-                    font-family: var(--serif-font-stack);
-                    font-style: italic;
-                }
+    .title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        height: 20px;
+        font-size: 1.25rem;
+        margin-bottom: 0.8rem;
 
-                .title {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    height: 20px;
-                    font-size: 1.25rem;
-                    margin-bottom: 0.8rem;
-
-                    svg {
-                        height: 100%;
-                        aspect-ratio: 1;
-                        width: auto;
-                    }
-                }
-
-                p {
-                    color: var(--text-6-color);
-                }
-            }
+        svg {
+            height: 100%;
+            aspect-ratio: 1;
+            width: auto;
         }
+    }
+
+    p {
+        color: var(--text-6-color);
     }
 }
 
@@ -524,6 +549,19 @@ const medicationsSectionMaxHeight = computed(() => {
             margin-top: 1rem;
         }
     }
+
+    .patient-medications-section {
+        width: 100%;
+        margin-top: 1rem;
+
+        .form-header {
+            margin-bottom: 2rem;
+        }
+
+        .medications-list {
+            margin-top: 0rem;
+        }
+    }
 }
 
 .invite-register-form {
@@ -540,16 +578,19 @@ const medicationsSectionMaxHeight = computed(() => {
     }
 
     .form-section.medications {
+        width: 100%;
+        box-sizing: border-box;
         max-height: v-bind(medicationsSectionMaxHeight);
         margin-top: 2.5rem;
         transition:
+            opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
             max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
-            padding 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+            margin 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+            overflow: hidden;
         
-            .form-header {
-                margin-top: 0rem;
-            }
-    
+        .form-header {
+            margin-top: 0rem;
+        }
     
         .form-inner {
             padding-top: 1.5rem;
@@ -559,16 +600,44 @@ const medicationsSectionMaxHeight = computed(() => {
                 border-color: rgb(255, 200, 0);
             }
         }
+
+        #additional-medications-section {     
+            .form-header {
+                margin-bottom: 2rem;
+            }    
+        }
+
+        &.collapsed {
+            opacity: 0;
+            max-height: 0;
+            margin: 0rem 0rem;
+        }
+        
     }
+
+}
+
+.submit-section {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 3rem;
 }
 
 
 .medications-teleporter {
     display: flex;
     flex-direction: column;
+    width: 100%;
+
+    .form-header {
+        .title-wrapper {
+            width: 100%;
+        }
+    }
 
     .medications-list {
-        margin: 2rem 0rem;
+        margin-bottom: 2rem;
         gap: 2.5rem;
         transition: margin 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
 
@@ -642,7 +711,7 @@ const medicationsSectionMaxHeight = computed(() => {
         }
 
         &.no-medications {
-            margin-top: 2rem;
+            margin-top: 0rem;
         }
     }
 }

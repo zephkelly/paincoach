@@ -13,8 +13,14 @@ export default defineEventHandler({
     onRequest: [
         (event) => onRequestValidateSession(event, true),
         (event) => onRequestValidatePermission(event, [
-            PERMISSIONS.INVITATION.VIEW.OWN,
-            PERMISSIONS.INVITATION.VIEW.ALL,
+            PERMISSIONS.INVITATION.VIEW.BASIC,
+            PERMISSIONS.INVITATION.VIEW.LIMITED,
+            PERMISSIONS.INVITATION.VIEW.FULL,
+
+            PERMISSIONS.INVITATION.VIEW.OWN.BASIC,
+            PERMISSIONS.INVITATION.VIEW.OWN.LIMITED,
+            PERMISSIONS.INVITATION.VIEW.OWN.FULL,
+
             PERMISSIONS.INVITATION.VIEW.CLINICIAN_PATIENT,
         ]),
     ],
@@ -27,31 +33,29 @@ export default defineEventHandler({
         try {
             let token: string | undefined = getQuery(event).token as string | undefined;
 
-            if (!token) {
-                //@ts-expect-error
-                token = session.secure?.invitation_token;
-
-                if (!token) {
-                    throw createError({
-                        statusCode: 400,
-                        message: 'Missing token',
-                    });
-                }
-            }
-
-            return await InvitationService.getInvitation(token, session, permissions);
+            return await InvitationService.getLimitedInvitation(event,
+                token,
+                session,
+                permissions
+            );
         }
         catch (error: unknown) {
             if (error instanceof H3Error) {
                 throw error;
             }
-            else {
-                console.error('Error fetching invitation:', error);
+            
+            if (error instanceof Error) {
                 throw createError({
                     statusCode: 500,
-                    message: 'Internal Server Error',
+                    message: error.message,
                 });
             }
+
+            console.error('Error getting invitation:', error);
+            throw createError({
+                statusCode: 500,
+                message: 'Internal Server Error',
+            });
         }
     }
 })

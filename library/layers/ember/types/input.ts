@@ -24,16 +24,18 @@ export type InputField = {
     readonly?: boolean;
     default?: any;
     placeholder?: string;
+    options?: { label: string; value: any }[];
 }
 
 export type InputProps = {
-    id: string;
-    modelValue: any;
-    required: boolean;
+    id?: string;
+    modelValue?: any;
+    required?: boolean;
     label?: string;
     disabled?: boolean;
     readonly?: boolean;
     default?: any;
     placeholder?: string;
     tabindex?: number;
+    options?: string[];
 }
