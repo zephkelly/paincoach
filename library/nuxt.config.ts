@@ -32,15 +32,6 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
-
-        session: {
-            name: 'paincoach-session',
-            password: process.env.NUXT_SESSION_PASSWORD || '',
-            cookie: {
-                domain: 'localhost',
-                sameSite: 'lax'
-            }
-        }
     },
 
     typescript: {

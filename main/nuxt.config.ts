@@ -16,14 +16,14 @@ export default defineNuxtConfig({
         databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
         environmentDomain: process.env.ENVIRONMENT_DOMAIN,
 
-        // nuxt-auth-utils
-        // session: {
-        //     name: 'paincoach-session',
-        //     password: process.env.NUXT_SESSION_PASSWORD || '',
-        //     cookie: {
-        //         sameSite: 'lax'
-        //     }
-        // },
+        session: {
+            name: 'paincoach-session',
+            password: process.env.NUXT_SESSION_PASSWORD || '',
+            cookie: {
+                domain: process.env.ENVIRONMENT_COOKIE_DOMAIN,
+                sameSite: 'lax'
+            }
+        },
 
         mailchimp: {
             dc: process.env.MAILCHIMP_DC,
