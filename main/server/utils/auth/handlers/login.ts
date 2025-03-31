@@ -78,8 +78,10 @@ export async function handleLoginCredentials(
             logged_in_at: new Date(),
             version: 1,
         }
+
+        await clearUserSession(event);
                 
-        await replaceUserSession(event, session, {
+        await setUserSession(event, session, {
             maxAge: 60 * 60 * 24 * 365 * 1,
         });
         
