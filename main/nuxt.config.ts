@@ -21,7 +21,7 @@ export default defineNuxtConfig({
             name: 'paincoach-session',
             password: process.env.NUXT_SESSION_PASSWORD || '',
             cookie: {
-                domain: 'localhost',
+                domain: process.env.ENVIRONMENT_DOMAIN,
                 sameSite: 'lax'
             }
         },
