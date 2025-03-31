@@ -17,13 +17,13 @@ export default defineNuxtConfig({
         environmentDomain: process.env.ENVIRONMENT_DOMAIN,
 
         // nuxt-auth-utils
-        session: {
-            name: 'paincoach-session',
-            password: process.env.NUXT_SESSION_PASSWORD || '',
-            cookie: {
-                sameSite: 'lax'
-            }
-        },
+        // session: {
+        //     name: 'paincoach-session',
+        //     password: process.env.NUXT_SESSION_PASSWORD || '',
+        //     cookie: {
+        //         sameSite: 'lax'
+        //     }
+        // },
 
         mailchimp: {
             dc: process.env.MAILCHIMP_DC,
