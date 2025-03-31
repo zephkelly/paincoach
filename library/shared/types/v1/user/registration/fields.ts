@@ -68,6 +68,13 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: RegisterInputField[] = [
         identifier: 'confirm_password',
         tabindex: 1,
         required: true,
+    },
+    {
+        inputType: 'checkbox',
+        label: 'Would you like to anonymously share your data to help improve our services?',
+        identifier: 'data_sharing_enabled',
+        tabindex: 1,
+        required: false,
     }
 ];
 

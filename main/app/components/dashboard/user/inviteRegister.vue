@@ -31,6 +31,7 @@
                                 <DashboardAccountRoleChip
                                     v-for="role in inviteeRoles"
                                     :userRole="role"
+                                    :class="{ 'primary-role': role === inviteePrimaryRole }"
                                     paneled
                                     :collapsable="(inviteeRoles && inviteeRoles.length > 1) && (role !== inviteePrimaryRole)"
                                     class="user-role"
@@ -139,10 +140,12 @@
             </div> -->
 
             <div class="submit-section">
+                <p class="submission-error" :class="{ show: submissionError }">{{ submissionError }}</p>
                 <EButton
                     class="submit-button"
                     type="submit"
                     :disabled="validatedRegistrationData === null"
+                    :loading="submitting"
                 >
                     Complete registration
                 </EButton>
@@ -241,6 +244,7 @@
                     </li>
                 </ol>
 
+
                 <EButton
                     :class="{ 'no-medications': !state.medications || !state.medications.length }"
                     class="add-medication-button flex-row"
@@ -287,7 +291,9 @@ const {
     validate,
     validatedRegistrationData,
 
-    submit
+    submit,
+    submitting,
+    submissionError
 } = useInviteRegister(invitation);
 
 import { userRegisterValidator } from '@@/shared/schemas/v1/user/registration';
@@ -506,11 +512,25 @@ const medicationsSectionMaxHeight = computed(() => {
             }
 
             .role-chip-container {
+                display: flex;
                 position: absolute;
                 bottom: 0;
                 right: 50%;
                 transform: translate(50%, 50%);
                 gap: 0.25rem;
+
+                .is-primary {
+                    order: 0;
+                }
+
+                :not(.primary-role) {
+                    order: 1;
+                }
+
+                .app {
+                    //last
+                    order: 5;
+                }
             }
         }
 
@@ -613,8 +633,31 @@ const medicationsSectionMaxHeight = computed(() => {
 .submit-section {
     width: 100%;
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-end;
     margin-top: 3rem;
+
+    .submission-error {
+        font-size: 1rem;
+        color: var(--error-color);
+        opacity: 0;
+        margin-bottom: 0rem;
+        max-height: 0px;
+        transition:
+            margin-bottom 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+            opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+            max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+        
+        &.show {
+            margin-bottom: 1rem;
+            opacity: 1;
+            max-height: 16px;
+        }
+    }
+
+    .submit-button {
+        // width: 200px;
+    }
 }
 
 
@@ -768,7 +811,17 @@ const medicationsSectionMaxHeight = computed(() => {
         justify-content: center;
         position: relative;
 
+        .button-content {
+            display: flex;
+            flex-direction: row;
+            white-space: nowrap;
+            align-items: center;
+            gap: 0.5rem;
+        }   
+
         svg {
+            position: relative;
+            top: -1px;
             height: 100%;
             aspect-ratio: 1;
             width: auto;

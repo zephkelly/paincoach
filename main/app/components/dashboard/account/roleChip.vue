@@ -4,6 +4,7 @@
         admin: userRole === 'admin',
         clinician: userRole === 'clinician',
         patient: userRole === 'patient',
+        app: userRole === 'app',
         skeleton: userRole === undefined,
         'has-default-slot': hasDefaultSlot,
         'collapsable': collapsable,
@@ -17,7 +18,7 @@
             <TransitionGroup name="fade" tag="div" class="transition-wrapper">
                 <template v-if="userRole === 'owner'">
                     <div class="chip-content-wrapper owner" :class="{ 'has-slot': hasDefaultSlot }">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.9q-.175 0-.325-.025t-.3-.075Q8 20.675 6 17.638T4 11.1V6.375q0-.625.363-1.125t.937-.725l6-2.25q.35-.125.7-.125t.7.125l6 2.25q.575.225.938.725T20 6.375V11.1q0 3.5-2 6.538T12.625 21.8q-.15.05-.3.075T12 21.9"/></svg>
                         <slot v-if="hasDefaultSlot" name="default"></slot>
                         <p v-else class="role-name">Owner</p>
                     </div>
@@ -41,6 +42,13 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></g></svg>
                         <slot v-if="hasDefaultSlot" name="default"></slot>
                         <p v-else class="role-name">Patient</p>
+                    </div>
+                </template>
+                <template v-else-if="userRole === 'app'">
+                    <div class="chip-content-wrapper app" :class="{ 'has-slot': hasDefaultSlot }">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="10" height="14" x="3" y="8" rx="2"/><path d="M5 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-2.4M8 18h.01"/></g></svg>
+                        <slot v-if="hasDefaultSlot" name="default"></slot>
+                        <p v-else class="role-name">App User</p>
                     </div>
                 </template>
             </TransitionGroup>
@@ -99,6 +107,11 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
     &.patient {
         width: 81px;
         min-width: 82px;
+    }
+
+    &.app {
+        width: 90px;
+        min-width: 91px;
     }
     
     &.has-default-slot {
@@ -170,6 +183,11 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
             &.patient {
                 width: 81px;
                 min-width: 82px;
+            }
+
+            &.app {
+                width: 90px;
+                min-width: 91px;
             }
 
             .chip-content-wrapper {
@@ -290,7 +308,13 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
             margin-right: 0.25rem;
         }
 
-        &.admin, &.owner {
+        &.owner {
+            svg {
+                height: 0.9rem;
+            }
+        }
+
+        &.admin {
             svg {
                 height: 0.85rem;
             }
@@ -303,6 +327,12 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
         }
 
         &.patient {
+            svg {
+                height: 0.85rem;
+            }
+        }
+
+        &.app {
             svg {
                 height: 0.85rem;
             }

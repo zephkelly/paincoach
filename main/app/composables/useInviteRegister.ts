@@ -1,3 +1,4 @@
+import { H3Error } from "h3";
 import { ZodError } from "zod";
 import type { Role } from "@@/shared/types/v1/role";
 import type { LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
@@ -25,6 +26,8 @@ import { userRegisterStrictValidator } from "@@/shared/schemas/v1/user/registrat
 
 
 export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation | null>) => {
+    const submissionError = ref<string | null>(null);
+
     const invitedRoles = computed(() => {
         if (!invitation.value) {
             return [];
@@ -120,7 +123,10 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
                 return null;
             }
 
+            submissionError.value = null;
+
             try {
+                console.log("Validating registration data:", state.value);
                 const validatedData = userRegisterStrictValidator.validate(state.value);
                 return validatedData;
             }
@@ -141,7 +147,9 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             isValid.value = false;
             return false;
         }
-        
+
+        submissionError.value = null;
+
         try {
             // If a specific field is provided, we can validate just that field
             if (fieldName) {
@@ -283,10 +291,19 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             return;
         }
 
-        state.value.medications.splice(index, 1);
+        const previousMedications = state.value.medications;
+        const splicedMedications = previousMedications.filter((_, i) => i !== index);
+
+        state.value.medications = (splicedMedications.length > 0) ? splicedMedications : undefined;
     }
 
+    const submitting = ref(false)
     async function submit() {
+        if (submitting.value) {
+            return;
+        }
+
+        submitting.value = true;
         try {
             const validatedData = await validatedRegistrationData.value;
 
@@ -311,6 +328,16 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         }
         catch (error) {
             console.error("Error during submission:", error);
+
+            if (error instanceof H3Error) {
+                submissionError.value = error.message
+            }
+            else {
+                submissionError.value = "An unexpected error occurred during submission, please reach out to an administrator.";
+            }
+        }
+        finally {
+            submitting.value = false;
         }
     }
 
@@ -335,6 +362,8 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         validate,
         validatedRegistrationData,
 
-        submit
+        submit,
+        submitting,
+        submissionError
     }
 }

@@ -39,6 +39,10 @@
                 <label for="clinician-profile" class="form__label">Allowed clinician profile</label>
                 <input type="checkbox" id="clinician-profile" class="form__input" v-model="allowedClinicianProfile" />
             </div>
+            <div class="form__group data-sharing">
+                <label for="owner-role" class="form__label">Allowed owner role</label>
+                <input type="checkbox" id="owner-role" class="form__input" v-model="allowedOwnerRole" />
+            </div>
         </div>
         <div class="form__footer">
             <button type="submit" class="button button--primary" :disabled="isSubmitting">
@@ -49,7 +53,7 @@
 </template>
 
 <script lang="ts" setup>
-import { H3Error } from 'h3'
+import type { Role } from '@@/shared/types/v1/role';
 import { validateCreateUserInvitationRequest } from '@@/shared/schemas/v1/user/invitation/create';
 import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
 
@@ -64,6 +68,7 @@ const email = ref('');
 const confirmEmail = ref('');
 const dataSharing = ref(false);
 const allowedClinicianProfile = ref(false);
+const allowedOwnerRole = ref(false);
 
 // For handling form errors
 const formError = ref('');
@@ -80,11 +85,19 @@ async function submitInviteAdminForm() {
         isSubmitting.value = false;
         return;
     }
-    
+
+    const finalRoles: Role[] = ['admin', 'app'];
+    if (allowedClinicianProfile.value) {
+        finalRoles.push('clinician');
+    }
+    if (allowedOwnerRole.value) {
+        finalRoles.push('owner');
+    }
+
     try {
         const createUserInviteRequest: CreateUserInvitationRequest = {
-            roles: allowedClinicianProfile.value ? ['admin', 'clinician'] : ['admin'],
-            primary_role: 'admin',
+            roles: finalRoles,
+            primary_role: (allowedOwnerRole.value) ? 'owner' : 'admin',
             email: email.value,
             confirm_email: confirmEmail.value,
             phone_number: phone.value,
@@ -100,15 +113,6 @@ async function submitInviteAdminForm() {
 
         const validatedCreateUserInviteRequest = validateCreateUserInvitationRequest(createUserInviteRequest);
 
-
-        // const inviteRequest: CreateUserInvitationRequest = {
-        //     user: user,  
-        //     ...mockUserAPIData.value
-        // };
-        
-        // validateCreateUserInvitationRequest(inviteRequest);
-        
-        // // Send the validated request directly
         const response = await $fetch('/api/v1/auth/invite', {
             method: 'POST',
             body: validatedCreateUserInviteRequest
@@ -116,17 +120,8 @@ async function submitInviteAdminForm() {
         
         console.log('Admin added successfully');
         
-        // // Reset form
-        // firstName.value = '';
-        // lastName.value = '';
-        // phone.value = '';
-        // email.value = '';
-        // confirmEmail.value = '';
-        // dataSharing.value = false;
-        // allowedClinicianProfile.value = false;
-        
-        // You could add success message or redirect here
-    } catch (error: unknown) {
+    }
+    catch (error: unknown) {
         if (error instanceof Error) {
             formError.value = `Validation error: ${error.message}`;
             

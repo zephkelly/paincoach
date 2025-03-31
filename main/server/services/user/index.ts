@@ -10,6 +10,9 @@ import { RoleRepository } from '~~/server/repositories/role';
 import { InvitationRepository } from '~~/server/repositories/invitation';
 import { PermissionRepository } from '~~/server/repositories/permission';
 
+import { invalidateCachedLimitedInvitation } from '~~/server/repositories/invitation/functions/getLimitedInvitation';
+import { invalidateCachedDBInvitation } from '~~/server/repositories/invitation/functions/getDBInvitation';
+
 import type { UnregisteredUserSession } from '#auth-utils';
 import type { UserRegister } from '@@/shared/types/v1/user/registration';
 
@@ -59,6 +62,10 @@ export class UserService {
         if (userRegisterRequest.will_use_app) {
             invitationRoles.add('app');
             requestedRoles.add('app');
+        }
+        else {
+            invitationRoles.delete('app');
+            requestedRoles.delete('app');
         }
 
         for (const role of requestedRoles) {
@@ -157,6 +164,10 @@ export class UserService {
                 message: 'Internal Server Error',
             });
         }
+
+        // Invalidate the cached invitation
+        await invalidateCachedLimitedInvitation(token);
+        await invalidateCachedDBInvitation(token);
         
         console.log('User created successfully:', user_id);
     }

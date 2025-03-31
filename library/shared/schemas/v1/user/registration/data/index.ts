@@ -20,18 +20,25 @@ import {
     DBPatientUserRegistrationDataPartialSchema
 } from '../../role/patient/register';
 
+import {
+    DBAppUserRegistrationDataSchema,
+    DBAppUserRegistrationDataPartialSchema
+} from '../../role/app/register';
+
 
 
 export const DBUserRegistrationDataSchema = z.discriminatedUnion('role', [
     DBOwnerUserRegistrationDataSchema,
     DBAdminUserRegistrationDataSchema,
     DBClinicianUserRegistrationDataSchema,
-    DBPatientUserRegistrationDataSchema
+    DBPatientUserRegistrationDataSchema,
+    DBAppUserRegistrationDataSchema
 ]);
 
 export const DBUserRegistrationDataPartialSchema = z.discriminatedUnion('role', [
     DBOwnerUserRegistrationDataPartialSchema,
     DBAdminUserRegistrationDataPartialSchema,
     DBClinicianUserRegistrationDataPartialSchema,
-    DBPatientUserRegistrationDataPartialSchema
+    DBPatientUserRegistrationDataPartialSchema,
+    DBAppUserRegistrationDataPartialSchema
 ]);

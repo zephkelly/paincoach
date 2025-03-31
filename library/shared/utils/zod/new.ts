@@ -523,6 +523,7 @@ export function createSchemaValidator<T extends z.ZodType>(
         const result = schema.parse(data);
         return result;
       } catch (error) {
+        console.log(error.issues)
         return handleValidationError(error, schema);
       }
     },
