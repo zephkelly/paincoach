@@ -59,31 +59,31 @@ export const useAuth = () => {
         isPrivilegedUser.value && (mockUserData.value !== undefined || isMockingRoles.value)
     )
 
-    const setMockUserData = async (userId: string | undefined) => {
-        if (isPrivilegedUser.value && userId) {
-            console.log('Fetching mock user data for', userId)
-            try {
-                const response = await $fetch<LimitedUserWithRoles>(`/api/v1/auth/${userId}`, {
-                    method: 'GET',
-                })
+    // const setMockUserData = async (userId: string | undefined) => {
+    //     if (isPrivilegedUser.value && userId) {
+    //         console.log('Fetching mock user data for', userId)
+    //         try {
+    //             const response = await $fetch<LimitedUserWithRoles>(`/api/v1/auth/${userId}`, {
+    //                 method: 'GET',
+    //             })
 
-                if (response) {
-                    console.log('Setting mock user data to', response)
-                    mockUserData.value = {
-                        id: response.uuid,
-                        roles: response.roles || [response.primary_role],
-                    }
+    //             if (response) {
+    //                 console.log('Setting mock user data to', response)
+    //                 mockUserData.value = {
+    //                     id: response.uuid,
+    //                     roles: response.roles || [response.primary_role],
+    //                 }
 
-                    if (isMockingLoading.value) {
-                        mockLoading.value = false
-                    }
-                }
-            }
-            catch (err) {
-                console.error('Exception when fetching mock user data:', err)
-            }
-        }
-    }
+    //                 if (isMockingLoading.value) {
+    //                     mockLoading.value = false
+    //                 }
+    //             }
+    //         }
+    //         catch (err) {
+    //             console.error('Exception when fetching mock user data:', err)
+    //         }
+    //     }
+    // }
 
     const clearMockUserData = () => {
         mockUserData.value = undefined
