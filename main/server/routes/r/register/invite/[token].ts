@@ -31,6 +31,7 @@ export default defineEventHandler(async (event) => {
             LIMIT 1
         `, [token]);
 
+
         if (!invitationResult.length) {
             throw createError({
                 statusCode: 404,
@@ -39,10 +40,10 @@ export default defineEventHandler(async (event) => {
         }
 
         const invitation = invitationResult[0];
-        
+
         const validatedInvitation = validateDBUserInvitation(invitation);
 
-        if (validatedInvitation.status === 'pending' || validatedInvitation.status === 'opened' && invitation?.effective_status === 'expired') {
+        if (invitation?.effective_status === 'expired') {
             const transaction = await db.createTransaction();
             try {
                 await transaction.query(`

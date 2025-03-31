@@ -8,7 +8,7 @@ import { ZodError } from 'zod';
 export async function onRequestValidateSession(event: H3Event, allowUnregistered: boolean = false) {
     const { session } = await getUserSessionContext(event);
 
-    if (!session) {
+    if (!session || !session.secure || !session.user) {
         throw createError({
             statusCode: 401,
             statusMessage: 'Unauthorized'
@@ -30,13 +30,6 @@ export async function onRequestValidateSession(event: H3Event, allowUnregistered
         }
     }
     catch (error: unknown) {
-        if (error instanceof ZodError) {
-            console.error('Session validation error:', error.format());
-        }
-        else {
-            console.error('Session validation error:', error);
-        }
-
         sendRedirect(event, '/dashboard/login', 401);
     }
 }

@@ -32,17 +32,23 @@
 <script lang="ts" setup>
 import { type InputType, type InputProps } from '@@/layers/ember/types/input';
 
+// Define a type for the combined validation prop
+type ValidationConfig = {
+    validator: {
+        validateField: (data: unknown, fieldPath: string) => string | null;
+    };
+    fieldPath: string;
+    fieldValue?: any;
+};
+
 type BaseInputProps = InputProps & {
     type: InputType;
     validateOnInput?: boolean;
     forceInvalid?: boolean;
     customValidationMessage?: string;
-    validator?: {
-      validateField: (data: unknown, fieldPath: string) => string | null;
-    };
-    fieldPath?: string;
-    fieldValue?: any;
-}
+    // Replace separate validator and identifier with a single validation prop
+    validation?: ValidationConfig;
+};
 
 const props = defineProps<BaseInputProps>();
 
@@ -93,146 +99,152 @@ const inputClasses = computed(() => {
 
 // Validate input using the provided validator
 function validateIfNeeded() {
-    // Skip validation if we're not client-side yet or if no validator
-    if (!isClient || !props.validator) {
+    // Skip validation if we're not client-side yet or if no validation config
+    if (!isClient || !props.validation) {
         return;
     }
 
-  if (props.validator && props.identifier) {
-    const dataToValidate = props.fieldValue !== undefined ? props.fieldValue : props.modelValue;
+    const { validator, fieldPath, fieldValue } = props.validation;
     
-    // For object validation, create an object with the field path based on identifier
-    const validationData = createValidationObjectFromPath(props.identifier, dataToValidate);
-    
-    // Validate the field using the identifier as the field path
-    const error = props.validator.validateField(validationData, props.identifier);
-    errorMessage.value = error;
-    
-    if (error) {
-      emit('invalid', error);
-      customInvalid.value = true;
-      if (inputRef.value) {
-        inputRef.value.setCustomValidity(error);
-      }
+    if (validator && fieldPath) {
+        const dataToValidate = fieldValue !== undefined ? fieldValue : props.modelValue;
+        
+        // Create an object with the field path
+        const validationData = createValidationObjectFromPath(fieldPath, dataToValidate);
+        
+        // Validate the field
+        const error = validator.validateField(validationData, fieldPath);
+        console.log('Validation error:', error);
+        errorMessage.value = error;
+        
+        if (error) {
+            emit('invalid', error);
+            customInvalid.value = true;
+            if (inputRef.value) {
+                inputRef.value.setCustomValidity(error);
+            }
+        } else {
+            emit('valid');
+            customInvalid.value = false;
+            if (inputRef.value) {
+                inputRef.value.setCustomValidity('');
+            }
+        }
+    } else if (props.customValidationMessage) {
+        errorMessage.value = props.customValidationMessage;
+        customInvalid.value = true;
+        emit('invalid', props.customValidationMessage);
     } else {
-      emit('valid');
-      customInvalid.value = false;
-      if (inputRef.value) {
-        inputRef.value.setCustomValidity('');
-      }
+        errorMessage.value = null;
+        customInvalid.value = false;
+        if (inputRef.value) {
+            inputRef.value.setCustomValidity('');
+        }
     }
-  } else if (props.customValidationMessage) {
-    errorMessage.value = props.customValidationMessage;
-    customInvalid.value = true;
-    emit('invalid', props.customValidationMessage);
-  } else {
-    errorMessage.value = null;
-    customInvalid.value = false;
-    if (inputRef.value) {
-      inputRef.value.setCustomValidity('');
-    }
-  }
 }
 
 // Create nested object from dot-notation path
-function createValidationObjectFromPath(path: string | undefined, value: any): any {
-    if (!path) {
-        return value;
+function createValidationObjectFromPath(path: string, value: any): any {
+    const parts = path.split('.');
+    const result: any = {};
+    let current = result;
+    
+    // Create the nested structure
+    for (let i = 0; i < parts.length - 1; i++) {
+        const part = parts[i];
+
+        if (!part) {
+            continue;
+        }
+        current[part] = {};
+        current = current[part];
     }
-  const parts = path.split('.');
-  const result: any = {};
-  let current = result;
-  
-  // Create the nested structure
-  for (let i = 0; i < parts.length - 1; i++) {
-    //@ts-expect-error
-    current[parts[i]] = {};
-    //@ts-expect-error
-    current = current[parts[i]];
-  }
-  
-  // Set the value at the leaf node
-  //@ts-expect-error
-  current[parts[parts.length - 1]] = value;
-  
-  return result;
+
+    const leafNode = parts[parts.length - 1];
+    if (!leafNode) {
+        return result;
+    }
+    
+    current[leafNode] = value;
+    
+    return result;
 }
 
 // Handle validation on input
 function updateModelValue(event: Event) {
-  const target = event.target as HTMLInputElement;
-  let value;
-  
-  if (props.type === 'checkbox') {
-    value = target.checked;
-  } else {
-    value = target.value;
-  }
-  
-  emit('update:modelValue', value);
-  dirtyValue.value = true;
-  
-  // Validate on input if enabled
-  if (props.validateOnInput && isClient) {
-    validateIfNeeded();
-  }
+    const target = event.target as HTMLInputElement;
+    let value;
+    
+    if (props.type === 'checkbox') {
+        value = target.checked;
+    } else {
+        value = target.value;
+    }
+    
+    emit('update:modelValue', value);
+    dirtyValue.value = true;
+    
+    // Validate on input if enabled
+    if (props.validateOnInput && isClient) {
+        validateIfNeeded();
+    }
 }
 
 // Handle validation on blur
 function handleBlur(event: FocusEvent) {
-  touched.value = true;
-  emit('blur', event);
-  
-  // Only validate on client
-  if (isClient) {
-    validateIfNeeded();
-  }
+    touched.value = true;
+    emit('blur', event);
+    
+    // Only validate on client
+    if (isClient) {
+        validateIfNeeded();
+    }
 }
 
 // Watch for changes to modelValue to update the input
 watch(() => props.modelValue, (newValue) => {
-  if (props.type === 'checkbox' && inputRef.value) {
-    inputRef.value.checked = !!newValue;
-  }
-  
-  // Validate on model change only if client-side and the field has been touched
-  if (isClient && (touched.value || props.validateOnInput)) {
-    validateIfNeeded();
-  }
+    if (props.type === 'checkbox' && inputRef.value) {
+        inputRef.value.checked = !!newValue;
+    }
+    
+    // Validate on model change only if client-side and the field has been touched
+    if (isClient && (touched.value || props.validateOnInput)) {
+        validateIfNeeded();
+    }
 });
 
 // Watch for changes to the custom validation message
 watch(() => props.customValidationMessage, (newValue) => {
-  // Skip during SSR
-  if (!isClient) return;
-  
-  if (newValue) {
-    errorMessage.value = newValue;
-    customInvalid.value = true;
-    emit('invalid', newValue);
-  } else if (!props.validator) {
-    // Only clear if we're not using a validator
-    errorMessage.value = null;
-    customInvalid.value = false;
-  }
+    // Skip during SSR
+    if (!isClient) return;
+    
+    if (newValue) {
+        errorMessage.value = newValue;
+        customInvalid.value = true;
+        emit('invalid', newValue);
+    } else if (!props.validation) {
+        // Only clear if we're not using a validator
+        errorMessage.value = null;
+        customInvalid.value = false;
+    }
 });
 
 // Public method to reset the field
 function reset() {
-  touched.value = false;
-  dirtyValue.value = false;
-  customInvalid.value = false;
-  errorMessage.value = null;
-  if (inputRef.value) {
-    inputRef.value.setCustomValidity('');
-  }
+    touched.value = false;
+    dirtyValue.value = false;
+    customInvalid.value = false;
+    errorMessage.value = null;
+    if (inputRef.value) {
+        inputRef.value.setCustomValidity('');
+    }
 }
 
 // Define exposed methods
 defineExpose({
-  reset,
-  inputElement: inputRef,
-  validate: validateIfNeeded
+    reset,
+    inputElement: inputRef,
+    validate: validateIfNeeded
 });
 </script>
    

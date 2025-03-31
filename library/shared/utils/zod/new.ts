@@ -1,5 +1,4 @@
 import { z } from 'zod';
-// import { H3Error } from 'h3';
 
 /**
  * CustomZodError extends the standard ZodError with additional functionality
@@ -315,86 +314,238 @@ function createPartialDiscriminatedUnion(schema: z.ZodDiscriminatedUnion<any, an
 }
 
 /**
- * Creates a utility function to validate data against a schema and
- * return errors in a format that exactly matches the schema structure.
+ * Type for validator configuration options
  */
-export function createSchemaValidator<T extends z.ZodType>(schema: T) {
+export interface SchemaValidatorOptions<T extends z.ZodType> {
+  /**
+   * The primary schema to validate against
+   */
+  schema: T;
+  
+  /**
+   * Optional custom partial schema (if not provided, will be inferred)
+   */
+  partialSchema?: z.ZodType;
+  
+  /**
+   * Optional custom schema for array items (if not provided, will be inferred)
+   * Can be either a single item schema or an array schema
+   */
+  arrayItemSchema?: z.ZodType;
+  
+  /**
+   * Optional custom schema for partial array items (if not provided, will be inferred)
+   * Can be either a single item schema or an array schema
+   */
+  partialArrayItemSchema?: z.ZodType;
+  
+  /**
+   * Optional array of default values to apply when creating new items
+   * with validatePartialArray
+   */
+  defaultValues?: Record<string, any>;
+}
+
+/**
+ * Creates a utility function to validate data against a schema with enhanced control
+ * over partial and array schemas.
+ */
+export function createSchemaValidator<T extends z.ZodType>(
+  schemaOrOptions: T | SchemaValidatorOptions<T>
+) {
+  // Extract schema and options
+  let schema: T;
+  let partialSchema: z.ZodType | undefined;
+  let arrayItemSchema: z.ZodType | undefined;
+  let partialArrayItemSchema: z.ZodType | undefined;
+  let defaultValues: Record<string, any> = {};
+  
+  if ('schema' in schemaOrOptions) {
+    // Options object provided
+    schema = schemaOrOptions.schema;
+    partialSchema = schemaOrOptions.partialSchema;
+    arrayItemSchema = schemaOrOptions.arrayItemSchema;
+    partialArrayItemSchema = schemaOrOptions.partialArrayItemSchema;
+    defaultValues = schemaOrOptions.defaultValues || {};
+  } else {
+    // Just the schema provided
+    schema = schemaOrOptions;
+  }
+
+  /**
+   * Internal function to create or get partial schema
+   */
+  const getPartialSchema = (): z.ZodType => {
+    if (partialSchema) return partialSchema;
+    
+    // Generate partial schema based on the main schema type
+    if (isDiscriminatedUnionSchema(schema)) {
+      return createPartialDiscriminatedUnion(schema as z.ZodDiscriminatedUnion<any, any>);
+    }
+    else if (isTransformedSchema(schema)) {
+      const innerSchema = extractInnerSchema(schema);
+      
+      if (innerSchema instanceof z.ZodObject) {
+        // Apply partial to the inner schema
+        return innerSchema.partial().transform((data) => {
+          // Apply the original transformation if possible
+          const transformFn = (schema as any)._def.effect?.transform;
+          return transformFn ? transformFn(data) : data;
+        });
+      }
+    }
+    else if (schema instanceof z.ZodObject) {
+      return schema.partial();
+    }
+    
+    // Fallback to the original schema
+    return schema;
+  };
+
+  /**
+   * Internal function to get the appropriate array item schema
+   */
+  const getArrayItemSchema = (): z.ZodType => {
+    if (arrayItemSchema) {
+      // If the provided schema is already an array, extract its element type
+      return arrayItemSchema instanceof z.ZodArray 
+        ? arrayItemSchema.element 
+        : arrayItemSchema;
+    }
+    
+    // Try to extract from an array schema or use the main schema
+    return schema instanceof z.ZodArray ? schema.element : schema;
+  };
+
+  /**
+   * Internal function to get the appropriate partial array item schema
+   */
+  const getPartialArrayItemSchema = (): z.ZodType => {
+    if (partialArrayItemSchema) {
+      // If the provided schema is already an array, extract its element type
+      return partialArrayItemSchema instanceof z.ZodArray 
+        ? partialArrayItemSchema.element 
+        : partialArrayItemSchema;
+    }
+    
+    const baseItemSchema = getArrayItemSchema();
+    
+    // Create partial versions of the item schema if not explicitly provided
+    if (baseItemSchema instanceof z.ZodObject) {
+      return baseItemSchema.partial();
+    } 
+    else if (isDiscriminatedUnionSchema(baseItemSchema)) {
+      return createPartialDiscriminatedUnion(
+        baseItemSchema as z.ZodDiscriminatedUnion<any, any>
+      );
+    }
+    
+    // For non-object schemas, use the original
+    return baseItemSchema;
+  };
+
+  /**
+   * Internal function to handle validation errors
+   */
+  const handleValidationError = (
+    error: any, 
+    schemaToFormat: z.ZodType, 
+    statusCode = 422, 
+    message = 'Validation failed'
+  ) => {
+    if (error instanceof z.ZodError) {
+      const customError = new CustomZodError(error.issues);
+      
+      throw createError({
+        statusCode,
+        message,
+        data: customError.formatToSchema(schemaToFormat)
+      });
+    }
+    throw error;
+  };
+
+  /**
+   * Internal function to handle array validation errors with specific formatting
+   */
+  const handleArrayValidationError = (
+    error: any, 
+    data: unknown[], 
+    itemSchema: z.ZodType,
+    arraySchema: z.ZodType,
+    statusCode = 422, 
+    message = 'Array validation failed'
+  ) => {
+    if (error instanceof z.ZodError) {
+      const customError = new CustomZodError(error.issues);
+      
+      // Format errors to match the array structure
+      const formattedArrayErrors = Array(data.length).fill(null);
+      
+      error.issues.forEach(issue => {
+        if (issue.path.length > 0 && !isNaN(Number(issue.path[0]))) {
+          const index = issue.path[0] as number;
+          const itemIssues = error.issues.filter(i => 
+            i.path[0] === index
+          ).map(i => ({
+            ...i,
+            path: i.path.slice(1) // Remove the array index
+          }));
+          
+          if (index < formattedArrayErrors.length) {
+            const itemError = new CustomZodError(itemIssues);
+            formattedArrayErrors[index] = itemError.formatToSchema(itemSchema);
+          }
+        }
+      });
+      
+      // Only include non-null errors in the result
+      const filteredErrors = formattedArrayErrors.filter(err => err !== null);
+      
+      throw createError({
+        statusCode,
+        message,
+        data: filteredErrors.length > 0 ? formattedArrayErrors : customError.formatToSchema(arraySchema)
+      });
+    }
+    throw error;
+  };
+
   return {
     /**
      * Validates the input data against the schema and returns formatted errors
      * @param data The data to validate
-     * @returns An object with errors matching the schema structure exactly, or null if validation succeeds
+     * @returns The validated data if successful
+     * @throws Error with validation errors if validation fails
      */
-    validate: (data: unknown): { success: true, data: z.infer<T> } | { success: false, errors: any } => {
+    validate: (data: unknown): z.infer<T> => {
       try {
         const result = schema.parse(data);
-        return { success: true, data: result };
+        return result;
       } catch (error) {
-        if (error instanceof z.ZodError) {
-          const customError = new CustomZodError(error.issues);
-
-          throw createError({
-            statusCode: 422,
-            message: 'Validation failed',
-            data: customError.formatToSchema(schema)
-          })
-        }
-        throw error;
+        return handleValidationError(error, schema);
       }
     },
 
     /**
      * Validates the input data against a partial version of the schema,
-     * making all fields optional while respecting complex schema types
+     * using either the provided partial schema or inferring one
      * @param data The data to validate
-     * @returns An object with errors matching the schema structure exactly, or null if validation succeeds
+     * @returns The validated partial data if successful
+     * @throws Error with validation errors if validation fails
      */
-    validatePartial: (data: unknown): { success: true, data: Partial<z.infer<T>> } | { success: false, errors: any } => {
+    validatePartial: (data: unknown): Partial<z.infer<T>> => {
       try {
-        let partialSchema: z.ZodType;
-
-        // Handle discriminated unions specially
-        if (isDiscriminatedUnionSchema(schema)) {
-          partialSchema = createPartialDiscriminatedUnion(schema as z.ZodDiscriminatedUnion<any, any>);
-        }
-        // Handle transformed schemas by extracting the inner schema if possible
-        else if (isTransformedSchema(schema)) {
-          const innerSchema = extractInnerSchema(schema);
-          
-          if (innerSchema instanceof z.ZodObject) {
-            // Apply partial to the inner schema
-            partialSchema = innerSchema.partial().transform((data) => {
-              // Apply the original transformation if possible
-              const transformFn = (schema as any)._def.effect?.transform;
-              return transformFn ? transformFn(data) : data;
-            });
-          } else {
-            // For non-object inner schemas, use the original with safeParse
-            partialSchema = schema;
-          }
-        }
-        // Standard case for object schemas
-        else if (schema instanceof z.ZodObject) {
-          partialSchema = schema.partial();
-        }
-        // For other schema types, fallback to the original schema
-        else {
-          partialSchema = schema;
-        }
-
-        const result = partialSchema.parse(data);
-        return { success: true, data: result };
+        const partialSchema = getPartialSchema();
+        // Merge defaultValues with input data
+        const dataWithDefaults = typeof data === 'object' && data !== null
+          ? { ...defaultValues, ...data }
+          : data;
+        
+        const result = partialSchema.parse(dataWithDefaults);
+        return result;
       } catch (error) {
-        if (error instanceof z.ZodError) {
-          const customError = new CustomZodError(error.issues);
-          
-          // Use the original schema for error formatting to maintain structure
-          return { 
-            success: false, 
-            errors: customError.formatToSchema(schema)
-          };
-        }
-        throw error;
+        return handleValidationError(error, getPartialSchema(), 422, 'Partial validation failed');
       }
     },
 
@@ -416,6 +567,104 @@ export function createSchemaValidator<T extends z.ZodType>(schema: T) {
         // For non-zod errors, return a generic message
         return 'Validation failed';
       }
-    }
+    },
+
+    /**
+     * Validates an array of items against the schema
+     * @param data The array of data to validate
+     * @param specificItemSchema Optional specific schema for this call only
+     * @returns The validated array if successful
+     * @throws Error with validation errors if validation fails
+     */
+    validateArray: <ItemType extends z.ZodType>(
+      data: unknown[],
+      specificItemSchema?: ItemType
+    ): z.infer<ItemType>[] => {
+      // Use provided specific schema, configured schema, or derived schema
+      const finalItemSchema = specificItemSchema || getArrayItemSchema();
+      const arraySchema = z.array(finalItemSchema);
+
+      try {
+        // Validate the entire array at once
+        const result = arraySchema.parse(data);
+        return result;
+      } catch (error) {
+        return handleArrayValidationError(
+          error, 
+          data, 
+          finalItemSchema, 
+          arraySchema
+        );
+      }
+    },
+
+    /**
+     * Validates an array of items against a partial version of the schema
+     * @param data The array of data to validate
+     * @param specificPartialItemSchema Optional specific partial schema for this call only
+     * @returns The validated partial array if successful
+     * @throws Error with validation errors if validation fails
+     */
+    validatePartialArray: <ItemType extends z.ZodType>(
+      data: unknown[],
+      specificPartialItemSchema?: ItemType
+    ): Partial<z.infer<ItemType>>[] => {
+      // Use provided specific schema, configured schema, or derived schema
+      const finalPartialItemSchema = specificPartialItemSchema || getPartialArrayItemSchema();
+      const partialArraySchema = z.array(finalPartialItemSchema);
+      
+      try {
+        const result = partialArraySchema.parse(data);
+        return result;
+      } catch (error) {
+        return handleArrayValidationError(
+          error, 
+          data, 
+          finalPartialItemSchema, 
+          partialArraySchema, 
+          422, 
+          'Partial array validation failed'
+        );
+      }
+    },
+
+    /**
+     * Get the main schema used by the validator
+     * @returns The main schema
+     */
+    getSchema: (): T => schema,
+
+    /**
+     * Get the partial schema used by the validator
+     * @returns The partial schema
+     */
+    getPartialSchema: getPartialSchema,
+
+    /**
+     * Get the array item schema used by the validator
+     * @returns The array item schema
+     */
+    getArrayItemSchema: getArrayItemSchema,
+
+    /**
+     * Get the partial array item schema used by the validator
+     * @returns The partial array item schema
+     */
+    getPartialArrayItemSchema: getPartialArrayItemSchema
   };
+}
+
+/**
+ * Helper function to create H3 error object for validation errors
+ * Can be replaced with your own error handling logic
+ */
+function createError(options: { 
+  statusCode: number; 
+  message: string; 
+  data?: any 
+}): Error {
+  const error = new Error(options.message);
+  (error as any).statusCode = options.statusCode;
+  (error as any).data = options.data;
+  return error;
 }

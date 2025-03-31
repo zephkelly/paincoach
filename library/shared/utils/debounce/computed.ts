@@ -1,87 +1,65 @@
-import { debounce } from "./";
+import { debounce, type DebouncedFunction } from '.'; // Assuming your debounce function is in a separate file
 
-/**
- * Creates a debounced computed property for Vue with flexible parameters
- * and proper SSR support that returns null during server-side rendering
- *
- * @param {Function} getter - The getter function
- * @param {Function|number} [setterOrWait] - Either the setter function or wait time
- * @param {number} [wait=300] - The number of milliseconds to delay (used when second param is setter)
- * @returns {WritableComputedRef<T>|ComputedRef<T>} - Returns a computed property
- */
-export function debouncedComputed<T>(
-    getter: () => T,
-    setterOrWait?: ((value: T) => void) | number,
-    maybeWait?: number
-  ): ComputedRef<T> | WritableComputedRef<T> {
-    // Default wait time
-    let wait = 300;
-    let setter: ((value: T) => void) | undefined = undefined;
-    
-    // Handle flexible parameters
-    if (typeof setterOrWait === 'function') {
-      // Second parameter is a setter function
-      setter = setterOrWait;
-      // Use third parameter as wait if provided
-      if (typeof maybeWait === 'number') {
-        wait = maybeWait;
-      }
-    } else if (typeof setterOrWait === 'number') {
-      // Second parameter is wait time
-      wait = setterOrWait;
-    }
-    
-    // Create a ref to track if we're in browser
-    const isBrowser = ref(import.meta.browser);
-    
-    // Create a ref to store the debounced value
-    // Initialize with the actual value to avoid hydration mismatches
-    const initialValue = getter();
-    const debouncedValue = ref<T>(initialValue);
-    
-    // Only set up the debounced watcher on the client side
-    if (isBrowser.value) {
-      // Create a debounced function to update the value
-      const debouncedUpdate = debounce((newValue: T) => {
-        debouncedValue.value = newValue;
-      }, wait);
-      
-      // Watch the getter and update the debounced value
-      const stopWatcher = watch(
-        () => getter(),
-        (newValue) => {
-          // Call the debounced update function instead of immediately updating
-          debouncedUpdate(newValue);
-        },
-        { deep: true } // Removed immediate flag to avoid overriding the initial value
-      );
-      
-      // Clean up the watcher and cancel any pending debounced calls when unmounted
-      onUnmounted(() => {
-        stopWatcher();
-        debouncedUpdate.cancel();
-      });
-    }
-    
-    // If no setter provided, return a read-only computed ref
-    if (!setter) {
-      return computed(() => {
-        // On server, return the actual value, on client use the debounced value
-        return debouncedValue.value;
-      });
-    }
-    
-    // With setter, return a writable computed
-    return computed({
-      get: () => {
-        return debouncedValue.value;
-      },
-      set: (value: T) => {
-        if (setter) {
-          setter(value);
-          // Also update the local value to maintain consistency
-          debouncedValue.value = value;
-        }
-      }
-    });
+
+
+export interface DebouncedComputedOptions {
+    wait?: number;
+    leading?: boolean;
+    trailing?: boolean;
+    context?: any;
   }
+  
+  export interface DebouncedComputedRef<T> extends Ref<T> {
+    cancel: () => void;
+    flush: () => T | undefined;
+    pending: () => boolean;
+  }
+  
+  /**
+   * Creates a debounced computed property that only recalculates after the debounce period
+   * when its dependencies change, not immediately.
+   * 
+   * @param getter - The function that returns the computed value
+   * @param deps - Array of reactive dependencies to watch
+   * @param options - Debounce options
+   * @returns A ref with debounce controls
+   */
+  export function debouncedComputed<T, D extends Array<any>>(
+    getter: () => T,
+    deps: D,
+    options: DebouncedComputedOptions = {}
+  ): DebouncedComputedRef<T> {
+    const { wait = 300, leading = false, trailing = true, context = null } = options;
+    
+    // Create a ref to store the result
+    const result = shallowRef(getter()) as Ref<T>;
+    
+    // Create the debounced calculation function
+    const debouncedCalculation = debounce(() => {
+      // Only execute the getter function after the debounce period
+      result.value = getter();
+    }, wait, { leading, trailing, context });
+    
+    // Watch the dependencies array
+    watch(deps, () => {
+      // When deps change, schedule the recalculation
+      debouncedCalculation();
+    }, { deep: true });
+    
+    // Create the debounced ref with additional methods
+    const debouncedRef = ref(result) as unknown as DebouncedComputedRef<T>;
+    
+    // Add debounce control methods
+    debouncedRef.cancel = () => {
+      debouncedCalculation.cancel();
+    };
+    
+    debouncedRef.flush = () => {
+      debouncedCalculation.flush();
+      return result.value;
+    };
+    
+    debouncedRef.pending = debouncedCalculation.pending;
+    
+    return debouncedRef;
+}

@@ -33,31 +33,44 @@ export const UserRegisterSchema = DBBaseUserWithRolesSchema.pick({
     confirm_password: z.string().min(1, 'Confirm password is required')
         .max(255, 'Confirm password must be less than 255 characters'),
 
+    invitation_token: UUIDSchema,
+
     will_use_app: z.boolean(),
     medications: z.array(CreateEncryptedPainMedicationDataV1RequestSchema).min(1).nullable().optional(),
 
     role_data: z.array(DBUserRegistrationDataSchema).min(1),
 });
 
+export const UserRegisterStrictSchema = UserRegisterSchema.refine((data) => {
+    return data.password === data.confirm_password;
+}, {
+    message: 'Passwords do not match',
+});
+
 export const UserRegisterPartialSchema = UserRegisterSchema.partial().extend({
+    // invitation_token: UUIDSchema,
     medications: z.array(CreateEncryptedPainMedicationDataV1RequestPartialSchema).min(1).nullable().optional(),
     role_data: z.array(DBUserRegistrationDataPartialSchema).min(1),
 })
 
-export function validateUserRegister(data: unknown): z.infer<typeof UserRegisterSchema> {
-    const parsedResult = UserRegisterSchema.safeParse(data);
-    if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
-    }
-    return parsedResult.data;
-}
+
+
+// export function validateUserRegister(data: unknown): z.infer<typeof UserRegisterSchema> {
+//     const parsedResult = UserRegisterSchema.safeParse(data);
+//     if (!parsedResult.success) {
+//         throw createZodValidationError(parsedResult.error);
+//     }
+//     return parsedResult.data;
+// }
 
 export const userRegisterValidator = createSchemaValidator(UserRegisterSchema);
 
-export function validateUserRegisterPartial(data: unknown): z.infer<typeof UserRegisterPartialSchema> {
-    const parsedResult = UserRegisterPartialSchema.safeParse(data);
-    if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
-    }
-    return parsedResult.data;
-}
+export const userRegisterStrictValidator = createSchemaValidator(UserRegisterStrictSchema);
+
+// export function validateUserRegisterPartial(data: unknown): z.infer<typeof UserRegisterPartialSchema> {
+//     const parsedResult = UserRegisterPartialSchema.safeParse(data);
+//     if (!parsedResult.success) {
+//         throw createZodValidationError(parsedResult.error);
+//     }
+//     return parsedResult.data;
+// }

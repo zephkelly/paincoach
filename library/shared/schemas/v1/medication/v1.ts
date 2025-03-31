@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { createSchemaValidator } from '@@/shared/utils/zod/new';
+
+
 
 export const MedicationReasonSchema = z.enum([
     'pain'
@@ -8,7 +11,16 @@ const VALID_DOSE_UNITS = ['mg', 'g', 'mcg', 'mL', 'L', 'IU', 'mEq'] as const;
 
 const DoseUnitSchema = z.enum(VALID_DOSE_UNITS);
 
-const FrequencySchema = z.number();
+const FrequencySchema = z.union([
+    z.string().transform(str => {
+        const parsed = parseFloat(str);
+        if (isNaN(parsed)) {
+            throw new Error('Invalid frequency');
+        }
+        return parsed;
+    }),
+    z.number(),
+]);
 
 const DosageSchema = z.object({
     original: z.string().refine(
@@ -58,7 +70,8 @@ export const DBEncryptedMedicationDataV1Schema = z.object({
     end_date: z.date().nullable().optional(),
     is_on_going: z.boolean(),
 
-    medication_name: z.string().min(2, "Medication name must be at least 2 characters"),
+    medication_name: z.string().min(1, "Medication name is required")
+        .max(255, "Medication name must be less than 255 characters"),
 
     dosage: z.union([
         z.string().transform(str => DosageSchema.parse({ original: str })),
@@ -93,37 +106,45 @@ export const CreateEncryptedPainMedicationDataV1RequestSchema = DBEncryptedMedic
     end_date: z.coerce.date().nullable().optional(),
     reason: z.literal('pain'),
 })
-export function validateCreateEncryptedPainMedicationDataV1Request(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestSchema> {
-    const parsedResult = CreateEncryptedPainMedicationDataV1RequestSchema.safeParse(data);
-    if (!parsedResult.success) {
-        throw parsedResult.error;
-    }
-    return parsedResult.data;
-}
-export function validateCreateEncryptedPainMedicationDataV1Requests(data: unknown[]): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestSchema>[] {
-    const parsedResult = z.array(CreateEncryptedPainMedicationDataV1RequestSchema).safeParse(data);
-    if (!parsedResult.success) {
-        throw parsedResult.error;
-    }
-    return parsedResult.data;
-}
 
 export const CreateEncryptedPainMedicationDataV1RequestPartialSchema = CreateEncryptedPainMedicationDataV1RequestSchema.partial().extend({
     reason: z.literal('pain').optional().default('pain'),
     is_on_going: z.boolean().optional().default(true),
 });
-export function validateCreateEncryptedPainMedicationDataV1RequestPartial(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestPartialSchema> {
-    const parsedResult = CreateEncryptedPainMedicationDataV1RequestPartialSchema.safeParse(data);
-    if (!parsedResult.success) {
-        throw parsedResult.error;
-    }
-    return parsedResult.data;
-}
-export function validateCreateEncryptedPainMedicationDataV1RequestsPartial(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestPartialSchema>[] {
-    const parsedResult = z.array(CreateEncryptedPainMedicationDataV1RequestPartialSchema).safeParse(data);
-    if (!parsedResult.success) {
-        console.log(parsedResult.error);
-        throw parsedResult.error;
-    }
-    return parsedResult.data;
-}
+
+export const encryptedPainMedicationDataV1RequestValidator = createSchemaValidator({
+    schema: CreateEncryptedPainMedicationDataV1RequestSchema,
+    partialSchema: CreateEncryptedPainMedicationDataV1RequestPartialSchema,
+    arrayItemSchema: DBEncryptedMedicationDataV1Schema,
+    partialArrayItemSchema: CreateEncryptedPainMedicationDataV1RequestPartialSchema,
+});
+// export function validateCreateEncryptedPainMedicationDataV1Request(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestSchema> {
+//     const parsedResult = CreateEncryptedPainMedicationDataV1RequestSchema.safeParse(data);
+//     if (!parsedResult.success) {
+//         throw parsedResult.error;
+//     }
+//     return parsedResult.data;
+// }
+// export function validateCreateEncryptedPainMedicationDataV1Requests(data: unknown[]): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestSchema>[] {
+//     const parsedResult = z.array(CreateEncryptedPainMedicationDataV1RequestSchema).safeParse(data);
+//     if (!parsedResult.success) {
+//         throw parsedResult.error;
+//     }
+//     return parsedResult.data;
+// }
+
+// export function validateCreateEncryptedPainMedicationDataV1RequestPartial(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestPartialSchema> {
+//     const parsedResult = CreateEncryptedPainMedicationDataV1RequestPartialSchema.safeParse(data);
+//     if (!parsedResult.success) {
+//         throw parsedResult.error;
+//     }
+//     return parsedResult.data;
+// }
+// export function validateCreateEncryptedPainMedicationDataV1RequestsPartial(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestPartialSchema>[] {
+//     const parsedResult = z.array(CreateEncryptedPainMedicationDataV1RequestPartialSchema).safeParse(data);
+//     if (!parsedResult.success) {
+//         console.log(parsedResult.error);
+//         throw parsedResult.error;
+//     }
+//     return parsedResult.data;
+// }

@@ -1,4 +1,3 @@
-import { H3Error } from "h3";
 import { ZodError } from "zod";
 import type { Role } from "@@/shared/types/v1/role";
 import type { LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
@@ -11,20 +10,16 @@ import {
     MEDICATION_FIELDS
 } from "@@/shared/types/v1/user/registration/fields"
 
-
 import type { UserRegisterPartial } from "@@/shared/types/v1/user/registration";
 
 import { DBUserRegistrationDataPartialSchema } from "@@/shared/schemas/v1/user/registration/data/index";
 
 import type { CreateEncryptedPainMedicationDataV1RequestPartial } from "@@/shared/types/v1/medication/v1";
 import {
-    validateCreateEncryptedPainMedicationDataV1Request,
-
-    validateCreateEncryptedPainMedicationDataV1RequestPartial,
-    validateCreateEncryptedPainMedicationDataV1RequestsPartial
+    encryptedPainMedicationDataV1RequestValidator,
 } from "@@/shared/schemas/v1/medication/v1";
 
-import { userRegisterValidator } from "@@/shared/schemas/v1/user/registration/index";
+import { userRegisterStrictValidator } from "@@/shared/schemas/v1/user/registration/index";
 
 
 
@@ -58,6 +53,8 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
     });
     
     const state = useState<UserRegisterPartial>('user-register-state', () => ({
+        invitation_token: invitation.value?.invitation_token,
+
         public_id: invitation.value?.public_user_id,
         email: invitation.value?.email,
         phone_number: invitation.value?.phone_number,
@@ -77,6 +74,9 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             })
         }) || []
     }));
+ 
+    const computedState = computed(() => state.value);
+
 
     //role specific data
     function getRoleField<R extends Role, K extends string>(
@@ -114,23 +114,23 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         }
     }
 
-    const validatedRegistrationData = debouncedComputed(() => {
-        if (!state.value) {
-            return null;
-        }
-
-        try {
-            const validatedData = userRegisterValidator.validate(state.value);
-            return validatedData;
-        }
-        catch (error: unknown) {
-            if (error instanceof H3Error) {
-                console.log(error.data);
+    const validatedRegistrationData = debouncedComputed(
+        () => {
+            if (!state.value) {
+                return null;
             }
-        }
-            
-        return null;
-    }, 1000);
+
+            try {
+                const validatedData = userRegisterStrictValidator.validate(state.value);
+                return validatedData;
+            }
+            catch (error: unknown) { }
+                    
+            return null;
+        }, 
+        [state.value],
+        { wait: 1000 }
+    );
 
 
     const isValid = ref(false);
@@ -150,7 +150,7 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
                 
                 try {
                     // This will throw if invalid
-                    userRegisterValidator.validate({
+                    userRegisterStrictValidator.validate({
                         ...state.value,
                         ...fieldToValidate
                     });
@@ -176,7 +176,7 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             }
             
             // Validate the entire form
-            const validatedData = userRegisterValidator.validate(state.value);
+            const validatedData = userRegisterStrictValidator.validate(state.value);
             formErrors.value = {}; // Clear previous errors
             isValid.value = true;
             return true;
@@ -199,9 +199,12 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
 
     function validateMedicationField(index: number, fieldValue: any, field: keyof CreateEncryptedPainMedicationDataV1RequestPartial) {
         try {
-            validateCreateEncryptedPainMedicationDataV1RequestPartial({
+            // validateCreateEncryptedPainMedicationDataV1RequestPartial({
+            //     [field]: fieldValue
+            // });
+            encryptedPainMedicationDataV1RequestValidator.validatePartial({
                 [field]: fieldValue
-            });
+            })
 
             const thisMedicationsErrors = medicationsErrors.value.get(index);
 
@@ -253,12 +256,21 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
     }, { deep: true });
 
     function addMedication() {
-        if (!state.value.medications) {
-            state.value.medications = validateCreateEncryptedPainMedicationDataV1RequestsPartial([{}]);
-            return;
+        try {
+            if (!state.value.medications) {
+                //@ts-expect-error -- The validator will fill in undefined default values
+                state.value.medications = encryptedPainMedicationDataV1RequestValidator.validatePartialArray([{}]);
+                console.log(state.value.medications);
+                return;
+            }
+    
+            const newMedication = encryptedPainMedicationDataV1RequestValidator.validatePartial({});
+            //@ts-expect-error -- The is_on_going field will be set to true by default
+            state.value.medications.push(newMedication);
         }
-
-        state.value.medications.push(validateCreateEncryptedPainMedicationDataV1RequestPartial({}));
+        catch (error) {
+            console.error("Error adding medication:", error);
+        }
     }
 
     function removeMedication(index: number) {
@@ -274,14 +286,39 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         state.value.medications.splice(index, 1);
     }
 
+    async function submit() {
+        try {
+            const validatedData = await validatedRegistrationData.value;
 
-    const userFirstName = computed(() => state.value.first_name);
+            if (!validatedData) {
+                return;
+            }
+
+            // Call your API or perform any action with the validated data
+            console.log("Validated data:", validatedData);
+
+            await $fetch('/api/v1/auth/invite/register', {
+                method: 'POST',
+                body: validatedData,
+            })
+
+            const {
+                clearSession
+            } = useAuth();
+
+            await clearSession();
+            await navigateTo('/dashboard/login');
+        }
+        catch (error) {
+            console.error("Error during submission:", error);
+        }
+    }
 
     return {
         state,
+        computedState,
 
         BASE_USER_INVITE_REGISTER_FIELDS,
-        userFirstName,
 
         MEDICATION_FIELDS,
         medicationsErrors,
@@ -296,6 +333,8 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         setRoleField,
 
         validate,
-        validatedRegistrationData
+        validatedRegistrationData,
+
+        submit
     }
 }

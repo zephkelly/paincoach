@@ -1,21 +1,29 @@
 import type { H3Event } from "h3";
 import type { Role } from "@@/shared/types/v1/role";
 
+import type { DBUserInvitation } from "@@/shared/types/v1/user/invitation";
 import type { DBUserInvitationDataPartial } from "@@/shared/types/v1/user/invitation/data";
 import type { LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
 
-import { getCachedLimitedInvitationByToken } from "./functions/getInvitation";
+import { completeInvitation } from "./functions/completeInvitation";
+import { getCachedLimitedInvitationByToken } from "./functions/getLimitedInvitation";
+import { getCachedDBInvitationByToken } from "./functions/getDBInvitation";
 import { verifyInvitedUser } from "./functions/verifyInvitedUser";
 import { verifyInvitedByUser } from "./functions/verifyInvitedByUser";
 
 
-import { createInvitationInDB, type CreateInvitationParams } from "./functions/createInvitation";
+import { createInvitationInDB } from "./functions/createInvitation";
+import type { DBTransaction } from "~~/server/types/db";
 
 
 
 export class InvitationRepository {
-    public static async getLimitedInvitation(event: H3Event, token: string): Promise<LimitedUserInvitation> {
+    public static async getLimitedInvitation(event: H3Event, token: string): Promise<LimitedUserInvitation | null> {
        return await getCachedLimitedInvitationByToken(event, token);
+    }
+
+    public static async getDBInvitation(event: H3Event, token: string): Promise<DBUserInvitation | null> {
+        return await getCachedDBInvitationByToken(event, token);
     }
 
     // Verify identify of users accessing the invitation
@@ -45,5 +53,13 @@ export class InvitationRepository {
             user_invitation_data,
             invited_by_user_id,
         });
+    }
+
+    public static async completeInvitation(
+        transaction: DBTransaction,
+        token: string,
+        user_id: string,
+    ): Promise<void> {
+        await completeInvitation(transaction, token, user_id);
     }
 }

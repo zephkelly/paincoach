@@ -29,7 +29,6 @@ export type InputField = {
 
 export type InputProps = {
     id?: string;
-    identifier?: string;
     modelValue?: any;
     required?: boolean;
     label?: string;
@@ -39,6 +38,7 @@ export type InputProps = {
     placeholder?: string;
     tabindex?: number;
     options?: string[];
+    identifier?: string;
     validator?: {
         validateField: (data: unknown, fieldId: string) => string | null;
     }

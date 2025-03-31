@@ -182,12 +182,9 @@ async function createTables(db: DatabaseService) {
     await db.query(`
         CREATE TABLE IF NOT EXISTS private.clinician_profile (
             user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
-            -- Public information (visible to admin and associated patients)
             ahprah_registration_number TEXT NOT NULL,
             specialisation TEXT,
             practice_name TEXT,
-            -- Private information (visible only to admin)
-            business_address TEXT,
             abn TEXT,
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
