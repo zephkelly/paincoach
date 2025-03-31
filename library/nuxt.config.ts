@@ -30,10 +30,6 @@ export default defineNuxtConfig({
         '@nuxt/test-utils/module'
     ],
 
-    runtimeConfig: {
-        databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
-    },
-
     typescript: {
         strict: true
     },
