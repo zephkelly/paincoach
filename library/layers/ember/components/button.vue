@@ -27,10 +27,10 @@ const buttonClasses = computed(() => ({
 
 <style lang="scss" scoped>
 button {
-    border: 1px solid var(--border-8-color);
+    border: 1px solid var(--text-color);
     background-color: var(--text-color);
     color: var(--text-invert-color);
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 0.5rem 1rem;
     cursor: pointer;
     opacity: 1;
@@ -57,7 +57,7 @@ button {
     &.button--outlined {
         background-color: transparent;
         color: var(--text-color);
-        border-color: var(--text-4-color);
+        border-color: var(--border-color);
         
         .spinner svg {
             color: var(--border-8-color);

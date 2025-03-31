@@ -9,7 +9,7 @@
         <div class="content-main">
             <Authenticator>
                 <template #default="{ user, primaryRole }">
-                    <DashboardAccountRoleChip :userRole="primaryRole.value" />
+                    <DashboardAccountRoleChip :userRole="primaryRole.value" class="nav-role-chip" />
                 </template>
             </Authenticator>
         </div>
@@ -48,6 +48,10 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="10" height="14" x="3" y="8" rx="2"/><path d="M5 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-2.4M8 18h.01"/></g></svg>
                                 App
                             </EButton>
+                            <EButton @click="setMockRoles(['unregistered'])" :class="{ active: primaryRole === 'unregistered' }">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></g></svg>
+                                Unregistered
+                            </EButton>
                             <EButtonCollapsable
                                 class="clear-mocks"
                                 @click="clearMocks()"
@@ -57,6 +61,19 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M7 11v2h10v-2zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8"/></svg>
                                 </template>
                             </EButtonCollapsable>
+                        </div>
+                    </div>
+                    <div class="grid-group navigator">
+                        <div class="grid-group-header">
+                            <p>Navigate</p>
+                        </div>
+                        <div class="grid-group-content">
+                            <EInput class="navigator-input"
+                                v-model="navigatorInput"
+                                placeholder="Route"
+                                type="text"
+                            />
+                            <EButton @click="navigate(navigatorInput)" style="max-width: 140px;">Submit</EButton>
                         </div>
                     </div>
                     <EButton @click="toggleMockLoading()" style="max-width: 140px;">Toggle Load</EButton>
@@ -87,46 +104,14 @@ const {
     primaryRole
 } = useAuth();
 
-const {
-    permissions,
-    permissionsMap
-} = await usePermissions();
+const navigatorInput = ref('');
 
-const userIDRef = ref('');
-async function submitUserId() {
-    const userData = await $fetch(`/api/v1/mailing-list`, {
-        method: 'POST',
-        body: {
-            email: userIDRef.value
-        }
-    });
-    console.log(userData);
-}
-
-async function test() {
-    try {
-        const response = await $fetch('/api/v1/auth/invite?token=e3647f31-feef-4f33-b2d2-85dcc908968a');
-        console.log(response);
-    }
-    catch(error) {
-        console.error(error);
+function navigate(route: string) {
+    if (route) {
+        navigateTo(route);
+        navigatorInput.value = '';
     }
 }
-
-async function test2() {
-    try {
-        const response = await $fetch('/api/v1/auth/permissions');
-        console.log(response);
-    }
-    catch(error) {
-        console.error(error);
-    }
-}
-
-const {
-    accountProfileModalOpen,
-    lastClickEvent
-} = useAccountProfile();
 
 const {
     toggleOpen
@@ -139,7 +124,6 @@ const {
     clearSession,
     isPrivilegedUser,
 } = useAuth();
-
 
 async function logout() {
     try {
@@ -225,6 +209,14 @@ header {
             gap: 1rem;
             width: 100%;
         }
+
+        .nav-role-chip {
+            :deep() {
+                .chip-main {
+                    border-color: var(--border-color);
+                }
+            }
+        }
     }
 
     .controls {
@@ -242,13 +234,14 @@ header {
     // position: absolute;
     right: 1rem;
     top: 0.5rem;
+    bottom: 1rem;
     z-index: 1000;
 
     .grid-group {
         .grid-group-header {
             p {
                 font-size: 0.8rem;
-                font-weight: 6500;
+                font-weight: 500;
                 color: var(--text-6-color);
                 margin-bottom: 0.5rem;
             }
@@ -268,8 +261,30 @@ header {
         }
 
         &.mock-roles {
-            margin-bottom: 0.5rem;
+            .grid-group-content {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                align-items: flex-end;
+
+                width: 414px;
+
+                gap: 0.5rem;
+                
+            }
         }
+
+        &.navigator {
+            .navigator-input {
+                width: 160px;
+            }
+        }
+
+        &:not(:last-child) {
+            margin-bottom: 1rem;
+        }
+
     }
 
     .admin {

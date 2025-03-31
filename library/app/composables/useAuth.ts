@@ -90,7 +90,7 @@ export const useAuth = () => {
     }
 
     // Updated to handle array of roles
-    const mockUserRoles = useState<Role[] | undefined>('mock-user-roles', () => undefined)
+    const mockUserRoles = useState<AllRoles[] | undefined>('mock-user-roles', () => undefined)
     const mockPrimaryRole = useState<AllRoles | undefined>('mock-primary-role', () => undefined)
 
     const actualUserRoles = computed<AllRoles[] | undefined>(() => {
@@ -157,7 +157,7 @@ export const useAuth = () => {
         return a.every((val, index) => val === b[index])
     }
 
-    const setMockRoles = (roles: Role[] | undefined, primaryRole?: AllRoles) => {
+    const setMockRoles = (roles: AllRoles[] | undefined, primaryRole?: AllRoles) => {
         if (isPrivilegedUser.value) {
             clearMockUserData()
             mockUserRoles.value = roles

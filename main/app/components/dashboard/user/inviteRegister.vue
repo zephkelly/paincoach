@@ -153,7 +153,7 @@
         </form>
 
 
-        <Teleport v-if="loadedInvitation && medicationsTeleportTarget" :to="medicationsTeleportTarget">
+        <Teleport v-if="loadedInvitation" to="#patient-medications-section">
             <div class="medications-teleporter">
                 <div class="form-header flex-row">
                     <!-- <p class="disclaimer">Because you opted into using the app:</p> -->
@@ -305,14 +305,14 @@ watch(medicationsErrors, () => {
     console.log(medicationsErrors.value)
 })
 
-const medicationsTeleportTarget = computed(() => {
-    if (inviteeRoles.value && !inviteeRoles.value.includes('patient')) {
-        return (state.value['will_use_app']) ? '#patient-medications-section' : null;
-    }
-    else {
-        return (userRequiresMedication.value) ? '#additional-medications-section' : null;
-    }
-});
+// const medicationsTeleportTarget = computed(() => {
+//     if (inviteeRoles.value && !inviteeRoles.value.includes('patient')) {
+//         return (state.value['will_use_app']) ? '#patient-medications-section' : null;
+//     }
+//     else {
+//         return (userRequiresMedication.value) ? '#additional-medications-section' : null;
+//     }
+// });
 
 const medicationsFormHeight = 430;
 const medicationsSectionMaxHeight = computed(() => {

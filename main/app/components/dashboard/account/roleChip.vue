@@ -272,9 +272,9 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
             border-radius: inherit;
             background-image: linear-gradient(
                 180deg,
-                rgba(170, 170, 170, 0.163) 0%,
-                rgba(212, 212, 212, 0.126) 50%,
-                rgba(167, 167, 167, 0.157) 100%
+                rgba(170, 170, 170, 0.386) 0%,
+                rgba(212, 212, 212, 0.545) 50%,
+                rgba(167, 167, 167, 0.478) 100%
             );
             background-size: 200% 100%;
             background-clip: border-box;
@@ -285,6 +285,7 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
             -webkit-mask-composite: xor;
             animation: skeleton-border-loading 2s infinite;
             pointer-events: none;
+            box-sizing: border-box;
         }
     }
 

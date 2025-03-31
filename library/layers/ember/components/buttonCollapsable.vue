@@ -28,23 +28,20 @@ const labelRef = ref<HTMLElement | null>(null);
 const calculatedWidth = computed(() => {
     if (!props.label) return '0px';
     
-    // Average character width (in px) - adjust based on your font
     const averageCharWidth = 8;
-    // Add some padding
     const padding = 16;
     
     const width = props.label.length * averageCharWidth + padding;
-    console.log('calculatedWidth', width);
     return `${width}px`;
 });
 </script>
 
 <style lang="scss" scoped>
 button {
-    border: 1px solid var(--border-8-color);
+    border: 1px solid var(--text-color);
     background-color: var(--text-color);
     color: var(--text-invert-color);
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 0.5rem 1rem;
     cursor: pointer;
     opacity: 1;
