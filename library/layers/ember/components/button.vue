@@ -12,16 +12,16 @@
 <script lang="ts" setup>
 type ButtonProps = {
     loading?: boolean;
-    variant?: 'default' | 'outlined';
+    spinnerInvert?: boolean;
+    variant?: 'outlined';
 };
 
-const props = withDefaults(defineProps<ButtonProps>(), {
-    loading: false,
-    variant: 'default'
-});
+const props = defineProps<ButtonProps>();
+
 
 const buttonClasses = computed(() => ({
-    'button--outlined': props.variant === 'outlined'
+    'button--outlined': props.variant === 'outlined',
+    'spinner-inverted': props.spinnerInvert,
 }));
 </script>
 
@@ -80,6 +80,15 @@ button {
             background-color: var(--background-8-color);
         }
     }
+
+    &.spinner-inverted {
+        .spinner {
+            svg {
+                color: var(--text-invert-color);
+                fill: var(--text-invert-color);
+            }
+        }
+    }
 }
 
 .spinner {
@@ -118,7 +127,6 @@ button {
         opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
         gap 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
     gap: 0.5rem;
-    overflow: hidden;
    
     &.hidden {
         opacity: 0;

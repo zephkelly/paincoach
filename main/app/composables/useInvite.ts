@@ -16,9 +16,16 @@ export const useInvite = async () => {
             return null;
         }
 
-        return validateLimitedUserInvitation(invitationData.value)
+        try {
+            return validateLimitedUserInvitation(invitationData.value)
+        }
+        catch (error) {
+            console.error('Invitation validation failed:', error);
+            return null;
+        }
     });
-    const loaded = computed(() => invitation !== null && invitation !== undefined);
+
+    const loaded = computed(() => invitation.value !== null && invitation.value !== undefined);
     const fetching = computed(() => invitationStatus.value === 'pending');
 
     const error = computed(() => {

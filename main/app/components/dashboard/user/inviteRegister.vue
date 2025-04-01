@@ -47,7 +47,7 @@
                             :id="field.identifier"
                             :label="field.label"
                             :type="field.inputType"
-                            :readonly="field.readonly"
+                            :readonly="isFieldReadonly(field)"
                             :required="field.required"
                             :tabindex="field.tabindex"
                             :default="field.default"
@@ -117,7 +117,7 @@
                                             Remove
                                         </EButton>
                                         <!-- @vue-expect-error -->
-                                        <component v-for="field in MEDICATION_FIELDS.base" :modelValue="state.medications[index][field.identifier]" @update:modelValue="state.medications[index][field.identifier] = $event" @blur="validateMedicationField(index, state.medications[index][field.identifier], field.identifier)"
+                                        <component v-for="field in MEDICATION_FIELDS.base" :modelValue="state.medications && state.medications[index] ? state.medications[index][field.identifier] : null" @update:modelValue="state.medications && state.medications[index] ? state.medications[index][field.identifier] = $event : null" @blur="validateMedicationField(index, state.medications[index][field.identifier], field.identifier)"
                                             class="input-field"
                                             :class="[{ 'field-required': field.required }, field.identifier]"
                                             :key="field.identifier"
@@ -137,6 +137,7 @@
                                                 fieldPath: field.identifier,
                                             }"
                                         />
+
                                         <!-- @vue-expect-error -->
                                         <EInput :modelValue="state.medications[index]['start_date']" @update:modelValue="state.medications[index]['start_date'] = $event" @blur="validateMedicationField(index, state.medications[index]['start_date'], 'start_date')"
                                             id="start_date"
@@ -193,7 +194,7 @@
                 </div>
             </div>
 
-            <div class="form-section clinician-profile">
+            <div class="form-section clinician-profile" v-if="inviteeRoles && inviteeRoles.includes('clinician')">
                 <div class="form-inner">
                     <div class="form-header">
                         <div class="title">
@@ -236,18 +237,13 @@
                 <EButton
                     class="submit-button"
                     type="submit"
-                    :disabled="validatedRegistrationData === null"
                     :loading="submitting"
+                    spinner-invert
                 >
                     Complete registration
                 </EButton>
             </div>
         </form>
-
-
-        <Teleport to="#patient-medications-section">
-                
-        </Teleport>
     </section>
 </template>
 
@@ -281,30 +277,31 @@ const {
     setRoleField,
 
     validate,
-    validatedRegistrationData,
 
     submit,
     submitting,
     submissionError
 } = useInviteRegister(invitation);
 
+function isFieldReadonly(field: InputField) {
+  if (!field.readonly || !invitation.value) return false;
+  
+  if (field.identifier === 'email') return !!invitation.value.email;
+  if (field.identifier === 'phone_number') return !!invitation.value.phone_number;
+  
+  return false;
+}
+
 import { userRegisterValidator } from '@@/shared/schemas/v1/user/registration';
 import { encryptedPainMedicationDataV1RequestValidator } from '@@/shared/schemas/v1/medication/v1';
 import { clinicianUserRegistrationDataValidator } from '@@/shared/schemas/v1/user/role/clinician/register';
+import type { InputField } from '@@/layers/ember/types/input';
 
 
 watch(medicationsErrors, () => {
     console.log(medicationsErrors.value)
 })
 
-// const medicationsTeleportTarget = computed(() => {
-//     if (inviteeRoles.value && !inviteeRoles.value.includes('patient')) {
-//         return (state.value['will_use_app']) ? '#patient-medications-section' : null;
-//     }
-//     else {
-//         return (userRequiresMedication.value) ? '#additional-medications-section' : null;
-//     }
-// });
 
 const medicationsFormHeight = 430;
 const medicationsSectionMaxHeight = computed(() => {
@@ -678,7 +675,7 @@ const medicationsSectionMaxHeight = computed(() => {
     }
 
     .submit-button {
-        // width: 200px;
+        width: 160px;
     }
 }
 

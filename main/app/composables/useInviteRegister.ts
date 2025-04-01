@@ -126,7 +126,6 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             submissionError.value = null;
 
             try {
-                console.log("Validating registration data:", state.value);
                 const validatedData = userRegisterStrictValidator.validate(state.value);
                 return validatedData;
             }
@@ -308,11 +307,10 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             const validatedData = await validatedRegistrationData.value;
 
             if (!validatedData) {
+                console.log('validation incomplete');
+                console.log(state.value);
                 return;
             }
-
-            // Call your API or perform any action with the validated data
-            console.log("Validated data:", validatedData);
 
             await $fetch('/api/v1/auth/invite/register', {
                 method: 'POST',

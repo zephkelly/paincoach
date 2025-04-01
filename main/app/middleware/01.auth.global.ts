@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-    const { session } = useUserSession();
+    const { session } = useAuth();
 
     const publicRoutes = ['/', '/dashboard/login', '/dashboard/register', '/dashboard/forgot/password']
     if (publicRoutes.includes(to.path)) {

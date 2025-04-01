@@ -5,7 +5,15 @@
 </template>
 
 <script lang="ts" setup>
+import { onRouteValidateSession } from '~/utils/auth/route-middleware/session-validate'
+import { onRouteValidateRoles } from '~/utils/auth/route-middleware/role-validate'
 
+definePageMeta({
+  middleware: () => {
+    onRouteValidateSession(true);
+    onRouteValidateRoles(['admin', 'unregistered']);
+  },
+})
 </script>
 
 <style lang="scss" scoped>

@@ -22,7 +22,7 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: RegisterInputField[] = [
         label: 'Phone Number',
         identifier: 'phone_number',
         tabindex: 1,
-        required: true,
+        required: false,
         readonly: true,
     },
     {
@@ -82,7 +82,7 @@ export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: ClinicianRegisterInputField[
         identifier: 'ahpra_registration_number',
         tabindex: 1,
         required: true,
-        placeholder: 'eg. MED0123456789',
+        placeholder: 'eg. PSY00000001',
     },
     {
         inputType: 'text',

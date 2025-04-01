@@ -1,9 +1,8 @@
 import { z } from 'zod';
-import { createZodValidationError } from '@@/shared/utils/zod/error';
+import { createSchemaValidator } from '@@/shared/utils/zod/new';
 import { UUIDSchema } from '@@/shared/schemas/primitives';
 
 import { RoleSchema } from '@@/shared/schemas/v1/role';
-import { Session } from 'inspector/promises';
 
 import { DBUserInvitationDataSchema } from './user/invitation/data';
 
@@ -40,14 +39,12 @@ export const RegisteredSessionObjectSchema = z.object({
     version: z.number(),
     id: UUIDSchema
 });
+export const registeredSessionObjectValidator = createSchemaValidator(RegisteredSessionObjectSchema);
 
-export function validateRegisteredSessionObjectSchema(data: unknown): z.infer<typeof RegisteredSessionObjectSchema> {
-    const parsedResult = RegisteredSessionObjectSchema.safeParse(data);
-    if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
-    }
-    return parsedResult.data;
-}
+export const ClientRegisteredSessionObjectSchema = RegisteredSessionObjectSchema.omit({
+    secure: true,
+});
+export const clientRegisteredSEssionObjectValidator = createSchemaValidator(ClientRegisteredSessionObjectSchema);
 
 
 export const UnregisterdSessionObjectSchema = RegisteredSessionObjectSchema.extend({
@@ -67,11 +64,9 @@ export const UnregisterdSessionObjectSchema = RegisteredSessionObjectSchema.exte
     }),
     invitation_data: DBUserInvitationDataSchema.optional(),
 });
+export const unregisterdSessionObjectValidator = createSchemaValidator(UnregisterdSessionObjectSchema);
 
-export function validateUnregisterdSessionObjectSchema(data: unknown): z.infer<typeof UnregisterdSessionObjectSchema> {
-    const parsedResult = UnregisterdSessionObjectSchema.safeParse(data);
-    if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
-    }
-    return parsedResult.data;
-}
+export const ClientUnregisteredSessionObjectSchema = UnregisterdSessionObjectSchema.omit({
+    secure: true,
+});
+export const clientUnregisteredSessionObjectValidator = createSchemaValidator(ClientUnregisteredSessionObjectSchema);

@@ -72,7 +72,7 @@ async function login() {
             }
         );
 
-        
+
         loginResponse.value = response.statusMessage;
         await fetchNewSession();
         return navigateTo('/dashboard');
