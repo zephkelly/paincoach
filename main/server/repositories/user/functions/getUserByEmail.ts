@@ -64,7 +64,7 @@ export const getCachedLimitedUserWithRolesByEmail = defineCachedFunction(async (
     maxAge: 3600,
     name: FUNCTION_NAME,
     getKey: (event: H3Event, user_email: string) => `user-limited-roles-${user_email}`,
-    integrity: process.env.LIMITED_USER_ROLES_VERSION || '1',
+    integrity: process.env.LIMITED_USER_ROLES_VERSION || '6',
 });
 
 export async function invalidateCachedLimitedUserWithRolesByEmail(user_email: string) {

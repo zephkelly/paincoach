@@ -7,11 +7,7 @@
             <div class="title-text">PAINCOACH</div>
         </div>
         <div class="content-main">
-            <Authenticator>
-                <template #default="{ user, primaryRole }">
-                    <DashboardAccountRoleChip :userRole="primaryRole.value" class="nav-role-chip" />
-                </template>
-            </Authenticator>
+            <DashboardAccountRoleChip v-show="loggedIn" :userRole="primaryRole" class="nav-role-chip" />
         </div>
         <div class="controls">
             <div class="privileged-controls" v-if="isPrivilegedUser">
@@ -80,7 +76,7 @@
                     
                 </div>
             </div>
-            <EButtonCollapsable
+            <EButtonCollapsable v-show="loggedIn"
                 class="logout"
                 @click="logout"
                 label="Logout"
@@ -101,6 +97,7 @@ import { EButton } from '#components';
 const adminTogglesOpen = ref(false);
 
 const {
+    loggedIn,
     primaryRole
 } = useAuth();
 
@@ -114,7 +111,8 @@ function navigate(route: string) {
 }
 
 const {
-    toggleOpen
+    toggleOpen,
+    setOpen,
 } = useAppSidebar();
 
 const {
@@ -129,6 +127,7 @@ async function logout() {
     try {
         await $fetch('/api/v1/auth/logout');
         await clearSession();
+        setOpen(false)
         navigateTo('/dashboard/login');
     }
     catch(error) {

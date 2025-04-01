@@ -6,9 +6,15 @@ import type { Permission } from '@@/shared/types/v1/permission';
 const globalPermissionsKey = 'global-user-permissions';
 
 export function usePermissions() {
+    const { loggedIn } = useAuth();
+
     const { data: permissionsArray, status, error, refresh } = useAsyncData(
         globalPermissionsKey,
         async () => {
+            if (!loggedIn.value) {
+                return [];
+            }
+            
             try {
                 const { data } = await useFetch('/api/v1/auth/permissions');
                 return data.value || [];

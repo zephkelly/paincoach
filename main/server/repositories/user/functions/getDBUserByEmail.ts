@@ -61,7 +61,7 @@ export const getCachedDBUserWithRolesByEmail = defineCachedFunction(async (event
     maxAge: 3600,
     name: FUNCTION_NAME,
     getKey: (event: H3Event, user_email: string) => `user-db-roles-${user_email}`,
-    integrity: process.env.LIMITED_USER_ROLES_VERSION || '4',
+    integrity: process.env.LIMITED_USER_ROLES_VERSION || '6',
 });
 
 export async function invalidateCachedDBUserWithRolesByEmail(user_email: string) {

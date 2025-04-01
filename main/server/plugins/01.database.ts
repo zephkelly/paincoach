@@ -182,7 +182,7 @@ async function createTables(db: DatabaseService) {
     await db.query(`
         CREATE TABLE IF NOT EXISTS private.clinician_profile (
             user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
-            ahprah_registration_number TEXT NOT NULL,
+            ahpra_registration_number TEXT NOT NULL,
             specialisation TEXT,
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
