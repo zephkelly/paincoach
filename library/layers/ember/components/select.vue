@@ -1,6 +1,9 @@
 <template>
     <div class="select-wrapper e-select" :class="[{ 'readonly': readonly }, { 'disabled': disabled }]">
-      <label v-if="label" :for="id" class="select-label">{{ label }}</label>
+      <label v-if="label" :for="id" class="select-label">
+        {{ label }}
+        <span v-if="required && modelValue === undefined" class="required-indicator" aria-hidden="true" >*</span>
+      </label>
       <div class="select-container" :class="{ 'open': isOpen, 'is-touched': touched }">
         <div 
           class="selected-option" 
@@ -9,7 +12,7 @@
           :id="id"
           ref="selectRef"
         >
-          <span v-if="selectedLabel">{{ selectedLabel }}</span>
+          <span v-if="isOptionSelected">{{ selectedLabel }}</span>
           <span v-else class="placeholder">{{ placeholder || 'Select an option' }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dropdown-icon">
             <polyline points="6 9 12 15 18 9"></polyline>
@@ -20,7 +23,7 @@
             v-for="(option, index) in normalizedOptions" 
             :key="index" 
             class="option"
-            :class="{ 'selected': option.value === modelValue }"
+            :class="{ 'selected': isOptionValueEqual(option.value, modelValue) }"
             @click="selectOption(option.value)"
           >
             {{ option.label }}
@@ -38,23 +41,22 @@
   
   type SelectOption = {
     label: string;
-    value: string;
+    value: string | null;
   };
   
   type SelectProps = {
     id: string;
     label?: string;
-    modelValue?: string;
+    modelValue?: string | null;
     options: Array<string | SelectOption>;
     placeholder?: string;
     required?: boolean;
     tabindex?: number;
     disabled?: boolean;
     readonly?: boolean;
-    default?: string;
+    default?: string | null;
     validateOnSelect?: boolean;
     forceInvalid?: boolean;
-    customValidationMessage?: string;
   };
   
   const props = defineProps<SelectProps>();
@@ -64,7 +66,6 @@
   const isOpen = ref(false);
   const touched = ref(false);
   const dirtyValue = ref(false);
-  const customInvalid = ref(false);
   
   // Normalize options to always have label and value
   const normalizedOptions = computed<SelectOption[]>(() => {
@@ -76,16 +77,31 @@
     });
   });
   
+  // Check if an option is currently selected (handles both null and undefined cases)
+  const isOptionSelected = computed(() => {
+    return props.modelValue !== undefined;
+  });
+  
   // Find the label that corresponds to the current value
   const selectedLabel = computed(() => {
-    if (!props.modelValue) return '';
+    if (props.modelValue === undefined) return '';
     
     const selectedOption = normalizedOptions.value.find(option => 
-      option.value === props.modelValue
+      isOptionValueEqual(option.value, props.modelValue)
     );
     
     return selectedOption ? selectedOption.label : '';
   });
+  
+  // Helper function to check equality between option values and modelValue
+  // This properly handles null values
+  function isOptionValueEqual(optionValue: string | null, modelValue: string | null | undefined): boolean {
+    // If modelValue is undefined, nothing is selected
+    if (modelValue === undefined) return false;
+    
+    // Now we can safely compare, including null values
+    return optionValue === modelValue;
+  }
   
   // Toggle dropdown open/closed
   function toggleDropdown() {
@@ -108,7 +124,7 @@
   }
   
   // Select an option
-  function selectOption(value: string) {
+  function selectOption(value: string | null) {
     emit('update:modelValue', value);
     isOpen.value = false;
     dirtyValue.value = true;
@@ -137,7 +153,6 @@
   function reset() {
     touched.value = false;
     dirtyValue.value = false;
-    customInvalid.value = false;
     isOpen.value = false;
   }
   
@@ -177,9 +192,19 @@
   }
   
   .select-label {
+    position: relative;
+    display: flex;
+    flex-direction: row;
     font-size: 0.8rem;
     color: var(--text-6-color);
     line-height: 1.5;
+  }
+  
+  .required-indicator {
+    color: var(--error-color);
+    margin-left: 0.25rem;
+    font-size: 0.9rem;
+    font-weight: bold;
   }
   
   .select-container {

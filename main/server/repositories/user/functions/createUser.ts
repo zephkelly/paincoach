@@ -1,18 +1,18 @@
-import { DatabaseService } from "~~/server/services/databaseService";
-
+import type { DBTransaction } from "~~/server/types/db";
 import type { UserRegister } from "@@/shared/types/v1/user/registration";
-import { validateUUID } from "@@/shared/schemas/primitives";
 
 
 
 export async function createUserInDB(
+    transaction: DBTransaction,
+    user_id: string,
     userRegisterRequest: UserRegister,
     password_hash: string,
-): Promise<string> {
-    const db = DatabaseService.getInstance();
+): Promise<void> {
     try {
-        const result = await db.query<{ id: string }>(`
+        const result = await transaction.query<{ id: string }>(`
             INSERT INTO private.user (
+                id,
                 public_id,
                 email,
                 phone_number,
@@ -29,10 +29,10 @@ export async function createUserInDB(
                 last_data_sharing_consent_date,
                 last_data_sharing_revocation_date
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
-            )
-            RETURNING id
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
+            ) RETURNING id
             `, [
+                user_id,
                 userRegisterRequest.public_id,
                 userRegisterRequest.email,
                 userRegisterRequest.phone_number,
@@ -53,13 +53,12 @@ export async function createUserInDB(
         );
 
         if (!result || result.length === 0 || !result[0]) {
+            
             throw createError({
                 statusCode: 500,
                 statusMessage: 'Failed to create user'
             });
         }
-
-        return validateUUID(result[0].id);
     }   
     catch (error: unknown) {
         if (
@@ -84,7 +83,6 @@ export async function createUserInDB(
             }
         }
         
-        // Re-throw any other errors
         throw error;
     }
 }

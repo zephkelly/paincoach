@@ -41,7 +41,7 @@
                         <component
                             v-for="field in BASE_USER_INVITE_REGISTER_FIELDS"
                             class="input-field"
-                            :class="{ 'field-required': field.required }"
+                            :class="[{ 'field-required': field.required }, field.identifier]"
                             :key="field.identifier"
                             :is="getComponent(field.inputType)"
                             :id="field.identifier"
@@ -60,28 +60,135 @@
                             @blur="validate(undefined)"
                             v-model="state[field.identifier]"
                         />
-                        <EInput v-if="!inviteeRoles || !inviteeRoles.includes('patient')"
-                            class="will-use-app-input"
-                            id="will_use_app"
-                            type="checkbox"
-                            label="Would you like access to the Pain Coach app for personal use?"
-                            v-model="state['will_use_app']"
-                            :required="false"
-                        />
-                        <EInput v-if="!inviteeRoles || !inviteeRoles.includes('patient')"
-                            class="requires-medication-input"
-                            :class="{ collapsed: !state['will_use_app']}"
-                            id="requires_medication"
-                            type="checkbox"
-                            label="Have you recently used any medications to manage your pain?"
-                            v-model="userRequiresMedication"
-                            :required="false"
-                        />
-                        <div
-                            id="patient-medications-section"
-                            class="patient-medications-section"
-                            :class="{ collapsed: !(state['will_use_app'] && userRequiresMedication) }"
-                        />
+
+                        <div class="checkbox-group">
+                            <EInput
+                                class="data-sharing"
+                                id="data_sharing_enabled"
+                                type="checkbox"
+                                label="Would you like to anonymously share data to help improve our services"
+                                v-model="state['data_sharing_enabled']"
+                                :required="false"
+                            />
+                            <EInput v-if="!inviteeRoles || !inviteeRoles.includes('patient')"
+                                class="will-use-app-input"
+                                :class="{ active: (inviteeRoles?.includes('patient')) ? true : state['will_use_app']}"
+                                id="will_use_app"
+                                type="checkbox"
+                                label="Would you like access to the Pain Coach app for personal use?"
+                                v-model="state['will_use_app']"
+                                :required="false"
+                            />
+                            <EInput
+                                class="requires-medication-input"
+                                :class="{ collapsed: (inviteeRoles?.includes('patient')) ? false : !state['will_use_app']}"
+                                id="requires_medication"
+                                type="checkbox"
+                                label="Have you recently used any medications to manage your pain?"
+                                v-model="userRequiresMedication"
+                                :required="false"
+                            />
+                            <div
+                                id="patient-medications-section"
+                                class="patient-medications-section"
+                                :class="{ collapsed: !(state['will_use_app'] && userRequiresMedication) }"
+                            >
+                                <div class="form-header flex-row">
+                                <!-- <p class="disclaimer">Because you opted into using the app:</p> -->
+                                    <div class="title-wrapper flex-col">
+                                        <div class="title flex-row">
+                                            <div>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M20.207 3.793a5.95 5.95 0 0 1 0 8.414l-8 8a5.95 5.95 0 0 1-8.414-8.414l8-8a5.95 5.95 0 0 1 8.414 0m-7 1.414L8.913 9.5l5.586 5.586l4.294-4.292a3.95 3.95 0 1 0-5.586-5.586"/></svg>
+                                                <h2>Pain Medications ({{ (state['medications']) ? state['medications'].length : 0 }})</h2>
+                                            </div>
+                                            <div class="encryption" title="All medication data is encrypted, ensuring your privacy">
+                                                Double-encryption
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><path fill="currentColor" fill-rule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1m2 6V4.5a2 2 0 1 0-4 0V7z" clip-rule="evenodd"/></svg>
+                                            </div>
+                                        </div>
+                                        <p>Enter your recent medication history</p>
+                                    </div>
+                                </div>
+                                <ol class="medications-list flex-col" :class="{ collapsed: !state.medications || !state.medications.length }">
+                                    <li class="medication-fields-wrapper flex-col" v-for="(medication, index) in state.medications" :key="index">
+                                        <h3><span>{{ (index + 1) + '.' }}</span> {{ medication.medication_name ? medication.medication_name : 'Medication' }}</h3>
+                                        <EButton class="remove-medication-button" type="button" @click="removeMedication(index)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12M6 18L18 6"/></svg>
+                                            Remove
+                                        </EButton>
+                                        <!-- @vue-expect-error -->
+                                        <component v-for="field in MEDICATION_FIELDS.base" :modelValue="state.medications[index][field.identifier]" @update:modelValue="state.medications[index][field.identifier] = $event" @blur="validateMedicationField(index, state.medications[index][field.identifier], field.identifier)"
+                                            class="input-field"
+                                            :class="[{ 'field-required': field.required }, field.identifier]"
+                                            :key="field.identifier"
+                                            :is="getComponent(field.inputType)"
+                                            :id="field.identifier"
+                                            :label="field.label"
+                                            :type="field.inputType"
+                                            :readonly="field.readonly"
+                                            :unit="(field.identifier === 'frequency') ? 'hours' : undefined"
+                                            :required="(userRequiresMedication) ? field.required : false"
+                                            :tabindex="(userRequiresMedication) ? field.tabindex : -1"
+                                            :default="field.default"
+                                            :placeholder="field.placeholder"
+                                            :options="field.options"
+                                            :validation="{
+                                                validator: encryptedPainMedicationDataV1RequestValidator,
+                                                fieldPath: field.identifier,
+                                            }"
+                                        />
+                                        <!-- @vue-expect-error -->
+                                        <EInput :modelValue="state.medications[index]['start_date']" @update:modelValue="state.medications[index]['start_date'] = $event" @blur="validateMedicationField(index, state.medications[index]['start_date'], 'start_date')"
+                                            id="start_date"
+                                            class="input-field field-required start_date"
+                                            label="Start Date"
+                                            type="date"
+                                            :required="true"
+                                            :validation="{
+                                                validator: encryptedPainMedicationDataV1RequestValidator,
+                                                fieldPath: 'start_date',
+                                            }"
+                                        />
+                                        <!-- @vue-expect-error -->
+                                        <EInput :modelValue="state.medications[index]['end_date']" @update:modelValue="state.medications[index]['end_date'] = $event" @blur="validateMedicationField(index, state.medications[index]['end_date'], 'end_date')"
+                                            id="end_date"
+                                            class="input-field field-required end_date"
+                                            :class="{ collapsed: state.medications[index]['is_on_going'] }"
+                                            label="End Date"
+                                            type="date"
+                                            :required="(state.medications[index]['is_on_going']) ? false : true"
+                                            :validation="{
+                                                validator: encryptedPainMedicationDataV1RequestValidator,
+                                                fieldPath: 'end_date',
+                                            }"
+                                        />
+                                        <!-- @vue-expect-error -->
+                                        <EInput :modelValue="state.medications[index]['is_on_going']" @update:modelValue="state.medications[index]['is_on_going'] = $event"
+                                            id="is_on_going"
+                                            class="input-field checkbox"
+                                            label="Ongoing"
+                                            type="checkbox"
+                                            :required="false"
+                                            :validation="{
+                                                validator: encryptedPainMedicationDataV1RequestValidator,
+                                                fieldPath: 'is_on_going',
+                                            }"
+                                        />
+                            
+                                    </li>
+                                </ol>
+                                <EButton
+                                    :class="{ 'no-medications': !state.medications || !state.medications.length }"
+                                    class="add-medication-button flex-row"
+                                    type="button"
+                                    @click="addMedication"
+                                    variant="outlined"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7v14"/></svg>
+                                    Add Medication
+                                </EButton>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -124,21 +231,6 @@
                 
             </div>
 
-            <!-- <div v-if="inviteeRoles && !inviteeRoles.includes('patient')" 
-                class="form-section medications"
-                :class="{ collapsed: !(state['will_use_app'] && userRequiresMedication) }">
-
-                <div class="form-section-disclaimer flex-row">
-                    <p>Because you opted into using the app:</p>
-
-                    <div class="encryption" title="All medication data is encrypted, ensuring your privacy">
-                        Double encrypted
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><path fill="currentColor" fill-rule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1m2 6V4.5a2 2 0 1 0-4 0V7z" clip-rule="evenodd"/></svg>
-                    </div>
-                </div>
-                <div class="form-inner" id="additional-medications-section" />
-            </div> -->
-
             <div class="submit-section">
                 <p class="submission-error" :class="{ show: submissionError }">{{ submissionError }}</p>
                 <EButton
@@ -153,108 +245,8 @@
         </form>
 
 
-        <Teleport v-if="loadedInvitation" to="#patient-medications-section">
-            <div class="medications-teleporter">
-                <div class="form-header flex-row">
-                    <!-- <p class="disclaimer">Because you opted into using the app:</p> -->
-                    <div class="title-wrapper flex-col">
-                        <div class="title flex-row">
-                            <div>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M20.207 3.793a5.95 5.95 0 0 1 0 8.414l-8 8a5.95 5.95 0 0 1-8.414-8.414l8-8a5.95 5.95 0 0 1 8.414 0m-7 1.414L8.913 9.5l5.586 5.586l4.294-4.292a3.95 3.95 0 1 0-5.586-5.586"/></svg>
-                                <h2>Pain Medications</h2>
-                            </div>
-                            <div class="encryption" title="All medication data is encrypted, ensuring your privacy"> 
-                                Double-encryption
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 16 16"><path fill="currentColor" fill-rule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1m2 6V4.5a2 2 0 1 0-4 0V7z" clip-rule="evenodd"/></svg>
-                            </div>
-                        </div>
-                        <p>Enter your recent medication history</p>
-                    </div>
-                </div>
-
-                <ol class="medications-list flex-col" :class="{ collapsed: !state.medications || !state.medications.length }">
-                    <li class="medication-fields-wrapper flex-col" v-for="(medication, index) in state.medications" :key="index">
-                        <h3><span>{{ (index + 1) + '.' }}</span> {{ medication.medication_name ? medication.medication_name : 'Medication' }}</h3>
-                        <EButton class="remove-medication-button" type="button" @click="removeMedication(index)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12M6 18L18 6"/></svg>
-                            Remove
-                        </EButton>
-                        <!-- @vue-expect-error -->
-                        <component v-for="field in MEDICATION_FIELDS.base" :modelValue="state.medications[index][field.identifier]" @update:modelValue="state.medications[index][field.identifier] = $event" @blur="validateMedicationField(index, state.medications[index][field.identifier], field.identifier)"
-                            class="input-field"
-                            :class="[{ 'field-required': field.required }, field.identifier]"
-                            :key="field.identifier"
-                            :is="getComponent(field.inputType)"
-                            :id="field.identifier"
-                            :label="field.label"
-                            :type="field.inputType"
-                            :readonly="field.readonly"
-                            :unit="(field.identifier === 'frequency') ? 'hours' : undefined"
-                            :required="(userRequiresMedication) ? field.required : false"
-                            :tabindex="(userRequiresMedication) ? field.tabindex : -1"
-                            :default="field.default"
-                            :placeholder="field.placeholder"
-                            :options="field.options"
-                            :validation="{
-                                validator: encryptedPainMedicationDataV1RequestValidator,
-                                fieldPath: field.identifier,
-                            }"
-                        />
-
-                        <!-- @vue-expect-error -->
-                        <EInput :modelValue="state.medications[index]['start_date']" @update:modelValue="state.medications[index]['start_date'] = $event" @blur="validateMedicationField(index, state.medications[index]['start_date'], 'start_date')"
-                            id="start_date"
-                            class="input-field field-required start_date"
-                            label="Start Date"
-                            type="date"
-                            :required="true"
-                            :validation="{
-                                validator: encryptedPainMedicationDataV1RequestValidator,
-                                fieldPath: 'start_date',
-                            }"
-                        />
-
-                        <!-- @vue-expect-error -->
-                        <EInput :modelValue="state.medications[index]['end_date']" @update:modelValue="state.medications[index]['end_date'] = $event" @blur="validateMedicationField(index, state.medications[index]['end_date'], 'end_date')"
-                            id="end_date"
-                            class="input-field field-required end_date"
-                            :class="{ collapsed: state.medications[index]['is_on_going'] }"
-                            label="End Date"
-                            type="date"
-                            :required="(state.medications[index]['is_on_going']) ? false : true"
-                            :validation="{
-                                validator: encryptedPainMedicationDataV1RequestValidator,
-                                fieldPath: 'end_date',
-                            }"
-                        />
-
-                        <!-- @vue-expect-error -->
-                        <EInput :modelValue="state.medications[index]['is_on_going']" @update:modelValue="state.medications[index]['is_on_going'] = $event"
-                            id="is_on_going"
-                            class="input-field checkbox"
-                            label="Ongoing"
-                            type="checkbox"
-                            :required="false"
-                            :validation="{
-                                validator: encryptedPainMedicationDataV1RequestValidator,
-                                fieldPath: 'is_on_going',
-                            }"
-                        />
-                        
-                    </li>
-                </ol>
-
-
-                <EButton
-                    :class="{ 'no-medications': !state.medications || !state.medications.length }"
-                    class="add-medication-button flex-row"
-                    type="button"
-                    @click="addMedication"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7v14"/></svg>
-                    Add Medication
-                </EButton>
-            </div>
+        <Teleport to="#patient-medications-section">
+                
         </Teleport>
     </section>
 </template>
@@ -466,8 +458,8 @@ const medicationsSectionMaxHeight = computed(() => {
             max-height: 0px;
             opacity: 0;
             user-select: none;
-            overflow: hidden;
-        }
+            overflow: hidden;  
+        }   
     }
 }
 
@@ -549,8 +541,38 @@ const medicationsSectionMaxHeight = computed(() => {
             }
         }
 
-        .will-use-app-input {
+        .data_sharing_enabled {
             margin-top: 1rem;
+        }
+
+        .will-use-app-input {
+            margin-top: 0.5rem;
+            transition: margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+            &.active {
+                margin-top: 1.5rem;
+            }
+        }
+
+        .requires-medication-input {
+            margin-top: 0.5rem;
+            transition:
+                max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+            &.collapsed {
+                margin-top: 0rem;
+            }
+        }
+    }
+
+    .checkbox-group {
+        margin-top: 0.5rem;
+        width: 100%;
+
+        .will-use-app-input {
+            margin-top: 0.8rem;
         }
     }
 
@@ -661,12 +683,14 @@ const medicationsSectionMaxHeight = computed(() => {
 }
 
 
-.medications-teleporter {
+.patient-medications-section {
     display: flex;
     flex-direction: column;
     width: 100%;
 
     .form-header {
+        margin-top: 2rem;
+
         .title-wrapper {
             width: 100%;
 

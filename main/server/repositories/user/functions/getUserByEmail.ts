@@ -45,6 +45,7 @@ export const getCachedLimitedUserWithRolesByEmail = defineCachedFunction(async (
                 ) AS roles
             FROM private.user u
             WHERE u.email = $1
+            LIMIT 1
             `, [user_email]);
         
         if (userResult.length === 0) {

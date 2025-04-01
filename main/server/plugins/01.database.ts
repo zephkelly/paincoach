@@ -184,8 +184,6 @@ async function createTables(db: DatabaseService) {
             user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
             ahprah_registration_number TEXT NOT NULL,
             specialisation TEXT,
-            practice_name TEXT,
-            abn TEXT,
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );

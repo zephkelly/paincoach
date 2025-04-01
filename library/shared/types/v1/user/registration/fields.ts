@@ -31,14 +31,14 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: RegisterInputField[] = [
         identifier: 'title',
         tabindex: 1,
         required: true,
-        default: null,
+        default: undefined,
         options: [
-            { label: 'Prof', value: 'Prof' },
-            { label: 'Dr', value: 'Dr' },
+            { label: 'No Title', value: null },
             { label: 'Mr', value: 'Mr' },
             { label: 'Mrs', value: 'Mrs' },
             { label: 'Miss', value: 'Ms' },
-            { label: 'No Title', value: null }
+            { label: 'Dr', value: 'Dr' },
+            { label: 'Prof', value: 'Prof' }
         ]
     },
     {
@@ -68,13 +68,6 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: RegisterInputField[] = [
         identifier: 'confirm_password',
         tabindex: 1,
         required: true,
-    },
-    {
-        inputType: 'checkbox',
-        label: 'Would you like to anonymously share your data to help improve our services?',
-        identifier: 'data_sharing_enabled',
-        tabindex: 1,
-        required: false,
     }
 ];
 
@@ -85,8 +78,8 @@ export type ClinicianRegisterInputField = InputField & {
 export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: ClinicianRegisterInputField[] = [
     {
         inputType: 'text',
-        label: 'AHPRHA Registration Number',
-        identifier: 'ahprah_registration_number',
+        label: 'AHPRA Registration Number',
+        identifier: 'ahpra_registration_number',
         tabindex: 1,
         required: true,
         placeholder: 'eg. MED0123456789',
@@ -99,20 +92,6 @@ export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: ClinicianRegisterInputField[
         required: true,
         default: 'physiotherapy',
         readonly: true,
-    },
-    {
-        inputType: 'text',
-        label: 'Practice Name',
-        identifier: 'practice_name',
-        tabindex: 1,
-        required: false,
-    },
-    {
-        inputType: 'text',
-        label: 'ABN',
-        identifier: 'abn',
-        tabindex: 1,
-        required: false,
     }
 ];
 

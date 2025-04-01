@@ -17,19 +17,15 @@ export class ClinicianUserRepository {
         await transaction.query(`
             INSERT INTO private.clinician_profile (
                 user_id,
-                ahprah_registration_number,
-                specialisation,
-                practice_name,
-                abn
+                ahpra_registration_number,
+                specialisation
             ) VALUES (
-                $1, $2, $3, $4, $5
+                $1, $2, $3
             )
         `, [
             user_id,
-            role_data.ahprah_registration_number,
-            role_data.specialisation,
-            role_data.practice_name,
-            role_data.abn,
+            role_data.ahpra_registration_number,
+            role_data.specialisation
         ]);
     }
 }

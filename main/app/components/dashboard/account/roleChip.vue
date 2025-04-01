@@ -96,7 +96,7 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
 
     &.admin, &.owner {
         width: 76px;
-        min-width: 77px;
+        // min-width: 77px;
     }
 
     &.clinician {
@@ -143,9 +143,10 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
         .chip-content-wrapper {
             margin-left: 0px;
             gap: 0;
-            transition: margin-left 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+            transition: margin-left 0.2s ease;
 
             svg {
+                transition: margin-right 0.2s ease;
                 margin-right: 0;
             }
 

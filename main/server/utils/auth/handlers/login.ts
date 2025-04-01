@@ -1,7 +1,7 @@
 import { H3Event, H3Error } from 'h3'
 import { type UserSession } from '#auth-utils'
 
-import type { DBUserWithRoles } from '@@/shared/types/v1/user'
+import type { UserLoginVerificationData } from '@@/shared/types/v1/user/login/ verify'
 
 import { UserRepository } from '~~/server/repositories/user'
 
@@ -26,7 +26,7 @@ export async function handleLoginCredentials(
     const randomString = Math.random().toString(36).substring(2, 15);
     
     try {
-        const user: DBUserWithRoles | undefined = await UserRepository.getDBUserWithRoles(event, {
+        const user: UserLoginVerificationData | undefined = await UserRepository.getUserLoginData({
             email: email,
         });
 

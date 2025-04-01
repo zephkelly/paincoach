@@ -18,6 +18,7 @@ import type { UserRegister } from '@@/shared/types/v1/user/registration';
 
 import { PERMISSIONS } from '@@/shared/schemas/v1/permission';
 import { validateUUID } from '@@/shared/schemas/primitives';
+import { UUID7 } from '@@/shared/utils/uuid';
 
 
 
@@ -110,40 +111,26 @@ export class UserService {
         // Create main user profile
         const hashedPassword = await hashPassword(userRegisterRequest.password);
 
-        let user_id: string | undefined;
+        const user_id: string = UUID7();
+        const transaction = await DatabaseService.getInstance().createTransaction();
 
         try {
-            user_id = await UserRepository.createUser(
+            await UserRepository.createUser(
+                transaction,
+                user_id,
                 userRegisterRequest,
                 hashedPassword,
             );
-        }
-        catch (error: unknown) {
-            if (error instanceof H3Error) {
-                throw error;
-            }
 
-            console.log('Error creating user:', error);
-            throw createError({
-                statusCode: 500,
-                message: 'Internal Server Error',
-            });
-        }
-        
-
-        const validatedUUID = validateUUID(user_id);
-
-        const transaction = await DatabaseService.getInstance().createTransaction();
-        try {
             await this.insertRoleProfileData(
                 transaction,
-                validatedUUID,
+                user_id,
                 userRegisterRequest.role_data
             );
             
             await RoleRepository.assignRolesToUser(
                 transaction,
-                validatedUUID,
+                user_id,
                 userRegisterRequest.roles,
                 userRegisterRequest.primary_role
             );
@@ -151,14 +138,15 @@ export class UserService {
             await InvitationRepository.completeInvitation(
                 transaction,
                 token,
-                validatedUUID
+                user_id
             );
 
             transaction.commit();
         }
         catch (error: unknown) {
-            console.error('Error during transaction:', error);
             await transaction.rollback();
+            console.error('Error during transaction:', error);
+            
             throw createError({
                 statusCode: 500,
                 message: 'Internal Server Error',

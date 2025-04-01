@@ -2,9 +2,7 @@
     <div class="input-wrapper e-input" :class="[{ 'readonly': readonly, 'invalid': !!errorMessage, 'is-touched': touched, 'is-dirty': dirtyValue }, type]">
         <label v-if="label" :for="id" class="input-label">
             {{ label }}
-            <template v-if="required && !props.modelValue">
-                <span class="required-indicator">*</span>
-            </template>
+            <span v-if="required && modelValue === undefined" class="required-indicator" aria-hidden="true">*</span>
         </label>
         <input
             :checked="type === 'checkbox' ? !!modelValue : undefined"
@@ -307,16 +305,13 @@ label {
     color: var(--text-6-color);
     line-height: 1.5;
     transition: color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
 
-    .required-indicator {
-        position: relative;
-        color: var(--error-color);
-        margin-left: 0.25rem;
-        height: 4px;
-        width: 4px;
-        top: 2px;
-        opacity: 0.8;
-    }
+.required-indicator {
+    color: var(--error-color);
+    margin-left: 0.25rem;
+    font-size: 0.9rem;
+    font-weight: bold;
 }
 
 input {
