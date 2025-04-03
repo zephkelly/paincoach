@@ -4,16 +4,15 @@ import { PERMISSIONS, type Permission } from '@@/shared/schemas/v1/permission';
 import { UUID7 } from '@@/shared/utils/uuid';
 import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
 
-import { sendInvitationEmail } from './email';
 import { InvitationRepository } from '~~/server/repositories/invitation';
 
 
 
-export async function createAndEmailInvitation(
+export async function createInvitationInDB(
     invitationRequest: CreateUserInvitationRequest,
     session: UserSession | UnregisteredUserSession,
     permissions: Permission[],
-) {
+): Promise<{ token: string }> {
     const typedSession = session as UserSession;
 
     const desiredRoles = invitationRequest.roles;
@@ -67,21 +66,5 @@ export async function createAndEmailInvitation(
         invitingUserId,
     );
 
-    try {
-        const inviterName = typedSession.user?.first_name || 'Pain Coach Admin';
-        
-        await sendInvitationEmail(
-            invitationRequest.email,
-            invitationToken,
-            inviterName,
-            desiredRoles,
-            invitationRequest.primary_role,
-            typedSession.user?.profile_url
-        );
-        
-        console.log(`Invitation email sent successfully to ${invitationRequest.email}`);
-    }
-    catch (error: unknown) {
-        console.error('Error sending invitation email:', error);
-    }
+    return { token: invitationToken }
 }

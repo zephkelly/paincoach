@@ -1,4 +1,8 @@
 import type { H3Event } from "h3";
+
+import { DatabaseService } from "~~/server/services/databaseService";
+import type { DBTransaction } from "~~/server/types/db";
+
 import type { Role } from "@@/shared/types/v1/role";
 
 import type { DBUserInvitation } from "@@/shared/types/v1/user/invitation";
@@ -13,7 +17,6 @@ import { verifyInvitedByUser } from "./functions/verifyInvitedByUser";
 
 
 import { createInvitationInDB } from "./functions/createInvitation";
-import type { DBTransaction } from "~~/server/types/db";
 
 
 
@@ -24,6 +27,15 @@ export class InvitationRepository {
 
     public static async getDBInvitation(event: H3Event, token: string): Promise<DBUserInvitation | null> {
         return await getCachedDBInvitationByToken(event, token);
+    }
+
+    public static async updateInvitationStatus(token: string, status: string): Promise<void> {
+        const db = DatabaseService.getInstance();
+        await db.query(`
+            UPDATE private.user_invitation 
+            SET status = $1 
+            WHERE invitation_token = $2
+        `, [status, token]);
     }
 
     // Verify identify of users accessing the invitation

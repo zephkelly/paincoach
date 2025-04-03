@@ -20,7 +20,7 @@ import {
     encryptedPainMedicationDataV1RequestValidator,
 } from "@@/shared/schemas/v1/medication/v1";
 
-import { userRegisterStrictValidator } from "@@/shared/schemas/v1/user/registration/index";
+import { userRegisterStrictValidator, userRegisterValidator } from "@@/shared/schemas/v1/user/registration/index";
 
 
 
@@ -61,9 +61,9 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         public_id: invitation.value?.public_user_id,
         email: invitation.value?.email,
         phone_number: invitation.value?.phone_number,
-        first_name: invitation.value?.invitation_data.first_name,
-        last_name: invitation.value?.invitation_data.last_name,
-        data_sharing_enabled: invitation.value?.invitation_data.data_sharing_enabled,
+        first_name: invitation.value?.invitation_data?.first_name,
+        last_name: invitation.value?.invitation_data?.last_name,
+        data_sharing_enabled: invitation.value?.invitation_data?.data_sharing_enabled,
         will_use_app: (invitation.value?.primary_role === "patient") ? true : false,
 
         primary_role: invitation.value?.primary_role,
@@ -304,12 +304,15 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
 
         submitting.value = true;
         try {
-            const validatedData = await validatedRegistrationData.value;
+            let validatedData = await validatedRegistrationData.value;
 
             if (!validatedData) {
-                console.log('validation incomplete');
-                console.log(state.value);
-                return;
+                validatedData = userRegisterValidator.validate(state.value);
+
+                if (!validatedData) {
+                    submissionError.value = "Sorry, an unexpected error has occurred and we cannot validate your data. Please refresh the page and try again.";
+                    return;
+                }
             }
 
             await $fetch('/api/v1/auth/invite/register', {

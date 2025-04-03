@@ -33,7 +33,7 @@ export const DBUserInvitationSchema = DBBaseUserWithRolesSchema.pick({
     created_at: z.date(),
     updated_at: z.date(),
 
-    invitation_data: DBUserInvitationDataSchema
+    invitation_data: DBUserInvitationDataSchema.nullable().optional(),
 });
 
 export const DBUserInvitationPartialSchema = DBUserInvitationSchema.partial();

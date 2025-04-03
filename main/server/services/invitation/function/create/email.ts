@@ -87,7 +87,7 @@ function getEmailTitle(primaryRole: Role): string {
     }
 }
 
-function getEmailContent(primaryRole: Role, roles: Role[], inviteeName: string, hasMultipleRoles: boolean, profileImageUrl?: string): string {
+function getEmailContent(primaryRole: Role, roles: Role[], inviteeName: string, hasMultipleRoles: boolean): string {
     let content = `
         <h2 class="text-dark" style="color: #0f0f0f; font-size: 22px; font-weight: 600; margin-bottom: 8px;">${getEmailTitle(primaryRole)}</h2>
     `;
@@ -156,10 +156,9 @@ function getEmailContent(primaryRole: Role, roles: Role[], inviteeName: string, 
 export async function sendInvitationEmail(
     email: string,
     inviteToken: string,
-    inviteeName: string,
     roles: Role[],
     primaryRole: Role,
-    profileImageUrl?: string
+    inviteeName: string,
 ): Promise<string> {
 
     const hasMultipleRoles = roles.length > 1;
@@ -176,7 +175,6 @@ export async function sendInvitationEmail(
         roles,
         inviteeName,
         hasMultipleRoles,
-        profileImageUrl
     );
     
     const buttonText = getButtonText(primaryRole);

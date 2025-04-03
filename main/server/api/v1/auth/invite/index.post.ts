@@ -33,12 +33,18 @@ export default defineEventHandler({
             } = await getPainCoachSession(event);
     
             const unvalidatedInvitation = await readBody<CreateUserInvitationRequest>(event);
-            const validatedInvitation = validateCreateUserInvitationRequest(unvalidatedInvitation);
+            const validatedInvitationRequest = validateCreateUserInvitationRequest(unvalidatedInvitation);
     
-            await InvitationService.createAndEmailInvitation(
-                validatedInvitation,
+            const { token } = await InvitationService.createInvitation(
+                validatedInvitationRequest,
                 session,
                 permissions,
+            );
+
+            await InvitationService.sendInvitation(
+                validatedInvitationRequest,
+                token,
+                session,
             );
         }
         catch (error: unknown) {

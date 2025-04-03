@@ -1,4 +1,4 @@
-import { type H3Event, H3Error } from 'h3';
+import { type H3Event } from 'h3';
 
 import type { DBTransaction } from '~~/server/types/db';
 import { DatabaseService } from '../databaseService';
@@ -17,7 +17,6 @@ import type { UnregisteredUserSession } from '#auth-utils';
 import type { UserRegister } from '@@/shared/types/v1/user/registration';
 
 import { PERMISSIONS } from '@@/shared/schemas/v1/permission';
-import { validateUUID } from '@@/shared/schemas/primitives';
 import { UUID7 } from '@@/shared/utils/uuid';
 
 

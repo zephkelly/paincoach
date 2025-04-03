@@ -12,7 +12,33 @@ export default defineNuxtConfig({
     modules: ['nuxt-auth-utils', '@vite-pwa/nuxt'],
 
     pwa: {
-
+        registerType: 'autoUpdate',
+        manifest: {
+            name: 'Pain Coach',
+            short_name: 'PainCoach',
+            theme_color: '#ffffff',
+            icons: [
+                {
+                    src: 'pwa-192x192.png',
+                    sizes: '192x192',
+                    type: 'image/png'
+                },
+                {
+                    src: 'pwa-512x512.png',
+                    sizes: '512x512',
+                    type: 'image/png'
+                },
+                {
+                    src: 'pwa-512x512.png',
+                    sizes: '512x512',
+                    type: 'image/png',
+                    purpose: 'any maskable'
+                }
+            ],
+            start_url: '/',
+            display: 'standalone',
+            background_color: '#ffffff'
+        },
     },
 
     ssr: false,
