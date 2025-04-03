@@ -59,6 +59,16 @@ export async function createUserInDB(
                 statusMessage: 'Failed to create user'
             });
         }
+
+        // update linked_user_id in invitation table
+        await transaction.query(`
+            UPDATE invitation.user_invitation
+            SET linked_user_id = $1
+            WHERE id = $2
+        `, [
+            user_id,
+            result[0].id,
+        ]);
     }   
     catch (error: unknown) {
         if (

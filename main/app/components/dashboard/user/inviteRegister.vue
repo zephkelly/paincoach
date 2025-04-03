@@ -238,6 +238,7 @@
                     class="submit-button"
                     type="submit"
                     :loading="submitting"
+                    :disabled="submitting || !validatedRegistrationData"
                     spinner-invert
                 >
                     Complete registration
@@ -277,6 +278,7 @@ const {
     setRoleField,
 
     validate,
+    validatedRegistrationData,
 
     submit,
     submitting,
@@ -676,6 +678,10 @@ const medicationsSectionMaxHeight = computed(() => {
 
     .submit-button {
         width: 160px;
+
+        &.potentially-invalid {
+            opacity: 0.6;
+        }
     }
 }
 

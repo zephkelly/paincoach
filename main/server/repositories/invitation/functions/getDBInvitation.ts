@@ -2,7 +2,8 @@ import type { H3Event } from 'h3';
 import { DatabaseService } from "~~/server/services/databaseService";
 import { invalidateNitroFunctionCache } from "~~/server/utils/cache/nitro";
 import { type DBUserInvitation } from '@@/shared/types/v1/user/invitation';
-import { validateDBUserInvitation } from '@@/shared/schemas/v1/user/invitation';
+// import { validateDBUserInvitation } from '@@/shared/schemas/v1/user/invitation';
+import { DBUserInvitationValidator } from '@@/shared/schemas/v1/user/invitation';
 
 
 
@@ -21,7 +22,7 @@ export const getCachedDBInvitationByToken = defineCachedFunction(
     
     const invitation = await db.query<DBUserInvitation>(`
         SELECT *
-        FROM private.user_invitation ui
+        FROM invitation.user_invitation_with_status ui
         WHERE ui.invitation_token = $1
         LIMIT 1
     `, [token]);
@@ -33,7 +34,7 @@ export const getCachedDBInvitationByToken = defineCachedFunction(
         });
     }
     
-    return validateDBUserInvitation(invitation[0]);
+    return DBUserInvitationValidator.validate(invitation[0]);
   },
   {
     maxAge: 3600, // Cache for 1 hour

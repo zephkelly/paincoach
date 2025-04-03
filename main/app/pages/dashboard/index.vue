@@ -6,6 +6,12 @@
             </div>
         </template>
         <div class="dashboard-content">
+            <div v-if="!ready" class="dashboard-loading">
+
+            </div>
+            <div v-else-if="hasRole('admin')" class="admin-dashboard">
+                <DashboardAdmin />
+            </div>
         </div>
     </Page>
 </template>
@@ -14,7 +20,8 @@
 const {
     ready,
     clearSession,
-    fetchNewSession
+    fetchNewSession,
+    hasRole,
 } = useAuth();
 
 async function logoutUser() {

@@ -2,13 +2,15 @@ import type { UserSession, UnregisteredUserSession } from '#auth-utils';
 import { PERMISSIONS, type Permission } from '@@/shared/schemas/v1/permission';
 
 import { UUID7 } from '@@/shared/utils/uuid';
+import { validateUUID } from '@@/shared/schemas/primitives';
 import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
 
 import { InvitationRepository } from '~~/server/repositories/invitation';
+import { DatabaseService } from '~~/server/services/databaseService';
 
 
 
-export async function createInvitationInDB(
+export async function createInvitation(
     invitationRequest: CreateUserInvitationRequest,
     session: UserSession | UnregisteredUserSession,
     permissions: Permission[],
@@ -56,15 +58,49 @@ export async function createInvitationInDB(
 
     const invitationToken = UUID7();
 
-    await InvitationRepository.createInvitation(
-        invitationToken,
-        invitationRequest.email,
-        invitationRequest.phone_number || undefined,
-        invitationRequest.primary_role,
-        invitationRequest.roles,
-        invitationRequest.invitation_data,
-        invitingUserId,
-    );
+    const transaction = await DatabaseService.getInstance().createTransaction();
 
-    return { token: invitationToken }
+    try {
+        const { invitation_id } = await InvitationRepository.createInvitation(transaction,
+            invitationToken,
+            invitationRequest.email,
+            invitationRequest.phone_number || undefined,
+            invitationRequest.primary_role,
+            invitationRequest.roles,
+            invitationRequest.invitation_data,
+            invitingUserId,
+        );
+
+        const validatedInvitationId = validateUUID(invitation_id);
+    
+        await InvitationRepository.updateInvitationStatus(
+            { token: invitationToken, invitation_id: validatedInvitationId },
+            'pending',
+            invitingUserId,
+            transaction,
+        );
+
+        transaction.commit();
+    
+        return { token: invitationToken }
+    }
+    catch (error: unknown) {
+        transaction.rollback();
+
+        if (error instanceof Error) {
+            throw createError({
+                statusCode: 500,
+                statusMessage: error.message,
+            });
+        }
+        else {
+            throw createError({
+                statusCode: 500,
+                statusMessage: 'Unknown error occurred while creating invitation'
+            });
+        }
+    }
+
+
+
 }

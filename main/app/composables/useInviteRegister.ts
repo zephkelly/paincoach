@@ -1,7 +1,7 @@
 import { H3Error } from "h3";
 import { ZodError } from "zod";
 import type { Role } from "@@/shared/types/v1/role";
-import type { LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
+import type { LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/limited";
 
 import { debouncedComputed } from "@@/shared/utils/debounce/computed";
 
@@ -20,7 +20,7 @@ import {
     encryptedPainMedicationDataV1RequestValidator,
 } from "@@/shared/schemas/v1/medication/v1";
 
-import { userRegisterStrictValidator, userRegisterValidator } from "@@/shared/schemas/v1/user/registration/index";
+import { userRegisterValidator } from "@@/shared/schemas/v1/user/registration/index";
 
 
 
@@ -126,7 +126,7 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             submissionError.value = null;
 
             try {
-                const validatedData = userRegisterStrictValidator.validate(state.value);
+                const validatedData = userRegisterValidator.validate(state.value);
                 return validatedData;
             }
             catch (error: unknown) { }
@@ -134,7 +134,7 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             return null;
         }, 
         [state.value],
-        { wait: 1000 }
+        { wait: 500 }
     );
 
 
@@ -157,7 +157,7 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
                 
                 try {
                     // This will throw if invalid
-                    userRegisterStrictValidator.validate({
+                    userRegisterValidator.validate({
                         ...state.value,
                         ...fieldToValidate
                     });
@@ -183,7 +183,7 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             }
             
             // Validate the entire form
-            const validatedData = userRegisterStrictValidator.validate(state.value);
+            userRegisterValidator.validate(state.value);
             formErrors.value = {}; // Clear previous errors
             isValid.value = true;
             return true;

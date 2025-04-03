@@ -1,9 +1,7 @@
 import { z } from 'zod';
-import { createZodValidationError } from '@@/shared/utils/zod/error';
-
-import { RoleSchema } from '../../role';
 
 import { DBUserInvitationSchema } from './index';
+import { createSchemaValidator } from '@@/shared/utils/zod/new';
 
 
 
@@ -23,12 +21,4 @@ export const LimitedUserInvitationSchema = DBUserInvitationSchema.pick({
     expires_at: z.coerce.date(),
 });
 
-
-
-export function validateLimitedUserInvitation(data: unknown): z.infer<typeof LimitedUserInvitationSchema> {
-    const parsedResult = LimitedUserInvitationSchema.safeParse(data);
-    if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
-    }
-    return parsedResult.data;
-}
+export const LimitedUserInvitationValidator = createSchemaValidator(LimitedUserInvitationSchema);

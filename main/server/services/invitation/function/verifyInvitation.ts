@@ -21,26 +21,26 @@ export async function verifyInvitation(event: H3Event, token: string): Promise<D
             message: 'Invitation not found',
         });
     }
-    if (invitation.expires_at < new Date()) {
-        await InvitationRepository.updateInvitationStatus(token, 'opened');
 
+    if (invitation.current_status === 'revoked' || invitation.current_status === 'expired') {
+        throw createError({
+            statusCode: 403,
+            message: 'This invitation has been revoked',
+        });
+    }
+    
+    if (new Date() > invitation.expires_at) {
+        console.log('Invitation expired:', invitation.expires_at, new Date());
+        await InvitationRepository.updateInvitationStatus({ token }, 'expired');
         throw createError({
             statusCode: 403,
             message: 'This invitation has expired',
-        });
+        }); 
     }
-
-    if (invitation.status !== 'pending') {
-        throw createError({
-            statusCode: 403,
-            message: 'This invitation has already been used',
-        });
-    }
-
 
     // Update invitation status to opened
-    await InvitationRepository.updateInvitationStatus(token, 'opened');
+    await InvitationRepository.updateInvitationStatus({ token } , 'opened');
 
-    invitation.status = 'opened';
+    invitation.current_status = 'opened';
     return invitation;
 }   

@@ -41,7 +41,7 @@ export default defineEventHandler({
                 permissions,
             );
 
-            await InvitationService.sendInvitation(
+            await InvitationService.emailInvitation(
                 validatedInvitationRequest,
                 token,
                 session,

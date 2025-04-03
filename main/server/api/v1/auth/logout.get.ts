@@ -3,9 +3,7 @@ import { invalidateCachedDBUserWithRolesByEmail } from "~~/server/repositories/u
 import { getUserSessionContext } from "~~/server/utils/auth/session/getSession";
 
 export default defineEventHandler({
-    onRequest: [
-        async (event) => await onRequestValidateSession(event),
-    ],
+    onRequest: [],
     handler: async (event) => {
         const { session } = await getUserSessionContext(event);
         const clearedSession = await clearUserSession(event);
