@@ -7,7 +7,7 @@
             <div class="title-text">PAINCOACH</div>
         </div>
         <div class="content-main">
-            <DashboardAccountRoleChip v-show="loggedIn" :userRole="primaryRole" class="nav-role-chip" />
+            <UserRoleChip v-show="loggedIn" :userRole="primaryRole" class="nav-role-chip" />
         </div>
         <div class="controls">
             <div class="privileged-controls" v-if="isPrivilegedUser">

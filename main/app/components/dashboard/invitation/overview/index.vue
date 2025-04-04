@@ -1,18 +1,17 @@
 <template>
     <DashboardInvitationOverviewList
-        v-if="invitationsResponse && invitationsResponse.data"
-        :invitations="invitationsResponse?.data"
+        v-if="computedInvitations"
+        :invitations="computedInvitations"
     />
 </template>
 
 <script lang="ts" setup>
-import type { PaginatedResponse } from '#imports';
+import type { PaginatedResponse } from '@@/shared/types/pagination';
 import type { BasicUserInvitation } from '@@/shared/types/v1/user/invitation/basic';
+import { BasicUserInvitationValidator } from '@@/shared/schemas/v1/user/invitation/basic';
 
 
 const { data: invitationsResponse } = await useFetch<PaginatedResponse<BasicUserInvitation>>('/api/v1/invitation')
 
-const computedInvitations = computed(() => {
-    return invitationsResponse.value?.data
-})
+const computedInvitations: ComputedRef<BasicUserInvitation[] | undefined> = computed(() => BasicUserInvitationValidator.validateArray(invitationsResponse.value?.data || []));
 </script>

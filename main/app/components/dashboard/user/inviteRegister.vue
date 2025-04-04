@@ -28,13 +28,10 @@
                                 :loading="false"
                             />
                             <div class="role-chip-container flex-row">
-                                <DashboardAccountRoleChip
-                                    v-for="role in inviteeRoles"
-                                    :userRole="role"
-                                    :class="{ 'primary-role': role === inviteePrimaryRole }"
-                                    paneled
-                                    :collapsable="(inviteeRoles && inviteeRoles.length > 1) && (role !== inviteePrimaryRole)"
-                                    class="user-role"
+                                <UserRoleChipList 
+                                    :roles="inviteeRoles" 
+                                    :primaryRole="inviteePrimaryRole" 
+                                    :collapsable="true"
                                 />
                             </div>
                         </div>
@@ -116,7 +113,6 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12M6 18L18 6"/></svg>
                                             Remove
                                         </EButton>
-                                        <!-- @vue-expect-error -->
                                         <component v-for="field in MEDICATION_FIELDS.base" :modelValue="state.medications && state.medications[index] ? state.medications[index][field.identifier] : null" @update:modelValue="state.medications && state.medications[index] ? state.medications[index][field.identifier] = $event : null" @blur="validateMedicationField(index, state.medications[index][field.identifier], field.identifier)"
                                             class="input-field"
                                             :class="[{ 'field-required': field.required }, field.identifier]"
@@ -138,7 +134,6 @@
                                             }"
                                         />
 
-                                        <!-- @vue-expect-error -->
                                         <EInput :modelValue="state.medications[index]['start_date']" @update:modelValue="state.medications[index]['start_date'] = $event" @blur="validateMedicationField(index, state.medications[index]['start_date'], 'start_date')"
                                             id="start_date"
                                             class="input-field field-required start_date"
@@ -150,7 +145,6 @@
                                                 fieldPath: 'start_date',
                                             }"
                                         />
-                                        <!-- @vue-expect-error -->
                                         <EInput :modelValue="state.medications[index]['end_date']" @update:modelValue="state.medications[index]['end_date'] = $event" @blur="validateMedicationField(index, state.medications[index]['end_date'], 'end_date')"
                                             id="end_date"
                                             class="input-field field-required end_date"
@@ -163,7 +157,6 @@
                                                 fieldPath: 'end_date',
                                             }"
                                         />
-                                        <!-- @vue-expect-error -->
                                         <EInput :modelValue="state.medications[index]['is_on_going']" @update:modelValue="state.medications[index]['is_on_going'] = $event"
                                             id="is_on_going"
                                             class="input-field checkbox"
@@ -508,20 +501,6 @@ const medicationsSectionMaxHeight = computed(() => {
                 bottom: 0;
                 right: 50%;
                 transform: translate(50%, 50%);
-                gap: 0.25rem;
-
-                .is-primary {
-                    order: 0;
-                }
-
-                :not(.primary-role) {
-                    order: 1;
-                }
-
-                .app {
-                    //last
-                    order: 5;
-                }
             }
         }
 

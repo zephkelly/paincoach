@@ -112,7 +112,7 @@ export class InvitationRepository {
     ): Promise<void> {
         await this.updateInvitationStatus({ token }, 'completed', user_id, transaction);
 
-        await setLinkedInvitationUser(transaction, token, user_id);
+        await setLinkedInvitationUser(transaction, user_id, token);
 
         // Invalidate the cached invitations
         await invalidateCachedBasicInvitation(token);

@@ -94,9 +94,13 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
         min-width: 90px;
     }
 
-    &.admin, &.owner {
+    &.owner {
         width: 76px;
         // min-width: 77px;
+    }
+
+    &.admin {
+        width: 72px;
     }
 
     &.clinician {
@@ -136,17 +140,14 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
     &.collapsable {
         width: 28px;
         min-width: 28px;
-        transition:
-            width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
-            min-width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+        
 
         .chip-content-wrapper {
             margin-left: 0px;
             gap: 0;
             transition: margin-left 0.2s ease;
 
-            svg {
-                transition: margin-right 0.2s ease;
+            svg { 
                 margin-right: 0;
             }
 
@@ -154,26 +155,39 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
                 max-width: 0;
                 opacity: 0;
                 overflow: hidden;
-                transition: max-width 0.15s cubic-bezier(0.075, 0.82, 0.165, 1),
-                    opacity 0.25s cubic-bezier(0.075, 0.82, 0.165, 1);
                 margin: 0;
                 padding: 0;
+
             }
         }
 
         &:hover {
             .chip-content-wrapper {
-                margin-left: -2px;
+                // margin-left: -2px;
                 // gap: 0.25rem;
+                transition:
+                    width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                    min-width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
 
                 svg {
+                    transition: margin-right 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
                     margin-right: 0.25rem;
+                }
+
+
+                .role-name {
+                   
+                    transition: max-width 0.15s cubic-bezier(0.075, 0.82, 0.165, 1),
+                        opacity 0.15s cubic-bezier(0.075, 0.82, 0.165, 1);
                 }
             }
 
-            &.admin, &.owner {
+            &.owner {
                 width: 76px;
-                min-width: 77px;
+            }
+
+            &.admin {
+                width: 72px;
             }
 
             &.clinician {
@@ -307,6 +321,8 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
         margin-left: -2px;
 
         svg {
+            position: relative;
+                left: -1px;
             margin-right: 0.25rem;
         }
 
@@ -336,6 +352,7 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
 
         &.app {
             svg {
+                
                 height: 0.85rem;
             }
         }

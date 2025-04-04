@@ -21,7 +21,7 @@ export const BasicUserInvitationSchema = DBUserInvitationSchema.pick({
 
     expires_at: z.coerce.date(),
 
-    // status: InvitationStatusSchema,
+    current_status: InvitationStatusSchema,
 });
 
 

@@ -74,4 +74,15 @@ export default defineNuxtConfig({
     devServer: {
         port: 3002
     },
+
+    css: [
+        '@@/layers/ember/assets/scss/reset.scss',
+        '@@/layers/ember/assets/scss/global.scss',
+        '@@/layers/ember/assets/scss/globals/index.scss',
+        
+        '@@/layers/ember/assets/scss/animations.scss',
+        '@@/layers/ember/assets/scss/skeleton.scss',
+        '@@/layers/ember/assets/scss/transition.scss',
+        '@@/layers/ember/assets/scss/theme.scss',
+    ]
 })

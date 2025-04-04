@@ -6,6 +6,7 @@ import { onRequestValidatePermission } from '~~/server/utils/auth/request-middle
 import { PERMISSIONS } from '@@/shared/schemas/v1/permission';
 
 import { InvitationService } from '~~/server/services/invitation';
+import type { BasicUserInvitation } from '@@/shared/types/v1/user/invitation/basic';
 
 
 
@@ -23,11 +24,13 @@ export default defineEventHandler({
         const { page, items, offset,  } = getQuery(event);
 
         try {
-            return await InvitationService.getBasicInvitations(event, {
+            const response: PaginatedResponse<BasicUserInvitation> = await InvitationService.getBasicInvitations(event, {
                 page: Number(page) || 1,
                 items: Number(items) || 10,
                 offset: Number(offset) || undefined,
             });
+
+            return response
         }
         catch (error: unknown) {
             if (error instanceof H3Error) {
