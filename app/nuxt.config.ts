@@ -20,6 +20,12 @@ export default defineNuxtConfig({
     extends: [
         './../library',
     ],
+
+
+    css: [
+        '~/assets/scss/theme.scss',
+    ],
+
     alias: {
         '~~lib': resolve(__dirname, '../library'),
         '~lib/types': resolve(__dirname, '../library/shared/types'),
