@@ -5,8 +5,6 @@ import { type ABVariant } from './../../types'
 export default defineEventHandler((event: H3Event) => {
     const abTestCookie = getCookie(event, 'ab_variant')
 
-    console.log('abTestCookie', abTestCookie)
-   
     let variant: ABVariant = abTestCookie as ABVariant
     
     if (variant === undefined || (variant !== 'A' && variant !== 'B')) {

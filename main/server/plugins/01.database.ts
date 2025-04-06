@@ -1,4 +1,5 @@
 import { DatabaseService } from '~~/server/services/databaseService'
+import { setupInvitationTables } from '../utils/database/invitation'
 
 
 
@@ -136,24 +137,11 @@ async function createTables(db: DatabaseService) {
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             version INT DEFAULT 1
         );
+        `);
 
-        CREATE TABLE IF NOT EXISTS private.user_invitation (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-            user_uuid UUID NOT NULL DEFAULT uuid_generate_v7() UNIQUE,
-            email TEXT NOT NULL UNIQUE,
-            phone_number TEXT,
-            linked_user_id UUID REFERENCES private.user(id) DEFAULT NULL, 
-            invitation_token TEXT NOT NULL DEFAULT uuid_generate_v7() UNIQUE,
-            invited_by_user_id UUID REFERENCES private.user(id) NOT NULL,
-            primary_role TEXT REFERENCES private.role(name) NOT NULL,
-            roles TEXT[] NOT NULL,
-            invitation_data JSONB,
-            expires_at TIMESTAMPTZ NOT NULL,
-            status TEXT DEFAULT 'pending', -- pending, opened, completed, expired
-            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-        );
+        await setupInvitationTables(db)
 
+    await db.query(`
         CREATE TABLE IF NOT EXISTS private.user_role (
             user_id UUID REFERENCES private.user(id) ON DELETE CASCADE,
             role_id BIGINT REFERENCES private.role(id) ON DELETE CASCADE,

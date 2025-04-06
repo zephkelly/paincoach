@@ -10,9 +10,9 @@
                 </li>
 
                 <!-- User management -->
-                <li class="sidebar-item users" :class="{ closed: userRole === 'patient'}">
+                <li class="sidebar-item users" :class="{ closed: hasRole('patient')}">
                     <Transition name="fast-fade">
-                        <div v-if=" isAdminUser || userRole === 'clinician'">
+                        <div v-if=" isAdminUser || hasRole('clinician')">
                             <div class="sidebar-item-header">
                                 <div class="toggleable-header">
                                     <Transition name="fade">
@@ -80,14 +80,15 @@ const {
 
 const {
     ready,
-    userRole,
-    isAdminUser
+    primaryRole,
+    isAdminUser,
+    hasRole
 } = useAuth();
 
 const manageableUsersType = computed(() => {
     if (isAdminUser.value) {
         return 'users';
-    } else if (userRole.value === 'clinician') {
+    } else if (primaryRole.value === 'clinician') {
         return 'patients';
     }
 })
@@ -95,7 +96,7 @@ const manageableUsersType = computed(() => {
 const yourUsersLinkComputed = computed(() => {
     if (isAdminUser.value) {
         return `/dashboard/manage/user`;
-    } else if (userRole.value === 'clinician') {
+    } else if (primaryRole.value === 'clinician') {
         return `/dashboard/manage/user/patient?tab=0`;
     }
 })
@@ -103,7 +104,7 @@ const yourUsersLinkComputed = computed(() => {
 const yourAddUsersLinkComputed = computed(() => {
     if (isAdminUser.value) {
         return `/dashboard/manage/user/add`;
-    } else if (userRole.value === 'clinician') {
+    } else if (primaryRole.value === 'clinician') {
         return `/dashboard/manage/user/patient?tab=1`;
     }
 })
@@ -148,6 +149,7 @@ section.app-sidebar {
 
     &.app-sidebar--open {
         width: 288px;
+        min-width: 288px;
         border-color: var(--border-5-color);
         border-right: 1px solid var(--border-7-color);
 
@@ -231,17 +233,17 @@ section.app-sidebar {
 }
 
 .sidebar-item.dashboard-item {
-    border: 1px solid var(--primary-border-1-color);
+    border: 1px solid var(--info-border-1-color);
     border-radius: 0.25rem;
-    background-color: var(--primary-background-3-color);
+    background-color: var(--info-background-3-color);
 
     &:hover {
-        background-color: var(--primary-background-4-color);
-        border-color: var(--primary-border-color);
+        background-color: var(--info-background-4-color);
+        border-color: var(--info-border-color);
     }
 
     &:active {
-        background-color: var(--primary-background-3-color);
+        background-color: var(--info-background-3-color);
     }
     
     a {
@@ -251,7 +253,7 @@ section.app-sidebar {
         height: 100%;
 
         svg, h3 {
-            color: var(--primary-text-color);
+            color: var(--info-text-color);
         }
     }
 }

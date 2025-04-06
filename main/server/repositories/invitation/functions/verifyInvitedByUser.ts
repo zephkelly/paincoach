@@ -7,7 +7,7 @@ export async function verifyInvitedByUser(user_id: string, invitation_token: str
 
     const result = await db.query<{ exists: boolean }>(`
         SELECT EXISTS (
-            SELECT 1 FROM private.user_invitation WHERE invitation_token = $1 AND invited_by_user_id = $2
+            SELECT 1 FROM invitation.user_invitation WHERE invitation_token = $1 AND invited_by_user_id = $2
         )
     `, [invitation_token, user_id]);
 

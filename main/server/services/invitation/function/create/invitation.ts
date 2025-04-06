@@ -2,18 +2,19 @@ import type { UserSession, UnregisteredUserSession } from '#auth-utils';
 import { PERMISSIONS, type Permission } from '@@/shared/schemas/v1/permission';
 
 import { UUID7 } from '@@/shared/utils/uuid';
+import { validateUUID } from '@@/shared/schemas/primitives';
 import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
 
-import { sendInvitationEmail } from './email';
 import { InvitationRepository } from '~~/server/repositories/invitation';
+import { DatabaseService } from '~~/server/services/databaseService';
 
 
 
-export async function createAndEmailInvitation(
+export async function createInvitation(
     invitationRequest: CreateUserInvitationRequest,
     session: UserSession | UnregisteredUserSession,
     permissions: Permission[],
-) {
+): Promise<{ token: string }> {
     const typedSession = session as UserSession;
 
     const desiredRoles = invitationRequest.roles;
@@ -57,31 +58,49 @@ export async function createAndEmailInvitation(
 
     const invitationToken = UUID7();
 
-    await InvitationRepository.createInvitation(
-        invitationToken,
-        invitationRequest.email,
-        invitationRequest.phone_number || undefined,
-        invitationRequest.primary_role,
-        invitationRequest.roles,
-        invitationRequest.invitation_data,
-        invitingUserId,
-    );
+    const transaction = await DatabaseService.getInstance().createTransaction();
 
     try {
-        const inviterName = typedSession.user?.first_name || 'Pain Coach Admin';
-        
-        await sendInvitationEmail(
-            invitationRequest.email,
+        const { invitation_id } = await InvitationRepository.createInvitation(transaction,
             invitationToken,
-            inviterName,
-            desiredRoles,
+            invitationRequest.email,
+            invitationRequest.phone_number || undefined,
             invitationRequest.primary_role,
-            typedSession.user?.profile_url
+            invitationRequest.roles,
+            invitationRequest.invitation_data,
+            invitingUserId,
         );
-        
-        console.log(`Invitation email sent successfully to ${invitationRequest.email}`);
+
+        const validatedInvitationId = validateUUID(invitation_id);
+    
+        await InvitationRepository.updateInvitationStatus(
+            { token: invitationToken, invitation_id: validatedInvitationId },
+            'pending',
+            invitingUserId,
+            transaction,
+        );
+
+        transaction.commit();
+    
+        return { token: invitationToken }
     }
     catch (error: unknown) {
-        console.error('Error sending invitation email:', error);
+        transaction.rollback();
+
+        if (error instanceof Error) {
+            throw createError({
+                statusCode: 500,
+                statusMessage: error.message,
+            });
+        }
+        else {
+            throw createError({
+                statusCode: 500,
+                statusMessage: 'Unknown error occurred while creating invitation'
+            });
+        }
     }
+
+
+
 }

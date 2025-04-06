@@ -5,12 +5,18 @@ import { UUIDSchema, BigIntSchema } from "@@/shared/schemas/primitives";
 
 import { DBBaseUserWithRolesSchema } from "../base";
 import { DBUserInvitationDataSchema } from "./data";
+import { createSchemaValidator } from "@@/shared/utils/zod/new";
 
 
 
 export const InvitationRoleSchema = z.enum(['owner', 'admin', 'clinician', 'patient']); // TODO: Remove 'owner' from the enum after inviting lachlan
-export const RegistrationTypeSchema = z.enum(['partial', 'full']);
-export const InvitationStatusSchema = z.enum(['pending', 'opened', 'completed', 'expired']);
+export const InvitationStatusSchema = z.enum([
+    'pending',
+    'opened',
+    'completed',
+    'expired',
+    'revoked',
+]);
 
 
 export const DBUserInvitationSchema = DBBaseUserWithRolesSchema.pick({
@@ -27,31 +33,33 @@ export const DBUserInvitationSchema = DBBaseUserWithRolesSchema.pick({
     linked_user_id: UUIDSchema.nullish(),
 
     invited_by_user_id: UUIDSchema,
-    status: InvitationStatusSchema,
 
     expires_at: z.date(),
     created_at: z.date(),
-    updated_at: z.date(),
 
-    invitation_data: DBUserInvitationDataSchema
+    current_status: InvitationStatusSchema,
+
+    invitation_data: DBUserInvitationDataSchema.nullable().optional(),
 });
 
-export const DBUserInvitationPartialSchema = DBUserInvitationSchema.partial();
+export const DBUserInvitationPartialSchema = DBUserInvitationSchema.partial()
+
+export const DBUserInvitationValidator = createSchemaValidator(DBUserInvitationSchema);
 
 
 
-export function validateDBUserInvitation(data: unknown): z.infer<typeof DBUserInvitationSchema> {
-    const parsedResult = DBUserInvitationSchema.safeParse(data);
-    if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
-    }
-    return parsedResult.data;
-}
+// export function validateDBUserInvitation(data: unknown): z.infer<typeof DBUserInvitationSchema> {
+//     const parsedResult = DBUserInvitationSchema.safeParse(data);
+//     if (!parsedResult.success) {
+//         throw createZodValidationError(parsedResult.error);
+//     }
+//     return parsedResult.data;
+// }
 
-export function validateDBUserInvitationPartial(data: unknown): z.infer<typeof DBUserInvitationPartialSchema> {
-    const parsedResult = DBUserInvitationPartialSchema.safeParse(data);
-    if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
-    }
-    return parsedResult.data;
-}
+// export function validateDBUserInvitationPartial(data: unknown): z.infer<typeof DBUserInvitationPartialSchema> {
+//     const parsedResult = DBUserInvitationPartialSchema.safeParse(data);
+//     if (!parsedResult.success) {
+//         throw createZodValidationError(parsedResult.error);
+//     }
+//     return parsedResult.data;
+// }

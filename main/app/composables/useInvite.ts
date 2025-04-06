@@ -1,6 +1,5 @@
 import type { Role } from "@@/shared/types/v1/role";
-import { type LimitedUserInvitation } from "@@/shared/types/v1/user/invitation/minimal";
-import { validateLimitedUserInvitation } from "@@/shared/schemas/v1/user/invitation/limited";
+import { LimitedUserInvitationValidator } from "@@/shared/schemas/v1/user/invitation/limited";
 
 
 
@@ -17,7 +16,7 @@ export const useInvite = async () => {
         }
 
         try {
-            return validateLimitedUserInvitation(invitationData.value)
+            return LimitedUserInvitationValidator.validate(invitationData.value)
         }
         catch (error) {
             console.error('Invitation validation failed:', error);
@@ -43,7 +42,7 @@ export const useInvite = async () => {
     const inviterFirstName = computed(() => invitation.value?.inviter_name);
     const inviterProfileImageUrl = computed(() => invitation.value?.inviter_profile_url);
 
-    const inviteeFirstName = computed(() => invitation.value?.invitation_data.first_name);
+    const inviteeFirstName = computed(() => invitation.value?.invitation_data?.first_name);
     const inviteeRoles = computed(() => invitation.value?.roles);
     const inviteePrimaryRole = computed(() => invitation.value?.primary_role);
     const inviteeAdditionalRoles = computed(() => invitation.value?.roles.filter((role: Role) => role !== invitation.value?.primary_role));

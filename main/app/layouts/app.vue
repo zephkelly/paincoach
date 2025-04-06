@@ -1,7 +1,7 @@
 <template>
-    <div class="dashboard-container">
+    <div class="navbar-container">
         <DashboardNavbar />
-        <div class="dashboard-content-container">
+        <div class="sidebar-container">
             <DashboardSidebar />
             <slot />
         </div>
@@ -14,7 +14,7 @@ await usePermissions();
 </script>
 
 <style lang="scss" scoped>
-.dashboard-container {
+.navbar-container {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -22,7 +22,7 @@ await usePermissions();
     min-height: 100dvh;
 }
 
-.dashboard-content-container {
+.sidebar-container {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;

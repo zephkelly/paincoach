@@ -11,7 +11,7 @@
                 </div>
                 <div v-if="showRole" class="user-role-wrapper detail-wrapper role">
                     <div v-if="loading" class="skeleton-component skeleton-component-panel" />
-                    <DashboardAccountRoleChip :userRole="userInfo?.primary_role" paneled />
+                    <UserRoleChip :userRole="userInfo?.primary_role" paneled />
                 </div>
                 <div class="user-email-wrapper detail-wrapper email">
                     <p>{{ props.userInfo?.email }}</p>

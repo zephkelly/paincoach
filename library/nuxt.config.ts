@@ -22,8 +22,9 @@ export default defineNuxtConfig({
     },
 
     extends: [
-        './layers/ember',
         './layers/paincrypt',
+        './layers/ember',
+        './layers/abtesting'
     ],
 
     modules: [
@@ -33,4 +34,15 @@ export default defineNuxtConfig({
     typescript: {
         strict: true
     },
+
+    css: [
+        '@/assets/scss/reset.scss',
+        '@/assets/scss/global.scss',
+        '@/assets/scss/globals/index.scss',
+        
+        '@/assets/scss/animations.scss',
+        '@/assets/scss/skeleton.scss',
+        '@/assets/scss/transition.scss',
+        '@/assets/scss/theme.scss',
+    ]
 })

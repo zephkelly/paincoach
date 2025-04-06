@@ -3,6 +3,10 @@ import { DatabaseService } from "~~/server/services/databaseService";
 
 import type { DBUserInvitationDataPartial } from "@@/shared/types/v1/user/invitation/data";
 
+import { validateUUID } from "@@/shared/schemas/primitives";
+import { updateInvitationStatusTransactional } from "./updateInvitationStatus";
+import type { DBTransaction } from "~~/server/types/db";
+
 
 export type CreateInvitationParams = {
     token: string,
@@ -14,12 +18,10 @@ export type CreateInvitationParams = {
     invited_by_user_id: string,
 }
 
-export async function createInvitationInDB(invitation: CreateInvitationParams): Promise<void> {
-    const db = DatabaseService.getInstance();
-
+export async function createInvitationTransactional(transaction: DBTransaction, invitation: CreateInvitationParams): Promise<{ invitation_id: string }> {
     try {
-        await db.query(`
-            INSERT INTO private.user_invitation (
+        const invitationCreationResult = await transaction.query(`
+            INSERT INTO invitation.user_invitation (
                 invitation_token,
                 email,
                 phone_number,
@@ -27,15 +29,13 @@ export async function createInvitationInDB(invitation: CreateInvitationParams): 
                 roles,
                 invitation_data,
                 invited_by_user_id,
-                status,
                 expires_at,
                 public_user_id
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7,
-                'pending',
                 NOW() + INTERVAL '7 days',
                 uuid_generate_v7()
-            )
+            ) RETURNING id
         `, [
             invitation.token,
             invitation.user_email,
@@ -45,6 +45,10 @@ export async function createInvitationInDB(invitation: CreateInvitationParams): 
             invitation.user_invitation_data,
             invitation.invited_by_user_id,
         ]);
+
+        return {
+            invitation_id: validateUUID(invitationCreationResult[0].id)
+        }
     }
     catch (error: unknown) {
         if (

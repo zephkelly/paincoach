@@ -6,6 +6,12 @@
             </div>
         </template>
         <div class="dashboard-content">
+            <div v-if="!ready" class="dashboard-loading">
+
+            </div>
+            <template v-else-if="hasRole('admin')">
+                <DashboardAdmin />
+            </template>
         </div>
     </Page>
 </template>
@@ -14,7 +20,8 @@
 const {
     ready,
     clearSession,
-    fetchNewSession
+    fetchNewSession,
+    hasRole,
 } = useAuth();
 
 async function logoutUser() {
@@ -41,9 +48,8 @@ definePageMeta({
 
 .dashboard-content {
     display: flex;
-    flex-direction: column;
     gap: 1rem;
-    height: 600px;
+    width: 100%;
 }
 
 h1 {
