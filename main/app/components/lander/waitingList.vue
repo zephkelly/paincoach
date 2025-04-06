@@ -90,7 +90,7 @@ async function submitForm() {
         console.log('Honeypot field filled out. Bot detected.');
         setTimeout(() => {
             statusError.value = false;
-            statusMessage.value = "You've successfully joined the waiting list! If you don't receive an email from us, please check your spam folder."
+            statusMessage.value = "You've successfully joined the waiting list!"
         }, 1500)
         return
     }
@@ -108,7 +108,7 @@ async function submitForm() {
             })
     
             statusError.value = false
-            statusMessage.value = "You've successfully joined the waiting list! Please check your spam folder for a confirmation email."
+            statusMessage.value = "You've successfully joined the waiting list!"
             emailModel.value = ''
         }
         catch (error: any) {
@@ -119,7 +119,7 @@ async function submitForm() {
             }
 
             statusError.value = true
-            statusMessage.value = 'There seems to be an error on our end! Please try again later.'
+            statusMessage.value = 'Sorry, but there seems to be an error on our end! Please try again later.'
         }
         finally {
             isSubmitting.value = false

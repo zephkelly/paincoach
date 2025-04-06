@@ -60,14 +60,5 @@ const factors: PainFactorProps[] = [factor5, factor1, factor2, factor3, factor4]
 </style>
 
 <style lang="css">
-main {
-    overflow: hidden;
-    overflow-y: scroll;
-    -ms-overflow-style: none;  /* Internet Explorer and Edge */
-    scrollbar-width: none;  /* Firefox */
-    -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
-    -webkit-scrollbar {
-        display: none; /* Safari and Chrome */
-    }
-}
+
 </style>
