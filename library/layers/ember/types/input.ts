@@ -25,6 +25,7 @@ export type InputField = {
     default?: any;
     placeholder?: string;
     options?: { label: string; value: any }[];
+    row?: string; // So that we can inline the input fields and group them
 }
 
 export type InputProps = {

@@ -13,7 +13,7 @@
 type ButtonProps = {
     loading?: boolean;
     spinnerInvert?: boolean;
-    variant?: 'outlined';
+    variant?: 'outlined' | 'ghost';
 };
 
 const props = defineProps<ButtonProps>();
@@ -21,6 +21,7 @@ const props = defineProps<ButtonProps>();
 
 const buttonClasses = computed(() => ({
     'button--outlined': props.variant === 'outlined',
+    'button--ghost': props.variant === 'ghost',
     'spinner-inverted': props.spinnerInvert,
 }));
 </script>
@@ -55,7 +56,7 @@ button {
         cursor: not-allowed;
     }
     
-    &.button--outlined {
+    &.button--outlined, &.button--ghost {
         background-color: transparent;
         color: var(--text-color);
         border-color: var(--border-color);
@@ -64,6 +65,14 @@ button {
             color: var(--border-8-color);
             fill: var(--border-8-color);
         }
+
+        &:hover {
+            background-color: var(--background-5-color);
+            color: var(--text-color);
+        }
+    }
+    &.button--ghost {
+        border-color: transparent;
 
         &:hover {
             background-color: var(--background-5-color);

@@ -32,6 +32,7 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: RegisterInputField[] = [
         tabindex: 1,
         required: true,
         default: undefined,
+        row: 'title-first_name',
         options: [
             { label: 'No Title', value: null },
             { label: 'Mr', value: 'Mr' },
@@ -47,6 +48,7 @@ export const BASE_USER_INVITE_REGISTER_FIELDS: RegisterInputField[] = [
         identifier: 'first_name',
         tabindex: 1,
         required: true,
+        row: 'title-first_name',
     },
     {
         inputType: 'text',
@@ -96,7 +98,7 @@ export const CLINICIAN_USER_INVITE_REGISTER_FIELDS: ClinicianRegisterInputField[
 ];
 
 type MedicalInputField = InputField & {
-    identifier: keyof DBEncryptedMedicationDataV1;
+    identifier: keyof Exclude<DBEncryptedMedicationDataV1, 'notes'>;
 }
 export const MEDICATION_FIELDS: {
     base: MedicalInputField[]

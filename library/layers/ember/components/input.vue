@@ -304,6 +304,7 @@ label {
     font-size: 0.8rem;
     color: var(--text-6-color);
     line-height: 1.5;
+    max-height: 20px;
     transition: color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 

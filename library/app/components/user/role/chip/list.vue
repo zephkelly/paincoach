@@ -17,8 +17,8 @@ import { type AllRoles } from '@@/shared/types/v1/role';
 
 
 type UserRoleChipListProps = {
-    roles: AllRoles[],
-    primaryRole: AllRoles,
+    roles: AllRoles[] | undefined,
+    primaryRole: AllRoles | undefined,
     collapsable: boolean
 };
 

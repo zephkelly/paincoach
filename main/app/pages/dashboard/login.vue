@@ -1,52 +1,60 @@
 <template>
     <div class="login-container">
-        <div class="login-card">
-            <h1 class="login-title">Sign In</h1>
+        <Transition name="fade">
+            <div class="login-card" v-show="!loggedIn">
+                <h1 class="login-title">Sign In</h1>
             
-            <form @submit.prevent="login" class="login-form">
-                <div class="form-group">
-                    <EInput 
-                        id="email"
-                        v-model="emailInput" 
-                        placeholder="Enter your email"
-                        label="Email"
-                        type="email"
-                        @input="clearError"
-                    />
-                </div>
-                
-                <div class="form-group">
-                    <EInput 
-                        id="password"
-                        v-model="passwordInput" 
-                        placeholder="Enter your password"
-                        label="Password"
-                        type="password"
-                        @input="clearError"
-                    />
-                </div>
-                
-                
-                <div class="button-group">
-                    <EButton type="submit" class="btn-primary" :loading="loggingIn">Sign In</EButton>
-                    <div v-if="errorMessage" class="error-message">
-                        * {{ errorMessage }}
+                <form @submit.prevent="login" class="login-form">
+                    <div class="form-group">
+                        <EInput
+                            id="email"
+                            v-model="emailInput"
+                            label="Email"
+                            type="email"
+                            @input="clearError"
+                            :validation="{
+                                validator: LoginValidator,
+                                fieldPath: 'email',
+                            }"
+                        />
                     </div>
-                </div>
-            </form>
-        </div>
+            
+                    <div class="form-group">
+                        <EInput
+                            id="password"
+                            v-model="passwordInput"
+                            label="Password"
+                            type="password"
+                            @input="clearError"
+                            :validation="{
+                                validator: LoginValidator,
+                                fieldPath: 'password',
+                            }"
+                        />
+                    </div>
+            
+            
+                    <div class="button-group">
+                        <EButton type="submit" class="btn-primary" :loading="loggingIn">Sign In</EButton>
+                        <div v-if="errorMessage" class="error-message">
+                            * {{ errorMessage }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </Transition>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { LoginValidator } from '@@/shared/schemas/v1/login';
 
 const emailInput = ref<string | null>(null);
 const passwordInput = ref<string | null>(null);
 const loginResponse = ref<string | null>(null);
 const errorMessage = ref<string | null>('');
 
-const { fetchNewSession } = useAuth();
+const { fetchNewSession, loggedIn } = useAuth();
 
 function clearError() {
     errorMessage.value = '';
@@ -160,22 +168,25 @@ definePageMeta({
 
 .btn-primary {
     flex: 1;
-    background-color: var(--primary-2-color);
-    color: white;
-    border: none;
+    background-color: var(--info-background-4-color);
+    border: 1px solid var(--info-border-2-color);
+    color: var(--text-2-color);
     border-radius: 6px;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: 
+        color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+        background-color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+        border-color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
     
     &:hover {
-        background-color: var(--primary-4-color);
+        color: var(--text-color);
+        background-color: var(--info-background-3-color);
+        border-color: var(--info-border-1-color);
     }
 }
 
 .error-message {
-    // padding: 0.75rem;
-    // background-color: #fee2e2;
     color: var(--error-color);
     border-radius: 6px;
     font-size: 0.875rem;

@@ -24,7 +24,6 @@ import { userRegisterValidator } from "@@/shared/schemas/v1/user/registration/in
 
 
 
-
 export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation | null>) => {
     const submissionError = ref<string | null>(null);
 
@@ -36,25 +35,6 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         return invitation.value.roles;
     });
 
-    const requiresMedicationRef = ref(false);
-
-    const userRequiresMedication = computed({
-        get() {
-            if (invitedRoles.value.includes("patient")) {
-                return true;
-            }
-
-            return requiresMedicationRef.value;
-        },
-        set(value: boolean) {
-            if (invitedRoles.value.includes("patient")) {
-                return;
-            }
-
-            requiresMedicationRef.value = value;
-        }
-    });
-    
     const state = useState<UserRegisterPartial>('user-register-state', () => ({
         invitation_token: invitation.value?.invitation_token,
 
@@ -79,6 +59,46 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
     }));
  
     const computedState = computed(() => state.value);
+
+    const requiresMedicationRef = ref(false);
+
+    // Patient and app roles require medication to show the
+    // medication fields, while other roles must click the checkbox
+    const { hasRole } = useAuth();
+    const userRequiresMedication = computed({
+        get() {
+            if (hasRole('patient') || hasRole('app')) {
+                return true;
+            }
+
+            return requiresMedicationRef.value;
+        },
+        set(value: boolean) {
+            if (hasRole('patient') || hasRole('app')) {
+                return;
+            }
+
+            requiresMedicationRef.value = value;
+        }
+    });
+
+    // If we set the 
+    const temporaryMedicationsData = ref<CreateEncryptedPainMedicationDataV1RequestPartial[] | undefined>(undefined);
+    watch(() => userRequiresMedication.value, (newValue) => {
+        if (!newValue) {
+            if (state.value.medications) {
+                temporaryMedicationsData.value = state.value.medications;
+                state.value.medications = undefined;
+            }
+        }
+        else {
+            if (temporaryMedicationsData.value) {
+                state.value.medications = temporaryMedicationsData.value;
+                temporaryMedicationsData.value = undefined;
+            }
+        }
+    });
+
 
 
     //role specific data
@@ -141,7 +161,7 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
     const isValid = ref(false);
     const formErrors = ref<Record<string, string>>({});
     // Validation function to call on blur or form submission
-    function validate(fieldName?: string): boolean {
+    function validate(): boolean {
         if (!state.value) {
             isValid.value = false;
             return false;
@@ -150,39 +170,6 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         submissionError.value = null;
 
         try {
-            // If a specific field is provided, we can validate just that field
-            if (fieldName) {
-                // Create an object with just the field to validate
-                const fieldToValidate = { [fieldName]: (state.value as any)[fieldName] };
-                
-                try {
-                    // This will throw if invalid
-                    userRegisterValidator.validate({
-                        ...state.value,
-                        ...fieldToValidate
-                    });
-                    
-                    // Field is valid, remove any existing error
-                    if (formErrors.value[fieldName]) {
-                        delete formErrors.value[fieldName];
-                    }
-                    
-                    return true;
-                } catch (error: unknown) {
-                    if (error instanceof ZodError) {
-                        // Find errors related to the specific field
-                        const fieldErrors = error.errors.filter(err => err.path.includes(fieldName));
-                        
-                        if (fieldErrors.length > 0) {
-                            formErrors.value[fieldName] = fieldErrors[0]?.message as string;
-                        }
-                    }
-                    
-                    return false;
-                }
-            }
-            
-            // Validate the entire form
             userRegisterValidator.validate(state.value);
             formErrors.value = {}; // Clear previous errors
             isValid.value = true;
@@ -199,47 +186,6 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
             
             isValid.value = false;
             return false;
-        }
-    }
-
-    const medicationsErrors = ref<Map<number, Map<string, string | undefined>>>(new Map(new Map()));
-
-    function validateMedicationField(index: number, fieldValue: any, field: keyof CreateEncryptedPainMedicationDataV1RequestPartial) {
-        try {
-            // validateCreateEncryptedPainMedicationDataV1RequestPartial({
-            //     [field]: fieldValue
-            // });
-            encryptedPainMedicationDataV1RequestValidator.validatePartial({
-                [field]: fieldValue
-            })
-
-            const thisMedicationsErrors = medicationsErrors.value.get(index);
-
-            if (thisMedicationsErrors) {
-                thisMedicationsErrors.delete(field);
-                medicationsErrors.value.set(index, thisMedicationsErrors);
-            }
-        }
-        catch (error: unknown) {
-            if (error instanceof ZodError) {
-                const painMedicationValidationError = error.errors[0]?.message;
-                if (!painMedicationValidationError) {
-                    console.error("Unknown error occurred while validating medication field");
-                    return;
-                }
-
-                const thisMedicationsErrors = medicationsErrors.value.get(index);
-                thisMedicationsErrors?.set(field, painMedicationValidationError || "");
-
-                if (!thisMedicationsErrors) {
-                    medicationsErrors.value.set(index, new Map([[field, painMedicationValidationError]]));
-                }
-                else {
-                    medicationsErrors.value.set(index, thisMedicationsErrors);
-                }
-            }
-
-            console.log(medicationsErrors.value)
         }
     }
 
@@ -349,9 +295,7 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
         BASE_USER_INVITE_REGISTER_FIELDS,
 
         MEDICATION_FIELDS,
-        medicationsErrors,
         userRequiresMedication,
-        validateMedicationField,
         addMedication,
         removeMedication,
 

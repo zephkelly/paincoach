@@ -13,7 +13,6 @@ export class ClinicianUserRepository {
         user_id: string,
         role_data: DBClinicianUserRegistrationData
     ): Promise<void> {
-        console.log('createClinicianProfile', user_id, role_data);
         await transaction.query(`
             INSERT INTO private.clinician_profile (
                 user_id,

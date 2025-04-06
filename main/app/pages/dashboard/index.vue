@@ -9,9 +9,9 @@
             <div v-if="!ready" class="dashboard-loading">
 
             </div>
-            <div v-else-if="hasRole('admin')" class="admin-dashboard">
+            <template v-else-if="hasRole('admin')">
                 <DashboardAdmin />
-            </div>
+            </template>
         </div>
     </Page>
 </template>
@@ -48,9 +48,8 @@ definePageMeta({
 
 .dashboard-content {
     display: flex;
-    flex-direction: column;
     gap: 1rem;
-    height: 600px;
+    width: 100%;
 }
 
 h1 {

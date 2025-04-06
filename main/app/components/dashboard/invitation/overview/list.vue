@@ -33,6 +33,9 @@ const props = defineProps<InvitationListProps>();
 </script>
 
 <style lang="scss" scoped>
+.basic-invitation-list {
+    margin: 0rem 1rem;
+}
 .list-column-headers {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;

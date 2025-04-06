@@ -13,7 +13,7 @@
           ref="selectRef"
         >
           <span v-if="isOptionSelected">{{ selectedLabel }}</span>
-          <span v-else class="placeholder">{{ placeholder || 'Select an option' }}</span>
+          <span v-else class="placeholder">{{ placeholder || '' }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dropdown-icon">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -30,15 +30,10 @@
           </div>
         </div>
       </div>
-      <!-- <div v-if="validationMessage && validationMessage.length > 0" class="error-message">
-        {{ validationMessage }}
-      </div> -->
     </div>
   </template>
   
-  <script lang="ts" setup>
-  import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
-  
+<script lang="ts" setup>
   type SelectOption = {
     label: string;
     value: string | null;
@@ -198,6 +193,7 @@
     font-size: 0.8rem;
     color: var(--text-6-color);
     line-height: 1.5;
+    max-height: 20px;
   }
   
   .required-indicator {
@@ -249,7 +245,7 @@
     }
   
     .dropdown-icon {
-      transition: transform 0.3s ease;
+      transition: transform 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
     }
   }
   

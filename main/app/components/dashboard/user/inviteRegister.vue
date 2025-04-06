@@ -35,7 +35,19 @@
                                 />
                             </div>
                         </div>
-                        <component
+
+                        <EFieldRenderer
+                            class="base-fields-container"
+                            :fields="BASE_USER_INVITE_REGISTER_FIELDS"
+                            :state="state"
+                            :validator="userRegisterValidator"
+                            :get-component="getComponent"
+                            :is-field-readonly="isFieldReadonly"
+                            :gap="0.5"
+                            @blur="validate"
+                            @update:state="updateState"
+                        />
+                        <!-- <component
                             v-for="field in BASE_USER_INVITE_REGISTER_FIELDS"
                             class="input-field"
                             :class="[{ 'field-required': field.required }, field.identifier]"
@@ -54,16 +66,16 @@
                                 validator: userRegisterValidator,
                                 fieldPath: field.identifier,
                             }"
-                            @blur="validate(undefined)"
-                            v-model="state[field.identifier]"
-                        />
-
+                            @blur="validate()"
+                            v-model="state[field.identifier]" 
+                            /> -->
+                        
                         <div class="checkbox-group">
                             <EInput
                                 class="data-sharing"
                                 id="data_sharing_enabled"
                                 type="checkbox"
-                                label="Would you like to anonymously share data to help improve our services"
+                                label="Would you like to anonymously share data with Pain Coach improve our services"
                                 v-model="state['data_sharing_enabled']"
                                 :required="false"
                             />
@@ -113,7 +125,9 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12M6 18L18 6"/></svg>
                                             Remove
                                         </EButton>
-                                        <component v-for="field in MEDICATION_FIELDS.base" :modelValue="state.medications && state.medications[index] ? state.medications[index][field.identifier] : null" @update:modelValue="state.medications && state.medications[index] ? state.medications[index][field.identifier] = $event : null" @blur="validateMedicationField(index, state.medications[index][field.identifier], field.identifier)"
+
+                                        <!-- @vue-expect-error -->
+                                        <component v-for="field in MEDICATION_FIELDS.base" :modelValue="state.medications && state.medications[index] ? state.medications[index][field.identifier] : null" @update:modelValue="state.medications && state.medications[index] ? state.medications[index][field.identifier] = $event : null" @blur="validate()"
                                             class="input-field"
                                             :class="[{ 'field-required': field.required }, field.identifier]"
                                             :key="field.identifier"
@@ -134,7 +148,8 @@
                                             }"
                                         />
 
-                                        <EInput :modelValue="state.medications[index]['start_date']" @update:modelValue="state.medications[index]['start_date'] = $event" @blur="validateMedicationField(index, state.medications[index]['start_date'], 'start_date')"
+                                        <!-- @vue-expect-error -->
+                                        <EInput :modelValue="state.medications[index]['start_date']" @update:modelValue="state.medications[index]['start_date'] = $event" @blur="validate()"
                                             id="start_date"
                                             class="input-field field-required start_date"
                                             label="Start Date"
@@ -145,7 +160,8 @@
                                                 fieldPath: 'start_date',
                                             }"
                                         />
-                                        <EInput :modelValue="state.medications[index]['end_date']" @update:modelValue="state.medications[index]['end_date'] = $event" @blur="validateMedicationField(index, state.medications[index]['end_date'], 'end_date')"
+                                        <!-- @vue-expect-error -->
+                                        <EInput :modelValue="state.medications[index]['end_date']" @update:modelValue="state.medications[index]['end_date'] = $event" @blur="validate()"
                                             id="end_date"
                                             class="input-field field-required end_date"
                                             :class="{ collapsed: state.medications[index]['is_on_going'] }"
@@ -157,6 +173,7 @@
                                                 fieldPath: 'end_date',
                                             }"
                                         />
+                                        <!-- @vue-expect-error -->
                                         <EInput :modelValue="state.medications[index]['is_on_going']" @update:modelValue="state.medications[index]['is_on_going'] = $event"
                                             id="is_on_going"
                                             class="input-field checkbox"
@@ -216,7 +233,7 @@
                                 validator: clinicianUserRegistrationDataValidator,
                                 fieldPath: field.identifier,
                             }"
-                            @blur="validate(undefined)"
+                            @blur="validate()"
                             :modelValue="getRoleField('clinician', field.identifier)"
                             @update:modelValue="setRoleField('clinician', field.identifier, $event)"
                         />
@@ -227,15 +244,26 @@
 
             <div class="submit-section">
                 <p class="submission-error" :class="{ show: submissionError }">{{ submissionError }}</p>
-                <EButton
-                    class="submit-button"
-                    type="submit"
-                    :loading="submitting"
-                    :disabled="submitting || !validatedRegistrationData"
-                    spinner-invert
-                >
-                    Complete registration
-                </EButton>
+                <div class="submit-inner">
+                    <EButton
+                        class="reject-button"
+                        :disabled="submitting"
+                        spinner-invert
+                        variant="ghost"
+                        @click.prevent="handleRejectInvitation"
+                    >
+                        No thanks
+                    </EButton>
+                    <EButton
+                        class="submit-button"
+                        type="submit"
+                        :loading="submitting"
+                        :disabled="submitting || !validatedRegistrationData"
+                        spinner-invert
+                    >
+                        Complete registration
+                    </EButton>
+                </div>
             </div>
         </form>
     </section>
@@ -260,9 +288,7 @@ const {
     BASE_USER_INVITE_REGISTER_FIELDS,
 
     MEDICATION_FIELDS,
-    medicationsErrors,
     userRequiresMedication,
-    validateMedicationField,
     addMedication,
     removeMedication,
 
@@ -277,6 +303,19 @@ const {
     submitting,
     submissionError
 } = useInviteRegister(invitation);
+
+const updateState = (updatedState) => {
+    console.log('updateState', newState);
+
+    const newState = {
+        ...state.value,
+        ...updatedState
+    }
+
+    state.value = newState;
+
+    console.log(state.value)
+};
 
 function isFieldReadonly(field: InputField) {
   if (!field.readonly || !invitation.value) return false;
@@ -293,69 +332,43 @@ import { clinicianUserRegistrationDataValidator } from '@@/shared/schemas/v1/use
 import type { InputField } from '@@/layers/ember/types/input';
 
 
-watch(medicationsErrors, () => {
-    console.log(medicationsErrors.value)
-})
-
 
 const medicationsFormHeight = 430;
 const medicationsSectionMaxHeight = computed(() => {
     if (!state.value.medications || !state.value.medications.length) return 'calc(148px + 4rem)';
     return `calc(${state.value.medications.length * medicationsFormHeight + 40}px + 105px + 4rem)`;
 })
+
+
+const { clearSession } = useAuth();
+async function handleRejectInvitation() {
+    const confirm = window.confirm('By rejecting this invitation, you will need to request another to access the app. Are you sure you want to proceed?');
+    if (confirm) {
+        try {
+            //
+            const response = await $fetch('/api/auth/logout');
+            await clearSession();
+            return navigateTo('/');
+        }
+        catch (error) {
+            console.error('Error rejecting invitation:', error);
+        }
+    }
+}
 </script>
 
 <style lang="scss" scoped>
 .invite-register-form-container {
     width: 100%;
     align-items: center;
-
-    .invite-register-form {
-        position: relative;
-        isolation: isolate;
-        width: 100%;
-        max-width: 800px;
-    }
-}
-
-.inviter-information {
-    height: 32px;
-    align-items: center;
-    align-content: flex-start;
-    font-size: 0.9rem;
-    font-style: italic;
-    font-family: var(--serif-font-stack);
-    color: var(--text-5-color);
-    gap: 0.25rem;
-
-    .inviter-profile-image {
-        height: 20px;
-        font-size: 0.8rem;
-        margin-left: 0.25rem;
-        opacity: 0.6;
-
-
-        :deep() {
-            .profile-placeholder {
-                p {
-                    font-size: 0.7rem;
-                    position: relative;
-                    font-style: normal;
-                    font-family: var(--geist-font-stack);
-                }
-            }
-        }
-    }
-
-    .inviter-name {
-        font-style: normal;
-        font-family: var(--geist-font-stack);
-        color: var(--text-4-color);
-    }
 }
 
 .invite-register-form {
     margin-bottom: 8rem;
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    max-width: 800px;
 
     .form-section {
         position: relative;
@@ -399,6 +412,37 @@ const medicationsSectionMaxHeight = computed(() => {
             border-radius: 0.5rem;
             box-shadow: 0 4px 16px 0px rgba(0, 0, 0, 0.1);
         }
+        
+        .form-header {
+            margin-top: 2.5rem;
+
+            .disclaimer {
+                margin-bottom: 2.5rem;
+                font-size: 0.9rem;
+                font-family: var(--serif-font-stack);
+                font-style: italic;
+            }
+
+            .title {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                height: 20px;
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+
+                svg {
+                    height: 100%;
+                    aspect-ratio: 1;
+                    width: auto;
+                }
+            }
+
+            p {
+                font-size: 0.9rem;
+                color: var(--text-6-color);
+            }
+        }
     
         .form-content {
             display: flex;
@@ -406,169 +450,128 @@ const medicationsSectionMaxHeight = computed(() => {
             align-items: center;
             gap: 0.5rem;
         }
-
-    }
-}
-.form-header {
-    margin-top: 2.5rem;
-
-    .disclaimer {
-        margin-bottom: 2.5rem;
-        font-size: 0.9rem;
-        font-family: var(--serif-font-stack);
-        font-style: italic;
     }
 
-    .title {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        height: 20px;
-        font-size: 1.25rem;
-        margin-bottom: 0.5rem;
+    .form-section.base {
+        padding-bottom: 1.25rem;
 
-        svg {
-            height: 100%;
-            aspect-ratio: 1;
-            width: auto;
-        }
-    }
+        .form-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2.5rem;
 
-    p {
-        font-size: 0.9rem;
-        color: var(--text-6-color);
-    }
-}
-
-:deep() {
-    .e-input {
-        &.checkbox {
-            max-height: 22px;
-        }
-
-        &.collapsed {
-            max-height: 0px;
-            opacity: 0;
-            user-select: none;
-            overflow: hidden;  
-        }   
-    }
-}
-
-
-.form-section.base {
-    padding-bottom: 1.25rem;
-
-    .form-header {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 2.5rem;
-
-        p {
-            font-family: var(--serif-font-stack);
-            font-style: italic;
-            color: var(--text-6-color);
-            opacity: 0.6;
-            
-        }
-
-        h1 {
-            font-size: 2.2rem;
-            font-weight: 500;
-            text-align: center;
-            font-family: var(--notoserif-font-stack);
-            line-height: 3.5rem;
-        }
-    }
-
-    .form-content {
-        .profile-wrapper {
-            position: relative;
-            width: 25%;
-            min-width: 150px;
-            height: auto;
-            margin-bottom: 2rem;
-
-            input {
-                height: 0;
-                opacity: 0;
-            }
-
-            .role-chip-container {
-                display: flex;
-                position: absolute;
-                bottom: 0;
-                right: 50%;
-                transform: translate(50%, 50%);
-            }
-        }
-
-        .user-profile-image {
-            cursor: pointer;
-            transition: opacity 0.3s ease;
-
-            &:hover {
+            p {
+                font-family: var(--serif-font-stack);
+                font-style: italic;
+                color: var(--text-6-color);
                 opacity: 0.6;
+                
             }
 
-            :deep() {
-                p {
-                    font-size: clamp(2rem, 5vw, 3rem);
+            h1 {
+                font-size: 2.2rem;
+                font-weight: 500;
+                text-align: center;
+                font-family: var(--notoserif-font-stack);
+                line-height: 3.5rem;
+            }
+        }
+
+        .form-content {
+            .profile-wrapper {
+                position: relative;
+                width: 25%;
+                min-width: 150px;
+                height: auto;
+                margin-bottom: 2rem;
+
+                input {
+                    height: 0;
+                    opacity: 0;
+                }
+
+                .role-chip-container {
+                    display: flex;
+                    position: absolute;
+                    bottom: 0;
+                    right: 50%;
+                    transform: translate(50%, 50%);
+                }
+            }
+
+            .user-profile-image {
+                cursor: pointer;
+                transition: opacity 0.3s ease;
+
+                &:hover {
+                    opacity: 0.6;
+                }
+
+                :deep() {
+                    p {
+                        font-size: clamp(2rem, 5vw, 3rem);
+                    }
+                }
+            }
+
+            .base-fields-container {
+                :deep() {
+                    .input-field.title {
+                        width: 120px;
+                    }
+                }
+            }
+
+            .data_sharing_enabled {
+                margin-top: 1rem;
+            }
+
+            .will-use-app-input {
+                margin-top: 0.5rem;
+                transition: margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+                &.active {
+                    margin-top: 1.5rem;
+                }
+            }
+
+            .requires-medication-input {
+                margin-top: 0.5rem;
+                transition:
+                    max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                    margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                    opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+                &.collapsed {
+                    margin-top: 0rem;
                 }
             }
         }
 
-        .data_sharing_enabled {
-            margin-top: 1rem;
-        }
-
-        .will-use-app-input {
+        .checkbox-group {
             margin-top: 0.5rem;
-            transition: margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+            width: 100%;
 
-            &.active {
-                margin-top: 1.5rem;
+            .will-use-app-input {
+                margin-top: 0.8rem;
             }
         }
 
-        .requires-medication-input {
-            margin-top: 0.5rem;
-            transition:
-                max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
-                margin-top 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
-                opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+        .patient-medications-section {
+            width: 100%;
+            margin-top: 1rem;
 
-            &.collapsed {
+            .form-header {
+                margin-bottom: 2rem;
+            }
+
+            .medications-list {
                 margin-top: 0rem;
             }
         }
     }
 
-    .checkbox-group {
-        margin-top: 0.5rem;
-        width: 100%;
-
-        .will-use-app-input {
-            margin-top: 0.8rem;
-        }
-    }
-
-    .patient-medications-section {
-        width: 100%;
-        margin-top: 1rem;
-
-        .form-header {
-            margin-bottom: 2rem;
-        }
-
-        .medications-list {
-            margin-top: 0rem;
-        }
-    }
-}
-
-.invite-register-form {
     .form-section.clinician-profile {
         .form-header {
             margin-bottom: 1.5rem;
@@ -627,43 +630,58 @@ const medicationsSectionMaxHeight = computed(() => {
             margin: 0rem 0rem;
         }
     }
-
 }
 
-.submit-section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-top: 3rem;
+.inviter-information {
+    height: 32px;
+    align-items: center;
+    align-content: flex-start;
+    font-size: 0.9rem;
+    font-style: italic;
+    font-family: var(--serif-font-stack);
+    color: var(--text-5-color);
+    gap: 0.25rem;
 
-    .submission-error {
-        font-size: 1rem;
-        color: var(--error-color);
-        opacity: 0;
-        margin-bottom: 0rem;
-        max-height: 0px;
-        transition:
-            margin-bottom 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
-            opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
-            max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
-        
-        &.show {
-            margin-bottom: 1rem;
-            opacity: 1;
-            max-height: 16px;
+    .inviter-profile-image {
+        height: 20px;
+        font-size: 0.8rem;
+        margin-left: 0.25rem;
+        opacity: 0.6;
+
+        :deep() {
+            .profile-placeholder {
+                p {
+                    font-size: 0.7rem;
+                    position: relative;
+                    font-style: normal;
+                    font-family: var(--geist-font-stack);
+                }
+            }
         }
     }
 
-    .submit-button {
-        width: 160px;
-
-        &.potentially-invalid {
-            opacity: 0.6;
-        }
+    .inviter-name {
+        font-style: normal;
+        font-family: var(--geist-font-stack);
+        color: var(--text-4-color);
     }
 }
 
+// Collapsable checkboxes
+:deep() {
+    .e-input {
+        &.checkbox {
+            max-height: 22px;
+        }
+
+        &.collapsed {
+            max-height: 0px;
+            opacity: 0;
+            user-select: none;
+            overflow: hidden;  
+        }   
+    }
+}
 
 .patient-medications-section {
     display: flex;
@@ -694,8 +712,6 @@ const medicationsSectionMaxHeight = computed(() => {
                 }
                 .encryption {
                     position: relative;
-                    // top: 3rem;
-                    // right: 1rem;
                     font-size: 0.8rem;
                     font-family: var(--geist-font-stack);
                     font-style: normal;
@@ -835,6 +851,59 @@ const medicationsSectionMaxHeight = computed(() => {
 
         &.no-medications {
             margin-top: 0rem;
+        }
+    }
+}
+
+.submit-section {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+    
+    .submit-inner {
+        display: flex;
+        flex-direction: row;
+        gap: 2rem;
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .submission-error {
+        font-size: 1rem;
+        color: var(--error-color);
+        opacity: 0;
+        margin-bottom: 0rem;
+        max-height: 0px;
+        transition:
+            margin-bottom 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+            opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+            max-height 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+        
+        &.show {
+            margin-bottom: 1rem;
+            opacity: 1;
+            max-height: 16px;
+        }
+    }
+
+    .submit-button {
+        width: 160px;
+
+        &.potentially-invalid {
+            opacity: 0.6;
+        }
+    }
+
+    .reject-button {
+        width: 120px;
+
+        color: var(--text-6-color);
+
+        &:hover {
+            background-color: var(--danger-background-3-color);
+            color: var(--danger-text-3-color);
         }
     }
 }

@@ -10,9 +10,9 @@
                 </li>
 
                 <!-- User management -->
-                <li class="sidebar-item users" :class="{ closed: userRole === 'patient'}">
+                <li class="sidebar-item users" :class="{ closed: hasRole('patient')}">
                     <Transition name="fast-fade">
-                        <div v-if=" isAdminUser || userRole === 'clinician'">
+                        <div v-if=" isAdminUser || hasRole('clinician')">
                             <div class="sidebar-item-header">
                                 <div class="toggleable-header">
                                     <Transition name="fade">
@@ -81,7 +81,8 @@ const {
 const {
     ready,
     primaryRole,
-    isAdminUser
+    isAdminUser,
+    hasRole
 } = useAuth();
 
 const manageableUsersType = computed(() => {
