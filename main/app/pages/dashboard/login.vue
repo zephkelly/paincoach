@@ -36,8 +36,8 @@
             
                     <div class="button-group">
                         <EButton type="submit" class="btn-primary" :loading="loggingIn">Sign In</EButton>
-                        <div v-if="errorMessage" class="error-message">
-                            * {{ errorMessage }}
+                        <div v-if="loginErrorMessage" class="error-message">
+                            * {{ loginErrorMessage }}
                         </div>
                     </div>
                 </form>
@@ -52,7 +52,6 @@ import { LoginValidator } from '@@/shared/schemas/v1/login';
 const emailInput = ref<string | null>(null);
 const passwordInput = ref<string | null>(null);
 const loginResponse = ref<string | null>(null);
-const errorMessage = ref<string | null>('');
 
 const {
     fetchNewSession,
@@ -60,10 +59,11 @@ const {
 
     login,
     loggingIn,
+    errorMessage: loginErrorMessage,
 } = useAuth();
 
 function clearError() {
-    errorMessage.value = '';
+    loginErrorMessage.value = '';
 }
 
 definePageMeta({

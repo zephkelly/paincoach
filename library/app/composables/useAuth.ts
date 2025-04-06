@@ -244,6 +244,7 @@ export const useAuth = () => {
     }
 
     const loggingIn = ref(false);
+    const errorMessage = ref<string | null>(null);
     async function login(email: string | undefined, password: string | undefined) {
         if (!email) {
             errorMessage.value = 'No email entered';
