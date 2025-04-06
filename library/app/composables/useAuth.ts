@@ -59,32 +59,6 @@ export const useAuth = () => {
         isPrivilegedUser.value && (mockUserData.value !== undefined || isMockingRoles.value)
     )
 
-    // const setMockUserData = async (userId: string | undefined) => {
-    //     if (isPrivilegedUser.value && userId) {
-    //         console.log('Fetching mock user data for', userId)
-    //         try {
-    //             const response = await $fetch<LimitedUserWithRoles>(`/api/v1/auth/${userId}`, {
-    //                 method: 'GET',
-    //             })
-
-    //             if (response) {
-    //                 console.log('Setting mock user data to', response)
-    //                 mockUserData.value = {
-    //                     id: response.uuid,
-    //                     roles: response.roles || [response.primary_role],
-    //                 }
-
-    //                 if (isMockingLoading.value) {
-    //                     mockLoading.value = false
-    //                 }
-    //             }
-    //         }
-    //         catch (err) {
-    //             console.error('Exception when fetching mock user data:', err)
-    //         }
-    //     }
-    // }
-
     const clearMockUserData = () => {
         mockUserData.value = undefined
     }
@@ -255,6 +229,58 @@ export const useAuth = () => {
         return undefined
     })
 
+
+    async function logout() {
+        if (!loggedIn.value) return;
+
+        try {
+            await $fetch('/api/v1/auth/logout');
+            await clearSession();
+            navigateTo('/dashboard/login');
+        }
+        catch(error) {
+            console.error(error);
+        }
+    }
+
+    const loggingIn = ref(false);
+    async function login(email: string | undefined, password: string | undefined) {
+        if (!email) {
+            errorMessage.value = 'No email entered';
+            return;
+        }
+        
+        if (!password) {
+            errorMessage.value = 'No password entered';
+            return;
+        }
+
+        loggingIn.value = true;
+        
+        try {
+            const response = await $fetch('/api/v1/auth/login',
+                {
+                    method: 'POST',
+                    body: {
+                        email: email,
+                        password: password
+                    }
+                }
+            );
+
+            loginResponse.value = response.statusMessage;
+            await fetchNewSession();
+            return navigateTo('/dashboard');
+        }
+        catch (error: any) {
+            errorMessage.value = error.statusMessage || 'Error logging in';
+        }
+        finally {
+            loggingIn.value = false;
+        }
+    }
+
+
     const clearMocks = () => {
         clearMockRoles()
         clearMockLoading()
@@ -304,5 +330,9 @@ export const useAuth = () => {
         clearMockUserData,
         userId,
         actualUserId,
+
+        logout,
+        loggingIn,
+        login,
     }
 }

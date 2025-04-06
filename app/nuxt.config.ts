@@ -5,6 +5,7 @@ import { resolve } from 'path'
 export default defineNuxtConfig({
     compatibilityDate: '2024-11-01',
     devtools: { enabled: true },
+
     future: {
         compatibilityVersion: 4
     },
@@ -41,8 +42,6 @@ export default defineNuxtConfig({
         },
     },
 
-    ssr: false,
-
     extends: [
         './../library',
     ],
@@ -61,7 +60,7 @@ export default defineNuxtConfig({
     },
 
     runtimeConfig: {
-        databaseConnectionString: process.env.POSTGRES_CONNECTION_STRING,
+        proxyOrigin: process.env.PROXY_ORIGIN,
 
         // nuxt-auth-utils
         session: {

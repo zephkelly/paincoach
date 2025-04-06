@@ -54,43 +54,16 @@ const passwordInput = ref<string | null>(null);
 const loginResponse = ref<string | null>(null);
 const errorMessage = ref<string | null>('');
 
-const { fetchNewSession, loggedIn } = useAuth();
+const {
+    fetchNewSession,
+    loggedIn,
+
+    login,
+    loggingIn,
+} = useAuth();
 
 function clearError() {
     errorMessage.value = '';
-}
-
-const loggingIn = ref(false);
-async function login() {
-    if (!passwordInput.value) {
-        errorMessage.value = 'No password entered';
-        return;
-    }
-
-    loggingIn.value = true;
-    
-    try {
-        const response = await $fetch('/api/v1/auth/login',
-            {
-                method: 'POST',
-                body: {
-                    email: emailInput.value,
-                    password: passwordInput.value
-                }
-            }
-        );
-
-
-        loginResponse.value = response.statusMessage;
-        await fetchNewSession();
-        return navigateTo('/dashboard');
-    }
-    catch (error: any) {
-        errorMessage.value = error.statusMessage || 'Error logging in';
-    }
-    finally {
-        loggingIn.value = false;
-    }
 }
 
 definePageMeta({

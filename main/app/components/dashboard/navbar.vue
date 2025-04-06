@@ -121,19 +121,8 @@ const {
     toggleMockLoading,
     clearSession,
     isPrivilegedUser,
+    logout, 
 } = useAuth();
-
-async function logout() {
-    try {
-        await $fetch('/api/v1/auth/logout');
-        await clearSession();
-        setOpen(false)
-        navigateTo('/dashboard/login');
-    }
-    catch(error) {
-        console.error(error);
-    }
-}
 </script>
 
 <style lang="scss" scoped>
