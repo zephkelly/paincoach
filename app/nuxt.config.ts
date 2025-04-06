@@ -17,20 +17,31 @@ export default defineNuxtConfig({
         manifest: {
             name: 'Pain Coach',
             short_name: 'PainCoach',
+            description: 'Pain Coach is a digital health platform that helps you manage your pain.',
             theme_color: '#ffffff',
             icons: [
                 {
-                    src: 'pwa-192x192.png',
+                    src: '180.png',
+                    sizes: '180x180',
+                    type: 'image/png'
+                },
+                {
+                    src: '192.png',
                     sizes: '192x192',
                     type: 'image/png'
                 },
                 {
-                    src: 'pwa-512x512.png',
+                    src: '256.png',
+                    sizes: '256x256',
+                    type: 'image/png'
+                },
+                {
+                    src: '512.png',
                     sizes: '512x512',
                     type: 'image/png'
                 },
                 {
-                    src: 'pwa-512x512.png',
+                    src: '512.png',
                     sizes: '512x512',
                     type: 'image/png',
                     purpose: 'any maskable'
