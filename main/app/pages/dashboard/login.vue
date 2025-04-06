@@ -4,7 +4,7 @@
             <div class="login-card" v-show="!loggedIn">
                 <h1 class="login-title">Sign In</h1>
             
-                <form @submit.prevent="login" class="login-form">
+                <form @submit.prevent="handleLogin" class="login-form">
                     <div class="form-group">
                         <EInput
                             id="email"
@@ -64,6 +64,12 @@ const {
 
 function clearError() {
     loginErrorMessage.value = '';
+}
+
+async function handleLogin() {
+    if (emailInput.value && passwordInput.value) {
+        await login(emailInput.value, passwordInput.value);
+    }
 }
 
 definePageMeta({
