@@ -235,7 +235,7 @@ export const useAuth = () => {
 
         try {
             await $fetch('/api/v1/auth/logout');
-            await clearSession();
+            await clear();
             navigateTo('/dashboard/login');
         }
         catch(error) {
