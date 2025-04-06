@@ -109,3 +109,40 @@
         --completed: var(--completed-dark);
     }
 }
+
+html {
+    scrollbar-width: thin;
+}
+
+body {
+    font-family: 'Geist', sans-serif;
+    color: var(--text-color);
+    background-color: var(--background);
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+}
+
+.container.section {
+    width: 100%;
+    max-width: 800px;
+    box-sizing: border-box;
+}
+
+svg {
+    fill: var(--text-color);
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 20px;
+}
