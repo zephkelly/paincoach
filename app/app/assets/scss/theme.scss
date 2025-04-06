@@ -114,10 +114,10 @@ html {
     scrollbar-width: thin;
 }
 
-body {
+body, main {
     font-family: 'Geist', sans-serif;
     color: var(--text-color);
-    background-color: var(--background);
+    background-color: transparent;
 }
 
 section {
