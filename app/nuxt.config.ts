@@ -23,6 +23,7 @@ export default defineNuxtConfig({
 
 
     css: [
+        '~~lib/app/assets/scss/reset.scss',
         '~/assets/scss/theme.scss',
     ],
 

@@ -11,8 +11,8 @@
 </template>
 
 <script lang="ts" setup>
-import CalendarTimelineDropdown from '~/components/app/calendar/timelineDropdown.vue';
-import { getEmptyDaysAtStart, generateCalendarDays } from '@/utils/calendar';
+import CalendarTimelineDropdown from '~/components/calendar/timelineDropdown.vue';
+import { getEmptyDaysAtStart, generateCalendarDays } from '~/utils/calendar';
 
 const currentDate = ref(new Date());
 const { currentTimeline } = useOverviewTimeline();
@@ -44,8 +44,6 @@ const handleCloseDataComponent = () => {
 };
 
 definePageMeta({
-    // alias: ['/calendar'],
-    layout: 'application',
     title: 'Calendar',
     description: 'This is the calendar page',
 })

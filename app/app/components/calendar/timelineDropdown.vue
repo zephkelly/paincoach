@@ -18,8 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { type TimelineOption, type TimelineOverview } from '@/types/timeline';
-import debounce from '@/utils/debounce';
+import { type TimelineOption, type TimelineOverview } from '~/types/timeline';
+import debounce from '~/utils/debounce';
 const { toggleEnabled, isEnabled  } = useTimelineDropdown();
 const { currentTimeline, setTimeline } = useOverviewTimeline();
 

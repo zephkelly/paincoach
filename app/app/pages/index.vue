@@ -16,7 +16,6 @@ import { type PainFactorProps } from '~/types/painFactor';
 const newDate = ref(new Date())
 
 definePageMeta({
-    layout: 'application',
     title: 'Overview',
     description: 'This is the overview page',
 })
@@ -61,15 +60,14 @@ const factors: PainFactorProps[] = [factor5, factor1, factor2, factor3, factor4]
 </style>
 
 <style lang="css">
-.platform-web button {
-    cursor: pointer;
-    transition: background-color 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
-}
-
-.platform-web button:hover {
-    background-color: var(--panel-hover);
-}
-.page-container {
-    padding: 0 1rem;
+main {
+    overflow: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* Internet Explorer and Edge */
+    scrollbar-width: none;  /* Firefox */
+    -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
+    -webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+    }
 }
 </style>

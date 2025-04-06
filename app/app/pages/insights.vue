@@ -2,22 +2,20 @@
     <main>
         <h1>Insights</h1>
         <div class="page-container">
-            <ContributionChart />
+            <InsightsContributionChart />
             <section class="panel">
                 <div class="headers wrapper">
                     <h2>Your Pain Factors</h2>
                 </div>
-                <img v-if="colorScheme === 'light'" :src="lightFactorChart" alt="Your Image">
-                <img v-else :src="darkFactorChart" alt="Example chart image">
+                <!-- <img v-if="colorScheme === 'light'" :src="lightFactorChart" alt="Your Image">
+                <img v-else :src="darkFactorChart" alt="Example chart image"> -->
             </section>
         </div>
     </main>
 </template>
 
 <script setup lang="ts">
-import lightFactorChart from '@/assets/images/insights-light.webp';
-import darkFactorChart from '@/assets/images/insights.webp';
-import ContributionChart from '@/components/app/insights/contributionChart.vue';
+// import ContributionChart from '@/components/app/insights/contributionChart.vue';
 
 const colorScheme = ref('light');
 
@@ -37,7 +35,6 @@ onUnmounted(() => {
 });
 
 definePageMeta({
-    layout: 'application',
     title: 'Insights',
     description: 'This is the insights page',
 });

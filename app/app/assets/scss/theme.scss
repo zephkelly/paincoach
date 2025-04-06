@@ -138,11 +138,46 @@ svg {
     fill: var(--text-color);
 }
 
+section.panel, button.panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px 16px;
+    background-color: var(--panel);
+    border-radius: 16px;
+}
+
+section.panel > .headers > h2, section > .headers > h2,
+section.panel > .headers > h3, section > .headers > h3 {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+    font-size: var(--font-size-18);
+    font-weight: 400;
+}
+
+.panel > .headers {
+    margin-bottom: 1.5rem;
+}
+
 .page-container {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 0 20px;
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 7rem;
+    box-sizing: border-box;
+    padding: 0rem 1rem;
+}
+
+body, html, main {
+    overflow: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* Internet Explorer and Edge */
+    scrollbar-width: none;  /* Firefox */
+    -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
+    -webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+    }
 }

@@ -63,12 +63,11 @@
 </template>
 
 <script lang="ts" setup>
-import SettingsToggle from '@/components/app/settings/toggle.vue';
+// import SettingsToggle from '@/components/app/settings/toggle.vue';
 
 const { getValue } = useAppSettings();
 
 definePageMeta({
-    layout: 'application',
     title: 'Settings',
     description: 'This is the settings page',
 });
