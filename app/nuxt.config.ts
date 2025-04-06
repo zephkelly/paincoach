@@ -62,14 +62,14 @@ export default defineNuxtConfig({
     runtimeConfig: {
         proxyOrigin: process.env.PROXY_ORIGIN,
 
+        public: {
+            dashboardUrl: process.env.DASHBOARD_URL,
+        },
+
         // nuxt-auth-utils
         session: {
             name: 'paincoach-session',
-            password: process.env.NUXT_SESSION_PASSWORD || '',
-            cookie: {
-                domain: 'localhost',
-                sameSite: 'lax'
-            }
+            password: process.env.NUXT_SESSION_PASSWORD,
         }
     },
 
