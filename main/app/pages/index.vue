@@ -28,6 +28,15 @@ definePageMeta({
 });
 </script>
 
+<style>
+html {
+    background-color: #ffffff;
+
+    @media (prefers-color-scheme: dark) {
+        background-color: #09090b;
+    }
+}
+</style>
 
 <style lang="scss" scoped>
 main {
@@ -57,7 +66,7 @@ main {
             color: var(--text-color);
         }
         h1 {
-            font-size: clamp(42px, 7vw, 46px);
+            font-size: clamp(46px, 5vw, 52px);
             line-height: 38px;
         }
         
@@ -146,7 +155,7 @@ main {
 
 .waitlist {
     margin-top: clamp(2rem, 7vw, 4rem);
-    padding-bottom: clamp(10rem, 8vw, 12rem);
+    padding-bottom: clamp(7rem, 8vw, 9rem);
 
     @media (max-width: 768px) {
         margin-top: 2.5rem;

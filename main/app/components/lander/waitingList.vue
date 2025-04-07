@@ -16,7 +16,6 @@
                         name="EMAIL"
                         class="email"
                         id="inputEmail"
-                        placeholder="example@email.com"
                         v-model="emailModel"
                         required
                         @input="verifyEmailInput"
@@ -137,7 +136,7 @@ section {
     }
 }
 
-.clarity {
+h2 {
     font-size: clamp(46px, 5vw, 48px);
     line-height: 48px;
 }
@@ -172,9 +171,9 @@ form {
         }
 
         input {
-            padding: 0.5rem;
+            padding: 0.5rem 1rem;
             border: 1px solid var(--text-color);
-            background-color: var(--background-color);
+            background-color: var(--background-2-color);
             color: var(--text-color);
             height: 2rem;
             border-radius: 0.5rem;
@@ -186,22 +185,31 @@ form {
             padding: 0.5rem;
             border: 1px solid var(--text-color);
             background-color: var(--text-color);
-            color: var(--background);
+            color: var(--background-color);
             height: 4rem;
             border-radius: 0.5rem;
             font-size: 1.2rem;
             cursor: pointer;
-            transition: background-color 0.5s cubic-bezier(0.075, 0.82, 0.165, 1), color 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+            transition:
+                background-color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                border-color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
 
             &:hover {
-                background-color: var(--background);
-                color: var(--text-color);
+                background-color: var(--background-9-color);
+                border-color: var(--background-9-color);
             }
 
             &:disabled {
                 background-color: var(--background);
                 color: var(--text-color);
                 cursor: not-allowed;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                &:hover {
+                    background-color: rgb(184, 184, 184);
+                }
             }
         }
 

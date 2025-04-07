@@ -76,7 +76,7 @@ html {
     background-color: var(--background-color);
     color: var(--text-color);
 
-    @media (prefers-color-scheme: light) {
-        background-color: var(--background-2-color);
-    }
+    // @media (prefers-color-scheme: light) {
+    //     background-color: var(--background-2-color);
+    // }
 }

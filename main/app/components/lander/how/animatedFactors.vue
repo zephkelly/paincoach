@@ -119,7 +119,7 @@ function handleVisible() {
             font-weight: 600;
             letter-spacing: 0.5px;
             background-color: var(--text-color);
-            color: var(--background);
+            color: var(--background-color);
             padding: 0.5rem 1rem;
             border-radius: 8px;
             opacity: 0;
@@ -140,7 +140,7 @@ function handleVisible() {
             p {
                 font-weight: 500;
                 font-size: 0.9rem;
-                color: var(--background);
+                color: var(--background-color);
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -232,7 +232,7 @@ function handleVisible() {
             height: 50%;
             width: 50%;
             border-bottom-left-radius: 50%;
-            border: 3px solid var(--accent);
+            border: 3px solid var(--text-color);
             border-right: none;
             border-top: none;
             opacity: 0;
@@ -244,7 +244,7 @@ function handleVisible() {
             right: 0;
             height: 150%;
             width: 50%;
-            border-left: 3px solid var(--accent);
+            border-left: 3px solid var(--text-color);
             opacity: 0;
         }
     }

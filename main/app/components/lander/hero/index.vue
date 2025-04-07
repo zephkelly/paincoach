@@ -1,11 +1,11 @@
 <template>
-    <div class="container section">
+    <section class="container section">
         <h1 tabindex="0" class="introduction">
             <span class="mobile-hidden">Introducing</span> <span class="desktop-hidden">Meet</span> <strong class="complex-shimmer" data-text="Pain Coach">Pain Coach</strong>.
         </h1>
-        <h2 tabindex="0"><span>Take Control, Reclaim Your Life.</span></h2>
+        <h2 tabindex="0"><span>A lifestyle tracker for pain relief.</span></h2>
         <p class="subtitle" tabindex="0">
-            Your personalised pain and lifestyle tracker, backed by real science.
+            Understand your pain and reclaim your life. Backed by real science.
         </p>
         <button 
             tabindex="0" 
@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <script lang="ts" setup>
@@ -57,8 +57,6 @@ button {
     font-size: 14px;
     font-weight: 500;
     line-height: 16px;
-    color: var(--background);
-    background-color: var(--text-color);
     border: none;
     border-radius: 0.25rem;
     cursor: pointer;
@@ -68,37 +66,42 @@ button {
         background-color: var(--accent-hover);
     }
 }
-section {
-    padding: 0rem 1rem;
-    width: 100%;
 
-    h1 {
-        margin-top: clamp(2.5rem, 7vw, 3rem);
-        margin-bottom: 1rem;
+h1 {
+    font-size: clamp(3.5rem, 7vw, 4.5rem);
+    margin-top: clamp(2.5rem, 7vw, 3rem);
+    margin-bottom: 1rem;
 
-        @media (max-width: 500px) {
-            line-height: 1;
-            font-size: 3.25rem;
-        }
+    @media (max-width: 500px) {
+        line-height: 1;
+        font-size: 3.25rem;
     }
+}
 
-    h2 {
-        display: flex;
-        margin-top: 1rem;
+h2 {
+    display: flex;
+    margin-top: 1rem;
 
-        @media (max-width: 768px) {
-            display: none;
-        }
+    @media (max-width: 768px) {
+        display: none;
     }
+}
 
-    .subtitle {
-        tab-size: 4;
+.subtitle {
+    tab-size: 4;
 
-        strong {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 0.3px;
-        }
+    strong {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+}
+section.container.section  {
+    // padding: 0rem 1rem;
+    // width: 100%;
+
+    @media (max-width: 650px) {
+        align-items: flex-start;
     }
 }
 
@@ -110,6 +113,20 @@ section {
 .waitlist-link {
     margin-top: 1.2rem;
     font-size: 1.1rem;
+    color: var(--background-color);
+    border: 1px solid var(--text-color);
+    transition: color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+        border-color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+        background-color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+    &:hover {
+        color: var(--text-color);
+        border-color: var(--text-color);
+    }
+
+    @media (prefers-color-scheme: light) {
+        background-color: var(--text-color);
+    }
 }
 
 .landing-image {
