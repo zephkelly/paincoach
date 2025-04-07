@@ -26,8 +26,8 @@
   
 <script setup lang="ts">
 const { smoothScroll } = useScroll();
-import type { CalendarDay } from '~/types/calendar';
-import debounce from '~/utils/debounce';
+import type { CalendarDay } from '~~/layers/legacy/types/calendar';
+import debounce from '~~/layers/legacy/utils/debounce';
 
 const props = defineProps<{
     calendarDays: CalendarDay[];

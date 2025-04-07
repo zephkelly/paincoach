@@ -32,11 +32,11 @@
 </template>
 
 <script setup lang="ts">
-import { getStartingDayOfWeekIndex, getMonthDays,  getDayOfWeek, getDayOfWeekShort, type CalendarDay, type CalendarMonth } from '~/types/calendar';
-import type { DayIndicatorLabelType } from '~/types/dayIndicator';
-import { type PainLevel } from '~/types/painLevel';
-import { daysOfWeekLabels } from '~/types/day';
-import { getEmptyDaysAtStart, generateCalendarDays, getStartOfWeek, getEndOfWeek, getStartOfFortnight, getEndOfFortnight, currentDateMonthDay } from '~/utils/calendar';
+import { getStartingDayOfWeekIndex, getMonthDays,  getDayOfWeek, getDayOfWeekShort, type CalendarDay, type CalendarMonth } from '~~/layers/legacy/types/calendar';
+import type { DayIndicatorLabelType } from '~~/layers/legacy/types/dayIndicator';
+import { type PainLevel } from '~~/layers/legacy/types/painLevel';
+import { daysOfWeekLabels } from '~~/layers/legacy/types/day';
+import { getEmptyDaysAtStart, generateCalendarDays, getStartOfWeek, getEndOfWeek, getStartOfFortnight, getEndOfFortnight, currentDateMonthDay } from '~~/layers/legacy/utils/calendar';
 // import OverviewDayIndicator from '@/components/app/overview/dayIndicator.vue';
 
 const props = defineProps<{

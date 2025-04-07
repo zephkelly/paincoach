@@ -1,4 +1,4 @@
-import { type TimelineOverview } from '~/types/timeline'
+import { type TimelineOverview } from '~~/layers/legacy/types/timeline'
 
 export const useOverviewTimeline = () => {
     const currentTimeline: Ref<TimelineOverview> = useState<TimelineOverview>('currentTimeline', () => 'week')

@@ -43,13 +43,13 @@
 </template>
 
 <script setup lang="ts">
-import type { PainFactor, PainFactorID } from '~/types/painFactor';
+import type { PainFactor, PainFactorID } from '~~/layers/legacy/types/painFactor';
 
-import debounce from '~/utils/debounce';
+import debounce from '~~/layers/legacy/utils/debounce';
 
 const { factorsExpanded, isFactorExpanded } = useFactorsExpanded();
 const isExpanded = computed(() => isFactorExpanded(props.factorID));
-const factorWidthStyle = ref(`${Math.floor(Math.random() * 42) + 24}%`);
+const factorWidthStyle = ref(42 + 24 + 16 + 'px');
 
 interface Props {
     factorID: PainFactorID,

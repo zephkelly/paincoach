@@ -109,7 +109,7 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
     }
 
     &.pending {
-        width: 90px;
+        width: 84px;
 
         .chip-main {
             border: 1px solid var(--pending-border-2-color);
@@ -119,6 +119,10 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
             &.paneled {
                 background-color: var(--pending-background-4-color);
                 border-color: var(--pending-border-3-color);
+            }
+
+            .chip-content-wrapper {
+                gap: 0.1rem;
             }
         }
     }
@@ -139,7 +143,7 @@ const hasDefaultSlot = computed(() => !!slots.default && slots.default().length 
     }
 
     &.opened {
-        width: 90px;
+        width: 82px;
 
         .chip-main {
             border: 1px solid var(--info-border-2-color);

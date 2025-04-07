@@ -11,7 +11,7 @@
 
 <script lang="ts" setup>
 import OverviewTimelineDropdown from '~/components/overview/timelineDropdown.vue';
-import { type PainFactorProps } from '~/types/painFactor';
+import { type PainFactorProps } from '~~/layers/legacy/types/painFactor';
 
 const newDate = ref(new Date())
 

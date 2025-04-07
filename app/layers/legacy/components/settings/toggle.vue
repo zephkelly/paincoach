@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import type { SettingName } from '~/types/settings';
-import debounce from '~/utils/debounce';
+import type { SettingName } from '~~/layers/legacy/types/settings';
+import debounce from '~~/layers/legacy/utils/debounce';
 
 const { toggleSetting } = useSettings();
 

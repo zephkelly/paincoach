@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 import CalendarTimelineDropdown from '~/components/calendar/timelineDropdown.vue';
-import { getEmptyDaysAtStart, generateCalendarDays } from '~/utils/calendar';
+import { getEmptyDaysAtStart, generateCalendarDays } from '~~/layers/legacy/utils/calendar';
 
 const currentDate = ref(new Date());
 const { currentTimeline } = useOverviewTimeline();

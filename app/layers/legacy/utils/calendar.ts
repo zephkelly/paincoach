@@ -1,4 +1,4 @@
-import { getStartingDayOfWeekIndex, getMonthDays,  getDayOfWeek, getDayOfWeekShort, type CalendarDay, type CalendarMonth } from '~/types/calendar';
+import { getStartingDayOfWeekIndex, getMonthDays,  getDayOfWeek, getDayOfWeekShort, type CalendarDay, type CalendarMonth } from '~~/layers/legacy/types/calendar';
 
 export function getStartOfWeek(date: Date): Date {
   const d = new Date(date);

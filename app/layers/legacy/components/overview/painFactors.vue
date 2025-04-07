@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PainFactorProps } from '~/types/painFactor';
+import type { PainFactorProps } from '~~/layers/legacy/types/painFactor';
 const { smoothScroll } = useScroll();
 const { isAnyFactorExpanded, disableAllFactors, disableAllButThenToggle } = useFactorsExpanded();
 

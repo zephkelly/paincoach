@@ -1,7 +1,7 @@
 <template>
     <div class="timeline" :class="{ open: isEnabled }">
         <button @click.prevent="debouncedToggleEnabled" class="main" :class="currentTimeline">
-            <div class="current-selection none"></div>
+            <p>{{ currentTimelineLength?.label }}</p>
             <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"><path d="M480-397.85 311.85-566h336.3L480-397.85Z"/></svg>
         </button>
         <Transition name="fade">
@@ -9,6 +9,7 @@
                 <ul>
                     <li v-for="option in dropdownOptions" :key="option.value">
                         <button @click.prevent="debouncedSelectTimeline(option.value)" :class="option.value">
+                            <p>{{ option.label }}</p>
                         </button>
                     </li>
                 </ul>
@@ -18,50 +19,55 @@
 </template>
 
 <script setup lang="ts">
-import { type TimelineOption, type TimelineOverview } from '~/types/timeline';
-import debounce from '~/utils/debounce';
+import { type TimelineOverview, type TimelineOption } from '~~/layers/legacy/types/timeline';
+import debounce from '~~/layers/legacy/utils/debounce';
 const { toggleEnabled, isEnabled  } = useTimelineDropdown();
 const { currentTimeline, setTimeline } = useOverviewTimeline();
 
 const timelineLengths: TimelineOption[] = [
-    { value: 'week', label: '7 Days' },
-    { value: 'fortnight', label: '14 Days' },
-    { value: 'month', label: '1 Month' }
+  { value: 'week', label: '7 Days' },
+  { value: 'fortnight', label: '14 Days' },
+  { value: 'month', label: '1 Month' }
 ];
 
-const dropdownOptions = computed(() => {
+const dropdownOptions = computed((): TimelineOption[] => {
     const options = [...timelineLengths];
     const currentIndex = options.findIndex(timeline => timeline.value === currentTimeline.value);
-    if (currentIndex !== -1) {
-        options.splice(currentIndex, 1);
-    }
     return options;
 });
 
-const currentTimelineLength = computed(() => {
-    return timelineLengths.find((timeline) => timeline.value === currentTimeline.value);
+const currentTimelineLength = computed((): TimelineOption | undefined => {
+  return timelineLengths.find((timeline) => timeline.value === currentTimeline.value);
 });
 
 const debouncedToggleEnabled = debounce(toggleEnabled, 100);
+
 const debouncedSelectTimeline = debounce((value: TimelineOverview) => {
-    setTimeline(value);
-    toggleEnabled();
+  setTimeline(value);
+  toggleEnabled();
 }, 100);
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 .timeline {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     width: 100%;
     height: 100%;
-    max-width: 80px;
-    margin-right: auto;
     border-radius: 10px;
     background-color: var(--panel);
     transition: background-color 0.2s cubic-bezier(0.075, 0.82, 0.165, 1), box-shadow 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
     box-shadow: none;
+    z-index: 100;
+}
+
+.timeline {
+    button.main {
+        background-color: transparent;
+        border: none;
+        width: 100%;
+    }
 }
 
 .timeline.open {
@@ -80,10 +86,6 @@ const debouncedSelectTimeline = debounce((value: TimelineOverview) => {
 }
 
 .timeline.open .main p {
-    opacity: 0.3;
-}
-
-.timeline.open .main .current-selection {
     opacity: 0.3;
 }
 
@@ -116,28 +118,37 @@ nav.menu li:last-child {
     border-bottom-right-radius: 10px;
 }
 
+
 button {
     display: flex;
     align-items: center;
     position: relative;
-    width: 100%;
+    width: 80%;
     padding: 12px 12px;
     border-radius: 10px;
     cursor: pointer;
-    height: 44px;
+    height: 100%;
+    min-height: 44px;
     background-color: transparent;
     border: none;
-    box-sizing: border-box;
 }
 
-.main .current-selection {
-    height: var(--font-size-16);
-    width: var(--font-size-16);
-    border-radius: 50%;
-    background-color: transparent;
-    border: 2px solid var(--text-color);
-    transition: background-color 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
-    margin-left: 2px;
+button.main p {
+    transition: opacity 0.4s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+button p {
+    position: relative;
+    text-transform: capitalize;
+    top: -1px;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+    font-size: 12px;
+    line-height: 12px;
+    font-weight: 400;
+    display: inline-bock;
+    text-align: left;
 }
 
 button svg {

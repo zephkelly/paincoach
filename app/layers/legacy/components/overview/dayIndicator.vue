@@ -6,9 +6,9 @@
 </template>
 
 <script setup lang="ts">
-import { type DayIndicatorLabelType } from '~/types/dayIndicator';
-import type { PainLevel } from '~/types/painLevel';
-import type { DayOfWeekLabel } from '~/types/day';
+import { type DayIndicatorLabelType } from '~~/layers/legacy/types/dayIndicator';
+import type { PainLevel } from '~~/layers/legacy/types/painLevel';
+import type { DayOfWeekLabel } from '~~/layers/legacy/types/day';
 
 interface Props {
     isEmpty: boolean,
