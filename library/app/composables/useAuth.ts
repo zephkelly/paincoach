@@ -244,15 +244,15 @@ export const useAuth = () => {
     }
 
     const loggingIn = ref(false);
-    const errorMessage = ref<string | null>(null);
+    const loginErrorMessage = ref<string | null>(null);
     async function login(email: string | undefined, password: string | undefined) {
         if (!email) {
-            errorMessage.value = 'No email entered';
+            loginErrorMessage.value = 'No email entered';
             return;
         }
         
         if (!password) {
-            errorMessage.value = 'No password entered';
+            loginErrorMessage.value = 'No password entered';
             return;
         }
 
@@ -269,12 +269,11 @@ export const useAuth = () => {
                 }
             );
 
-            loginResponse.value = response.statusMessage;
-            await fetchNewSession();
+            await fetch();
             return navigateTo('/dashboard');
         }
         catch (error: any) {
-            errorMessage.value = error.statusMessage || 'Error logging in';
+            loginErrorMessage.value = error.statusMessage || 'Error logging in';
         }
         finally {
             loggingIn.value = false;
@@ -334,6 +333,7 @@ export const useAuth = () => {
 
         logout,
         loggingIn,
+        loginErrorMessage,
         login,
     }
 }

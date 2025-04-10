@@ -59,7 +59,7 @@ const {
 
     login,
     loggingIn,
-    errorMessage: loginErrorMessage,
+    loginErrorMessage,
 } = useAuth();
 
 function clearError() {

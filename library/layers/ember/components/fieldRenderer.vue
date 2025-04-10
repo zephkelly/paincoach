@@ -56,10 +56,12 @@
   
   <script setup lang="ts">
   import { computed, watch } from 'vue';
-  import type { InputField } from '@@/layers/ember/types/input';
+  import type { InputField, InputType } from '@@/layers/ember/types/input';
+
   
   interface Validator {
-    validate: (state: Record<string, any>) => boolean;
+    validate: (state: Record<string, any>) => boolean | any; // Accept any return type
+    validateField?: (data: Record<string, any>, fieldId: string) => string | null;
   }
   
   interface ProcessedFieldItem {
@@ -77,10 +79,10 @@
   
   type FieldRendererProps = {
     fields: InputField[];
-    state: Ref<Record<string, any>>;
+    state: Record<string, any>;
     validator: Validator;
     gap?: number;
-    getComponent: (inputType: string) => string;
+    getComponent: (inputType: InputType) => Component | string;
     isFieldReadonly: (field: InputField) => boolean;
   }
   
@@ -116,8 +118,6 @@
           rowGroups[field.row] = [];
         }
 
-        console.log(field.identifier)
-        
         rowGroups[field.row]?.push(field);
       }
     });
@@ -143,8 +143,6 @@
         }
       }
     });
-
-    console.log('Processed Fields:', result);
     
     return result;
   });

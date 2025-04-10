@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { createSchemaValidator } from '@@/shared/utils/zod/new';
 
+import { Formulate } from '@@/layers/formulate/utils';
+
 
 
 export const MedicationReasonSchema = z.enum([
@@ -112,39 +114,11 @@ export const CreateEncryptedPainMedicationDataV1RequestPartialSchema = CreateEnc
     is_on_going: z.boolean().optional().default(true),
 });
 
-export const encryptedPainMedicationDataV1RequestValidator = createSchemaValidator({
-    schema: CreateEncryptedPainMedicationDataV1RequestSchema,
+export const EncryptedPainMedicationDataV1RequestValidator = Formulate.createSchemaValidator(CreateEncryptedPainMedicationDataV1RequestSchema, {
     partialSchema: CreateEncryptedPainMedicationDataV1RequestPartialSchema,
-    arrayItemSchema: DBEncryptedMedicationDataV1Schema,
-    partialArrayItemSchema: CreateEncryptedPainMedicationDataV1RequestPartialSchema,
+    validate: true,
+    validateArray: true,
+    validatePartial: true,
+    validatePartialArray: true,
+    validateField: true,
 });
-// export function validateCreateEncryptedPainMedicationDataV1Request(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestSchema> {
-//     const parsedResult = CreateEncryptedPainMedicationDataV1RequestSchema.safeParse(data);
-//     if (!parsedResult.success) {
-//         throw parsedResult.error;
-//     }
-//     return parsedResult.data;
-// }
-// export function validateCreateEncryptedPainMedicationDataV1Requests(data: unknown[]): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestSchema>[] {
-//     const parsedResult = z.array(CreateEncryptedPainMedicationDataV1RequestSchema).safeParse(data);
-//     if (!parsedResult.success) {
-//         throw parsedResult.error;
-//     }
-//     return parsedResult.data;
-// }
-
-// export function validateCreateEncryptedPainMedicationDataV1RequestPartial(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestPartialSchema> {
-//     const parsedResult = CreateEncryptedPainMedicationDataV1RequestPartialSchema.safeParse(data);
-//     if (!parsedResult.success) {
-//         throw parsedResult.error;
-//     }
-//     return parsedResult.data;
-// }
-// export function validateCreateEncryptedPainMedicationDataV1RequestsPartial(data: unknown): z.infer<typeof CreateEncryptedPainMedicationDataV1RequestPartialSchema>[] {
-//     const parsedResult = z.array(CreateEncryptedPainMedicationDataV1RequestPartialSchema).safeParse(data);
-//     if (!parsedResult.success) {
-//         console.log(parsedResult.error);
-//         throw parsedResult.error;
-//     }
-//     return parsedResult.data;
-// }

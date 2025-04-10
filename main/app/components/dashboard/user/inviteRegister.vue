@@ -47,28 +47,6 @@
                             @blur="validate"
                             @update:state="updateState"
                         />
-                        <!-- <component
-                            v-for="field in BASE_USER_INVITE_REGISTER_FIELDS"
-                            class="input-field"
-                            :class="[{ 'field-required': field.required }, field.identifier]"
-                            :key="field.identifier"
-                            :is="getComponent(field.inputType)"
-                            :id="field.identifier"
-                            :label="field.label"
-                            :type="field.inputType"
-                            :readonly="isFieldReadonly(field)"
-                            :required="field.required"
-                            :tabindex="field.tabindex"
-                            :default="field.default"
-                            :options="field.options"
-                            :identifier="field.identifier"
-                            :validation="{
-                                validator: userRegisterValidator,
-                                fieldPath: field.identifier,
-                            }"
-                            @blur="validate()"
-                            v-model="state[field.identifier]" 
-                            /> -->
                         
                         <div class="checkbox-group">
                             <EInput
@@ -143,7 +121,7 @@
                                             :placeholder="field.placeholder"
                                             :options="field.options"
                                             :validation="{
-                                                validator: encryptedPainMedicationDataV1RequestValidator,
+                                                validator: EncryptedPainMedicationDataV1RequestValidator,
                                                 fieldPath: field.identifier,
                                             }"
                                         />
@@ -156,7 +134,7 @@
                                             type="date"
                                             :required="true"
                                             :validation="{
-                                                validator: encryptedPainMedicationDataV1RequestValidator,
+                                                validator: EncryptedPainMedicationDataV1RequestValidator,
                                                 fieldPath: 'start_date',
                                             }"
                                         />
@@ -169,7 +147,7 @@
                                             type="date"
                                             :required="(state.medications[index]['is_on_going']) ? false : true"
                                             :validation="{
-                                                validator: encryptedPainMedicationDataV1RequestValidator,
+                                                validator: EncryptedPainMedicationDataV1RequestValidator,
                                                 fieldPath: 'end_date',
                                             }"
                                         />
@@ -181,7 +159,7 @@
                                             type="checkbox"
                                             :required="false"
                                             :validation="{
-                                                validator: encryptedPainMedicationDataV1RequestValidator,
+                                                validator: EncryptedPainMedicationDataV1RequestValidator,
                                                 fieldPath: 'is_on_going',
                                             }"
                                         />
@@ -304,13 +282,13 @@ const {
     submissionError
 } = useInviteRegister(invitation);
 
-const updateState = (updatedState) => {
-    console.log('updateState', newState);
-
+const updateState = (updatedState: any) => {
+    
     const newState = {
         ...state.value,
         ...updatedState
     }
+    console.log('updateState', newState);
 
     state.value = newState;
 
@@ -327,7 +305,7 @@ function isFieldReadonly(field: InputField) {
 }
 
 import { userRegisterValidator } from '@@/shared/schemas/v1/user/registration';
-import { encryptedPainMedicationDataV1RequestValidator } from '@@/shared/schemas/v1/medication/v1';
+import { EncryptedPainMedicationDataV1RequestValidator } from '@@/shared/schemas/v1/medication/v1';
 import { clinicianUserRegistrationDataValidator } from '@@/shared/schemas/v1/user/role/clinician/register';
 import type { InputField } from '@@/layers/ember/types/input';
 
@@ -414,7 +392,7 @@ async function handleRejectInvitation() {
         }
         
         .form-header {
-            margin-top: 2.5rem;
+            margin-top: 1.5rem;
 
             .disclaimer {
                 margin-bottom: 2.5rem;
@@ -484,7 +462,7 @@ async function handleRejectInvitation() {
                 width: 25%;
                 min-width: 150px;
                 height: auto;
-                margin-bottom: 2rem;
+                margin-bottom: 3rem;
 
                 input {
                     height: 0;

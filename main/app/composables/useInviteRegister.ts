@@ -17,7 +17,7 @@ import { DBUserRegistrationDataPartialSchema } from "@@/shared/schemas/v1/user/r
 
 import type { CreateEncryptedPainMedicationDataV1RequestPartial } from "@@/shared/types/v1/medication/v1";
 import {
-    encryptedPainMedicationDataV1RequestValidator,
+    EncryptedPainMedicationDataV1RequestValidator,
 } from "@@/shared/schemas/v1/medication/v1";
 
 import { userRegisterValidator } from "@@/shared/schemas/v1/user/registration/index";
@@ -211,14 +211,12 @@ export const useInviteRegister = (invitation: ComputedRef<LimitedUserInvitation 
     function addMedication() {
         try {
             if (!state.value.medications) {
-                //@ts-expect-error -- The validator will fill in undefined default values
-                state.value.medications = encryptedPainMedicationDataV1RequestValidator.validatePartialArray([{}]);
+                state.value.medications = EncryptedPainMedicationDataV1RequestValidator.validatePartialArray([{}]);
                 console.log(state.value.medications);
                 return;
             }
     
-            const newMedication = encryptedPainMedicationDataV1RequestValidator.validatePartial({});
-            //@ts-expect-error -- The is_on_going field will be set to true by default
+            const newMedication = EncryptedPainMedicationDataV1RequestValidator.validatePartial({});
             state.value.medications.push(newMedication);
         }
         catch (error) {
