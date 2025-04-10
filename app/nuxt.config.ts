@@ -73,11 +73,11 @@ export default defineNuxtConfig({
             dashboardUrl: process.env.DASHBOARD_URL,
         },
 
-        // // nuxt-auth-utils
-        // session: {
-        //     name: 'paincoach-session',
-        //     password: process.env.NUXT_SESSION_PASSWORD || '',
-        // }
+        // nuxt-auth-utils
+        session: {
+            name: 'paincoach-session',
+            password: process.env.NUXT_SESSION_PASSWORD || '',
+        }
     },
 
     typescript: {

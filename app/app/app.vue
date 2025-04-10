@@ -5,7 +5,9 @@
 </template>
 
 <script setup lang="ts">
+const { session } = useAuth();
 
+console.log(session.value)
 </script>
 
 <style lang="scss" scoped>

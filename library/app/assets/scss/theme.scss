@@ -18,7 +18,7 @@
     --text-7-color: #7a7a7a;
     --text-8-color: #6e6e6e;
 
-
+    --text-invert-color: #f3f3f3;
     --text-invert-1-color: #0f0f0f;
     --text-invert-2-color: #171717;
     --text-invert-3-color: #1e1e1e;
@@ -165,7 +165,7 @@
 
 
     --text-color: var(--text-color-dark);
-    --text-color-invert: var(--text-color-dark);
+    --text-invert-color: var(--text-color-light);
 
     --completed: var(--completed-light);
 }
@@ -180,6 +180,6 @@
         --background-4-color: var(--background-4-color-light);
 
         --text-color: var(--text-color-light);
-        --text-color-invert: var(--text-color-dark);
+        --text-invert-color: var(--text-color-dark);
     }
 }
