@@ -2,20 +2,23 @@
     <MobilePage>
         <div class="wrapper">
             <PrimitiveSliderInput
-                v-model="sliderValue"
                 :min="1"
                 :max="5"
                 :step="1"
-                bounce-effect="light"
-                transition-speed="fast"
+                bounce-effect="medium"
+                transition-speed="normal"
                 :max-bounce-distance="10"
+                :colorVariables="['--pain-0', '--pain-1', '--pain-2', '--pain-3']"
+                stepIndicatorStyle="line"
+                show-step-indicators
+                use-hardware-acceleration
             />
         </div>     
     </MobilePage>
 </template>
 
 <script setup lang="ts">
-const sliderValue = ref(2.5);
+// const sliderValue = ref(3);
 </script>
 
 <style lang="scss" scoped>
