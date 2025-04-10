@@ -155,35 +155,85 @@ export function createSchemaValidator<T extends z.ZodType>(
 	}
 	
 	if (validatePartial) {
-		validator.validatePartial = (data: unknown): Partial<z.infer<T>> => {
-			try {
-				const partialSchema = getPartialSchema();
-				return partialSchema.parse(data);
-			} catch (error) {
-				return handleValidationError(
-					error, 
-					getPartialSchema(), 
-					422, 
-					'Partial validation failed'
-				);
-			}
-		};
-	}
+        validator.validatePartial = (data: unknown): Partial<z.infer<T>> => {
+            try {
+                const partialSchema = getPartialSchema();
+                
+                const objectData = typeof data === 'object' && data !== null 
+                    ? data 
+                    : {};
+                
+                const dataWithDefaults = partialSchema.parse(objectData);
+
+                return dataWithDefaults;
+            }
+            catch (error) {
+                return handleValidationError(
+                    error, 
+                    getPartialSchema(), 
+                    422, 
+                    'Partial validation failed'
+                );
+            }
+        };
+    }
 	
-	if (validateField) {
-		validator.validateField = (data: unknown, fieldId: string): string | null => {
-			try {
-				schema.parse(data);
-				return null;
-			} catch (error) {
-				if (error instanceof z.ZodError) {
-					const customError = new FormulateError(error.issues);
-					return customError.getFieldError(fieldId);
-				}
-				return 'Validation failed';
-			}
-		};
-	}
+    if (validateField) {
+            validator.validateField = (data: unknown, fieldId: string): string | null => {
+            try {
+                if (schema instanceof z.ZodObject) {
+                    // Check if the field exists in the schema
+                    if (!(fieldId in schema.shape)) {
+                        return `Field '${fieldId}' does not exist in the schema`;
+                    }
+            
+                    // Extract the field schema
+                    const fieldSchema = schema.shape[fieldId];
+                    
+                    // Create a single field schema to properly capture validation context
+                    const singleFieldSchema = z.object({
+                        [fieldId]: fieldSchema
+                    });
+                    
+                    // Get the field value from data, handling potential undefined data
+                    const dataObj = typeof data === 'object' && data !== null ? data : {};
+                    const fieldValue = (dataObj as any)[fieldId];
+                    
+                    // Validate just this field
+                    singleFieldSchema.parse({
+                        [fieldId]: fieldValue
+                    });
+                    
+                    return null;
+                }
+                else if (schema instanceof z.ZodArray) {
+                    // If schema is an array and fieldId is numeric, validate the array item at that index
+                    const index = parseInt(fieldId, 10);
+                    if (!isNaN(index) && Array.isArray(data) && index >= 0 && index < data.length) {
+                        const itemSchema = schema.element;
+                        itemSchema.parse(data[index]);
+                        return null;
+                    }
+                    else {
+                        return `Invalid array index: ${fieldId}`;
+                    }
+                }
+                else {
+                    // For primitive schemas, validate the entire data
+                    schema.parse(data);
+                    return null;
+                }
+            }
+            catch (error) {
+                if (error instanceof z.ZodError) {
+                    const customError = new FormulateError(error.issues);
+                    return customError.getFieldError(fieldId) || error.issues[0]?.message || 'Validation failed';
+                }
+                
+                return error instanceof Error ? error.message : 'Validation failed';
+            }
+        };
+    }
 	
 	if (validateArray) {
 		validator.validateArray = (data: unknown[]): Array<z.infer<T> extends Array<infer U> ? U : z.infer<T>> => {
@@ -202,22 +252,30 @@ export function createSchemaValidator<T extends z.ZodType>(
 	}
 	
 	if (validatePartialArray) {
-		validator.validatePartialArray = (data: unknown[]): Array<Partial<z.infer<T> extends Array<infer U> ? U : z.infer<T>>> => {
-			const partialItemSchema = getPartialArrayItemSchema();
-			const partialArraySchema = z.array(partialItemSchema);
-			
-			try {
-				return partialArraySchema.parse(data);
-			} catch (error) {
-				return handleArrayValidationError(
-					error,
-					partialArraySchema,
-					422,
-					'Partial array validation failed'
-				);
-			}
-		};
-	}
+        validator.validatePartialArray = (data: unknown[]): Array<Partial<z.infer<T> extends Array<infer U> ? U : z.infer<T>>> => {
+            const partialItemSchema = partialSchema || getPartialArrayItemSchema();
+            const partialArraySchema = z.array(partialItemSchema);
+            
+            try {
+                const arrayData = Array.isArray(data) ? data : [];
+                
+                const processedData = arrayData.map(item => {
+                    const processedItem = partialItemSchema.parse(item || {});
+                    return processedItem;
+                });
+                
+                return partialArraySchema.parse(processedData);
+            }
+            catch (error) {
+                return handleArrayValidationError(
+                    error,
+                    partialArraySchema,
+                    422,
+                    'Partial array validation failed'
+                );
+            }
+        };
+    }
 	
 	// If no methods were requested, warn in development
 	if (Object.keys(validator).length === 0) {

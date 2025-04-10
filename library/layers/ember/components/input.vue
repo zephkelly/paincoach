@@ -112,7 +112,6 @@ function validateIfNeeded() {
         
         // Validate the field
         const error = validator.validateField(validationData, fieldPath);
-        console.log('Validation error:', error);
         errorMessage.value = error;
         
         if (error) {
