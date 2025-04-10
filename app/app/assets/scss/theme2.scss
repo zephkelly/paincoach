@@ -3,21 +3,19 @@
 
     --background-color-dark: #121212;
 
-    --border-color-dark: #707070;
-    --border-1-color-dark: #5e5e5e;
-    --border-2-color-dark: #555555;
-    --border-3-color-dark: #464646;
-    --border-4-color-dark: #373737;
-    --border-5-color-dark: #333333;
-    --border-6-color-dark: #2c2c2c;
-    --border-7-color-dark: #252525;
-    --border-8-color-dark: #262626;
+    --panel-color-dark: #1c1c1e;
+
+    --border-color-dark: #3d3d3d;
 }
 
 :root {
     --text-color-light: #121212;
 
     --background-color-light: #f2f2f2;
+
+    --panel-color-light: #ffffff;
+
+    --border-color-light: #b3b3b3;
 }
 
 :root {
@@ -26,6 +24,10 @@
 
     --background-color: var(--background-color-light);
     --background-color-invert: var(--background-color-dark);
+
+    --panel-color: var(--panel-color-light);
+
+    --border-color: var(--border-color-light);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -35,5 +37,9 @@
 
         --background-color: var(--background-color-dark);
         --background-color-invert: var(--background-color-light);
+
+        --panel-color: var(--panel-color-dark);
+
+        --border-color: var(--border-color-dark);
     }
 }
