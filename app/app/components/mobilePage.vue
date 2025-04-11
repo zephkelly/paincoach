@@ -40,6 +40,7 @@ onUpdated(checkHeaderContent);
     flex-direction: column;
     align-items: center;
     flex-grow: 1;
+    padding: 0 1rem;
     padding-top: 1rem;
     margin-bottom: 86px;
     min-height: calc(100vh - 1rem - 86px);

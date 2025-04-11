@@ -2,6 +2,11 @@ html, body {
     background-color: var(--panel-color);
 }
 
+p, h1, h2, h3, h4, h5, h6 {
+    color: var(--text-color);
+    font-family: var(--inter-font-family);
+}
+
 @font-face {
     font-family: 'Inter';
     src: url('../../../../library/app/assets/fonts/inter-600.woff2') format('woff2');

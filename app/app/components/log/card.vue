@@ -23,11 +23,20 @@ const props = defineProps<LogCardProps>();
 </script>
 
 <style lang="scss" scoped>
+.log-card {
+    background-color: var(--panel-color);
+    border-radius: 8px;
+    padding: clamp(1rem, 6vw, 1.5rem) clamp(1.5rem, 6vw, 2rem);
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 500px;
+}
+
 .log-card-header {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 16px;
+    margin-bottom: 3rem;
 }
 .log-card-icon {
     margin-right: 16px;
@@ -41,15 +50,9 @@ const props = defineProps<LogCardProps>();
     margin: 0;
     font-family: var(--inter-font-family);
     color: var(--text-2-color);
+    text-wrap: stable;
+    text-align: center;
 }
 
 
-.log-card {
-    background-color: var(--card-background);
-    border-radius: 8px;
-    padding: 16px;
-    width: 100%;
-    box-sizing: border-box;
-    max-width: 500px;
-}
 </style>

@@ -36,7 +36,8 @@ nav {
     padding-bottom: 2rem;
 
     background-color: var(--panel-color);
-    border-top: 1px solid var(--border-color);
+
+    z-index: 100;
 }
 
 ul {
@@ -62,7 +63,7 @@ li {
 
     &.active {
         svg {
-            opacity: 1;
+            opacity: 0.9;
         }
     }
 

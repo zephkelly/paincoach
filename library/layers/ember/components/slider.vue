@@ -13,8 +13,12 @@
                         :style="getStepStyle(position)"
                         @click.stop="handleStepClick(position.value)">
                         <!-- Add number directly for numbered indicator style -->
-                        <div v-if="stepIndicatorStyle === 'numbered'" class="slider-step-number"
-                             :class="{ 'active': visualPosition >= position.value }"
+                        <!-- Add number for numbered indicator style -->
+                        <div v-if="stepIndicatorStyle === 'numbered' || stepIndicatorStyle === 'numbered-line'" class="slider-step-number"
+                             :class="{ 
+                                'active': visualPosition >= position.value,
+                                'with-line': stepIndicatorStyle === 'numbered-line'
+                             }"
                              :style="{ color: visualPosition >= position.value ? currentColorValue : '' }">
                             {{ formatNumber(position.value) }}
                         </div>
@@ -65,7 +69,7 @@ const props = withDefaults(defineProps<{
     maxBounceDistance?: number;
     colorVariables?: string[];
     showStepIndicators?: boolean;
-    stepIndicatorStyle?: 'dot' | 'line' | 'numbered';  // Updated to include 'numbered'
+    stepIndicatorStyle?: 'dot' | 'line' | 'numbered' | 'numbered-line';  // Updated to include 'numbered-line'
     initialPosition?: 'min' | 'mid' | 'max';
     defaultColor?: string;
     precision?: number;
@@ -275,7 +279,7 @@ const formatNumber = (value: number): string => {
 const getStepStyle = (position: { value: number, percent: number }) => {
     const isActive = visualPosition.value >= position.value;
     
-    if (props.stepIndicatorStyle === 'line') {
+    if (props.stepIndicatorStyle === 'line' || props.stepIndicatorStyle === 'numbered-line') {
         return {
             left: `${position.percent}%`,
             ...(isActive ? { backgroundColor: currentColorValue.value } : {})
@@ -840,24 +844,38 @@ onUnmounted(() => {
     width: auto;
     height: auto;
     background-color: transparent !important;
-    top: -1.5rem;
+    top: 0;
     transform: translate(-50%, -50%);
     cursor: pointer;
-    font-family: var(--inter-font-family);
+}
+
+/* Styles for the numbered-line indicators */
+.slider-step-numbered-line {
+    width: 2px;
+    height: 8px; /* Taller than regular line indicators */
+    border-radius: 1px;
+    background-color: var(--pain-none, #e0e0e0);
+    top: -8px;
+    transform: translate(-50%, 0);
+    cursor: pointer;
 }
 
 .slider-step-number {
-    display: inline-block;
     font-size: 0.8rem;
+    font-family: var(--inter-font-family);
+    color: var(--pain-none, #e0e0e0);
     font-weight: 600;
-    color: #666;
-    transition: color 0.3s ease;
-    white-space: nowrap;
     text-align: center;
-    cursor: pointer;
-    user-select: none;
+    line-height: 1.2;
+    transition: color 0.3s ease, font-weight 0.2s;
+    position: relative;
+    top: -22px;
+    left: -3px;
 }
 
+.slider-step-numbered-line.active {
+    background-color: currentColor;
+}
 /* No need for this since we control the color in the inline style */
 /* .slider-step-numbered.active .slider-step-number {
     color: currentColor;
@@ -865,12 +883,12 @@ onUnmounted(() => {
 } */
 
 @media (max-width: 640px) {
-    .slider-step-number {
+    /* .slider-step-number {
         font-size: 8px;
     }
     
     .slider-label {
         font-size: 10px;
-    }
+    } */
 }
 </style>
