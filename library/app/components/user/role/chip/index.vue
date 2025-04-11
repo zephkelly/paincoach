@@ -1,0 +1,389 @@
+<template>
+    <div v-if="userRole !== 'unregistered'" class="chip" :class="{
+        owner: userRole === 'owner',
+        admin: userRole === 'admin',
+        clinician: userRole === 'clinician',
+        patient: userRole === 'patient',
+        app: userRole === 'app',
+        skeleton: userRole === undefined,
+        'has-default-slot': hasDefaultSlot,
+        'collapsable': collapsable,
+    }">
+    
+        <div class="chip-main" :class="{ 
+            'loading-skeleton skeleton-component skeleton-component-panel skeleton-component-border': userRole === undefined,
+            'owner-shimmer': userRole === 'owner',
+            'paneled': paneled === true
+        }">
+            <TransitionGroup name="fade" tag="div" class="transition-wrapper">
+                <template v-if="userRole === 'owner'">
+                    <div class="chip-content-wrapper owner" :class="{ 'has-slot': hasDefaultSlot }">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.9q-.175 0-.325-.025t-.3-.075Q8 20.675 6 17.638T4 11.1V6.375q0-.625.363-1.125t.937-.725l6-2.25q.35-.125.7-.125t.7.125l6 2.25q.575.225.938.725T20 6.375V11.1q0 3.5-2 6.538T12.625 21.8q-.15.05-.3.075T12 21.9"/></svg>
+                        <slot v-if="hasDefaultSlot" name="default"></slot>
+                        <p v-else class="role-name">Owner</p>
+                    </div>
+                </template>
+                <template v-else-if="userRole === 'admin'">
+                    <div class="chip-content-wrapper admin" :class="{ 'has-slot': hasDefaultSlot }">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+                        <slot v-if="hasDefaultSlot" name="default"></slot>
+                        <p v-else class="role-name">Admin</p>
+                    </div>
+                </template>
+                <template v-else-if="userRole === 'clinician'">
+                    <div class="chip-content-wrapper clinician" :class="{ 'has-slot': hasDefaultSlot }">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor"><path d="M20 22v-3c0-2.828 0-4.243-.879-5.121C18.243 13 16.828 13 14 13l-2 2l-2-2c-2.828 0-4.243 0-5.121.879C4 14.757 4 16.172 4 19v3m12-9v5.5"/><path d="M8.5 13v4m0 0a2 2 0 0 1 2 2v1m-2-3a2 2 0 0 0-2 2v1m9-13.5v-1a3.5 3.5 0 1 0-7 0v1a3.5 3.5 0 1 0 7 0m1.25 12.75a.75.75 0 1 1-1.5 0a.75.75 0 0 1 1.5 0"/></g></svg>
+                        <slot v-if="hasDefaultSlot" name="default"></slot>
+                        <p v-else class="role-name">Clinician</p>
+                    </div>
+                </template>
+                <template v-else-if="userRole === 'patient'">
+                    <div class="chip-content-wrapper patient" :class="{ 'has-slot': hasDefaultSlot }">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></g></svg>
+                        <slot v-if="hasDefaultSlot" name="default"></slot>
+                        <p v-else class="role-name">Patient</p>
+                    </div>
+                </template>
+                <template v-else-if="userRole === 'app'">
+                    <div class="chip-content-wrapper app" :class="{ 'has-slot': hasDefaultSlot }">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="10" height="14" x="3" y="8" rx="2"/><path d="M5 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-2.4M8 18h.01"/></g></svg>
+                        <slot v-if="hasDefaultSlot" name="default"></slot>
+                        <p v-else class="role-name">App User</p>
+                    </div>
+                </template>
+            </TransitionGroup>
+        </div>
+    </div>
+</template>
+
+<script setup lang="ts">
+import type { AllRoles } from '@@/shared/types/v1/role';
+import { useSlots, computed } from 'vue';
+
+interface ChipProps {
+    userRole: AllRoles | undefined;
+    paneled?: boolean;
+    collapsable?: boolean;
+}
+
+defineProps<ChipProps>();
+
+const slots = useSlots();
+const hasDefaultSlot = computed(() => !!slots.default && slots.default().length > 0);
+</script>
+
+<style scoped lang="scss">
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    50% {
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.chip {
+    position: relative;
+    height: 28px;
+    transition: width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), min-width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+    &.skeleton {
+        width: 90px;
+        min-width: 90px;
+    }
+
+    &.owner {
+        width: 76px;
+        // min-width: 77px;
+    }
+
+    &.admin {
+        width: 72px;
+    }
+
+    &.clinician {
+        width: 90px;
+        min-width: 91px;
+    }
+
+    &.patient {
+        width: 81px;
+        min-width: 82px;
+    }
+
+    &.app {
+        width: 90px;
+        min-width: 91px;
+    }
+    
+    &.has-default-slot {
+        width: auto;
+        min-width: auto;
+
+        .chip-main {
+            position: relative;
+
+            .chip-content-wrapper {
+                position: relative;
+
+                .role-name {
+                    border-right: 1px solid var(--border-5-color);
+                    padding-right: 0.5rem;
+                    margin-right: 0.28rem;
+                }
+            }
+        }
+    }
+
+    &.collapsable {
+        width: 28px;
+        min-width: 28px;
+        
+
+        .chip-content-wrapper {
+            margin-left: 0px;
+            gap: 0;
+            transition: margin-left 0.2s ease;
+
+            svg { 
+                margin-right: 0;
+            }
+
+            .role-name {
+                max-width: 0;
+                opacity: 0;
+                overflow: hidden;
+                margin: 0;
+                padding: 0;
+
+            }
+        }
+
+        &:hover {
+            .chip-content-wrapper {
+                // margin-left: -2px;
+                // gap: 0.25rem;
+                transition:
+                    width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1),
+                    min-width 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+                svg {
+                    transition: margin-right 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+                    margin-right: 0.25rem;
+                }
+
+
+                .role-name {
+                   
+                    transition: max-width 0.15s cubic-bezier(0.075, 0.82, 0.165, 1),
+                        opacity 0.15s cubic-bezier(0.075, 0.82, 0.165, 1);
+                }
+            }
+
+            &.owner {
+                width: 76px;
+            }
+
+            &.admin {
+                width: 72px;
+            }
+
+            &.clinician {
+                width: 90px;
+                min-width: 91px;
+            }
+
+            &.patient {
+                width: 81px;
+                min-width: 82px;
+            }
+
+            &.app {
+                width: 90px;
+                min-width: 91px;
+            }
+
+            .chip-content-wrapper {
+                .role-name {
+                    max-width: 150px;
+                    opacity: 1;
+                    margin-right: 0;
+                }
+            }
+        }
+    }
+}
+
+.chip-transition-wrapper {
+    display: flex;
+    height: 100%;
+}
+
+.loading-skeleton {
+    position: absolute;
+    height: 100%;
+    border-radius: 0.25rem;
+}
+
+.chip-main {
+    position: absolute;
+    display: inline-flex;
+    box-sizing: border-box;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    color: var(--text-3-color);
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+
+    &.owner-shimmer {
+        background: linear-gradient(
+            90deg, 
+            var(--background-3-color) 0%, 
+            #212121 25%, 
+            var(--background-2-color) 50%, 
+            #1e1e1e 80%, 
+            var(--background-3-color) 100%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 8s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
+        z-index: 1;
+
+        &.paneled {
+            background: linear-gradient(
+                90deg, 
+                var(--background-4-color) 0%, 
+                #292929 25%, 
+                var(--background-4-color) 50%, 
+                #272727 80%, 
+                var(--background-4-color) 100%
+            );
+
+            background-size: 200% 100%;
+            animation: shimmer 7s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
+        
+            &::before {
+                background-image: linear-gradient(
+                    180deg,
+                    rgba(170, 170, 170, 0.1) 0%,
+                    rgba(212, 212, 212, 0.099) 50%,
+                    rgba(167, 167, 167, 0.13) 100%
+                );
+            }
+        }
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid transparent;
+            border-radius: inherit;
+            background-image: linear-gradient(
+                180deg,
+                rgba(170, 170, 170, 0.386) 0%,
+                rgba(212, 212, 212, 0.545) 50%,
+                rgba(167, 167, 167, 0.478) 100%
+            );
+            background-size: 200% 100%;
+            background-clip: border-box;
+            -webkit-background-clip: border-box;
+            mask: linear-gradient(#bcbcbc 0 0) content-box, linear-gradient(#d7d7d7 0 0);
+            -webkit-mask: linear-gradient(#bfbfbf 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            animation: skeleton-border-loading 2s infinite;
+            pointer-events: none;
+            box-sizing: border-box;
+        }
+    }
+
+    .transition-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        position: relative;
+        width: 100%;
+    }
+
+    .chip-content-wrapper {
+        display: flex;
+        align-items: center;
+        // gap: 0.25rem;
+        position: absolute;
+        margin-left: -2px;
+
+        svg {
+            position: relative;
+                left: -1px;
+            margin-right: 0.25rem;
+        }
+
+        &.owner {
+            svg {
+                height: 0.9rem;
+            }
+        }
+
+        &.admin {
+            svg {
+                height: 0.85rem;
+            }
+        }
+
+        &.clinician {
+            svg {
+                height: 0.95rem;
+            }
+        }
+
+        &.patient {
+            svg {
+                height: 0.85rem;
+            }
+        }
+
+        &.app {
+            svg {
+                
+                height: 0.85rem;
+            }
+        }
+
+        
+        &.has-default-slot {
+            gap: 0.5rem;
+        }
+    }
+
+    p {
+        font-size: 0.8rem;
+        font-family: var(--geist-font-stack);
+        text-wrap: nowrap;
+        white-space: nowrap;
+    }
+
+    svg {
+        height: 12px;
+        width: auto;
+        aspect-ratio: 1/1;
+    }
+}
+
+.chip-main:not(.loading-skeleton):not(.owner-shimmer) {
+    border: 1px solid var(--border-5-color);
+    background-color: var(--background-3-color);
+
+    &.paneled {
+        background-color: var(--background-4-color);
+        border-color: var(--border-5-color);
+    }
+}
+</style>

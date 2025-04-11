@@ -1,0 +1,19 @@
+import { type TimelineOverview } from '~~/layers/legacy/types/timeline'
+
+export const useOverviewTimeline = () => {
+    const currentTimeline: Ref<TimelineOverview> = useState<TimelineOverview>('currentTimeline', () => 'week')
+
+    function setTimeline(timeline: TimelineOverview) {
+        currentTimeline.value = timeline
+    }
+
+    function isCurrentTimeline(timeline: TimelineOverview): boolean {
+        return currentTimeline.value === timeline
+    }
+
+    return {
+        currentTimeline,
+        setTimeline,
+        isCurrentTimeline
+    }
+}

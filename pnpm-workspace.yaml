@@ -1,0 +1,4 @@
+packages:
+  - 'library'
+  - 'main'
+  - 'app'
