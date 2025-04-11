@@ -236,7 +236,7 @@
                         class="submit-button"
                         type="submit"
                         :loading="submitting"
-                        :disabled="submitting || !validatedRegistrationData"
+                        :disabled="submitting"
                         spinner-invert
                     >
                         Complete registration
@@ -324,7 +324,7 @@ async function handleRejectInvitation() {
     if (confirm) {
         try {
             //
-            const response = await $fetch('/api/auth/logout');
+            const response = await $fetch('/api/v1/auth/logout');
             await clearSession();
             return navigateTo('/');
         }

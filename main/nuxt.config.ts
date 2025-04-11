@@ -49,6 +49,10 @@ export default defineNuxtConfig({
                 noreply: process.env.AWS_SES_NOREPLY_EMAIL,
                 updates: process.env.AWS_SES_UPDATES_EMAIL,
             }
+        },
+
+        public: {
+            appUrl: process.env.APP_URL,
         }
     },
 
@@ -105,6 +109,13 @@ export default defineNuxtConfig({
             htmlAttrs: { lang: 'en', },
         },
     },
+
+    css: [
+        '@/assets/scss/global.scss',
+        '@/assets/scss/globals/index.scss',
+        
+        '@/assets/scss/theme.scss',
+    ],
 
     vite: {
         css: {

@@ -14,6 +14,8 @@ type ButtonProps = {
     loading?: boolean;
     spinnerInvert?: boolean;
     variant?: 'outlined' | 'ghost';
+    colorway?: 'success' | 'pending' | 'warning' | 'info' | 'danger';
+    paneled?: boolean;
 };
 
 const props = defineProps<ButtonProps>();
@@ -23,6 +25,8 @@ const buttonClasses = computed(() => ({
     'button--outlined': props.variant === 'outlined',
     'button--ghost': props.variant === 'ghost',
     'spinner-inverted': props.spinnerInvert,
+    [`${props.colorway}`]: true,
+    'paneled': props.paneled,
 }));
 </script>
 
@@ -55,6 +59,69 @@ button {
         opacity: 0.5;
         cursor: not-allowed;
     }
+
+    &.success {
+        border: 1px solid var(--success-border-2-color);
+        background-color: var(--success-background-3-color);
+        color: var(--success-text-color);
+
+        &.paneled {
+            background-color: var(--success-background-4-color);
+            border-color: var(--success-border-3-color);
+        }
+    }
+
+    &.pending {
+        border: 1px solid var(--pending-border-2-color);
+        background-color: var(--pending-background-3-color);
+        color: var(--pending-text-color);
+
+        &.paneled {
+            background-color: var(--pending-background-4-color);
+            border-color: var(--pending-border-3-color);
+        }
+    }
+
+    &.warning {
+        border: 1px solid var(--warning-border-2-color);
+        background-color: var(--warning-background-3-color);
+        color: var(--warning-text-color);
+
+        &.paneled {
+            background-color: var(--warning-background-4-color);
+            border-color: var(--warning-border-3-color);
+        }
+    }
+
+    &.info {
+        border: 1px solid var(--info-border-2-color);
+        background-color: var(--info-background-3-color);
+        color: var(--info-text-color);
+
+        &:hover {
+            background-color: var(--info-background-2-color);
+        }
+
+        &.paneled {
+            background-color: var(--info-background-4-color);
+            border-color: var(--info-border-3-color);
+
+            &:hover {
+                background-color: var(--info-background-3-color);
+            }
+        }
+    }
+
+    &.danger {
+        border: 1px solid var(--danger-border-2-color);
+        background-color: var(--danger-background-3-color);
+        color: var(--danger-text-color);
+
+        &.paneled {
+            background-color: var(--danger-background-4-color);
+            border-color: var(--danger-border-3-color);
+        }
+    }
     
     &.button--outlined, &.button--ghost {
         background-color: transparent;
@@ -71,6 +138,7 @@ button {
             color: var(--text-color);
         }
     }
+
     &.button--ghost {
         border-color: transparent;
 

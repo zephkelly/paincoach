@@ -91,6 +91,7 @@ definePageMeta({
     width: 100%;
     max-width: 400px;
     padding: 2rem;
+    height: auto;
     background-color: var(--background-3-color);
     border: 1px solid var(--border-6-color);
     border-radius: 8px;

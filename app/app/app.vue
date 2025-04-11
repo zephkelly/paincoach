@@ -5,9 +5,11 @@
 </template>
 
 <script setup lang="ts">
-const {
-    fetchNewSession,
-    session,
-    loggedIn
-} = useAuth();
+const { session } = useAuth();
+
+console.log(session.value)
 </script>
+
+<style lang="scss" scoped>
+
+</style>

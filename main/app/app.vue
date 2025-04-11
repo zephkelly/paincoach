@@ -29,5 +29,6 @@
 </template>
 
 <script lang="ts" setup>
-
+const { session } = useAuth();
+console.log(session.value)
 </script>
