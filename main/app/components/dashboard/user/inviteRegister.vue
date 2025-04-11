@@ -236,7 +236,7 @@
                         class="submit-button"
                         type="submit"
                         :loading="submitting"
-                        :disabled="submitting || !validatedRegistrationData"
+                        :disabled="submitting"
                         spinner-invert
                     >
                         Complete registration

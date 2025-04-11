@@ -1,28 +1,44 @@
 <template>
     <MobilePage>
-        <div class="wrapper">
-            <PrimitiveSliderInput
-                :min="1"
-                :max="5"
-                :step="1"
-                bounce-effect="medium"
-                transition-speed="normal"
-                :max-bounce-distance="10"
-                :colorVariables="['--pain-0', '--pain-1', '--pain-2', '--pain-3']"
-                stepIndicatorStyle="line"
-                show-step-indicators
-                use-hardware-acceleration
-            />
-        </div>     
+        <div class="settings-inner-wrapper">
+            <LogCard
+                title="What would you rate your level of pain?"
+            >
+                <LogSlider
+                    v-model="sliderValue"
+                    @update:modelValue="sliderValue = $event"
+                    @update:color="sliderColor = $event"
+                    :color="sliderColor"/>
+            </LogCard>
+        </div>
+        <!-- <div class="wrapper">
+            <LogSlider 
+                v-model="happiness" 
+                @update:happiness="happinessDescription = $event" 
+                />
+        </div>      -->
     </MobilePage>
 </template>
 
 <script setup lang="ts">
-// const sliderValue = ref(3);
+const sliderValue = ref(3);
+const sliderColor = ref('#888888');
+
+const happiness = ref(3); // Default to neutral
+const happinessDescription = ref('Neutral');
+
+watch(sliderColor, (newValue) => {
+    console.log(`Slider colour changed: ${newValue}`);
+}, { immediate: true });
 </script>
 
 <style lang="scss" scoped>
-.wrapper {
-    width: 80%;
+.settings-inner-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
 }
 </style>

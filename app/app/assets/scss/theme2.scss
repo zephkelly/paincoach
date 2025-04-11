@@ -1,5 +1,8 @@
 // Globals
 :root {
+    --system-font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --inter-font-family: 'Inter', var(--system-font-stack);
+
     --pain-missing: transparent;
     --pain-none: #58585863;
     --pain-0: #83A45D;
@@ -21,6 +24,8 @@
 // Dark
 :root {
     --text-color-dark: #f2f2f2;
+    --text-1-color-dark: #dcdcdc;
+    --text-2-color-dark: #c7c7c7;
 
     --background-color-dark: #121212;
 
@@ -32,6 +37,8 @@
 // Light
 :root {
     --text-color-light: #121212;
+    --text-1-color-light: #1c1c1e;
+    --text-2-color-light: #2c2c2e;
 
     --background-color-light: #f2f2f2;
 
@@ -43,6 +50,8 @@
 // Default light
 :root {
     --text-color: var(--text-color-light);
+    --text-1-color: var(--text-1-color-light);
+    --text-2-color: var(--text-2-color-light);
     --text-color-invert: var(--text-color-dark);
 
     --background-color: var(--background-color-light);
@@ -58,6 +67,8 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --text-color: var(--text-color-dark);
+        --text-1-color: var(--text-1-color-dark);
+        --text-2-color: var(--text-2-color-dark);
         --text-color-invert: var(--text-color-light);
 
         --background-color: var(--background-color-dark);
