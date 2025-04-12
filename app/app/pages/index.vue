@@ -1,150 +1,21 @@
 <template>
     <MobilePage>
         <div class="settings-inner-wrapper">
-            <h1>
-                This is a demo of the different settings of our slider input.
-            </h1>
-            <p style="margin-bottom: 1rem;">
-                These inputs have a range of 1-5, and are continuous, meaning you can place the slider in between values
-            </p>
-            <p class="label">Line</p>
             <LogCard
-                title="What is your current level of pain?"
+                title="What would you rate your pain today?"
             >
                 <LogHappinessSlider
                     v-model="sliderValue"
                     v-model:color="sliderColor"
-                    :min="1"
-                    :max="5"
+                    :min="0"
+                    :max="10"
                     :animation="{
                         edgeEasingStrength: 'subtle'
                     }"
                     :indicators="{
                         showStepIndicators: true,
-                        stepIndicatorStyle: 'line',
-                        maxIndicators: 5
-                    }"
-                />
-            </LogCard>
-            <p class="label">Dot</p>
-            <LogCard
-                title="What is your current level of pain?"
-            >
-                <LogHappinessSlider
-                    v-model="sliderValue"
-                    v-model:color="sliderColor"
-                    :min="1"
-                    :max="5"
-                    :indicators="{
-                        showStepIndicators: true,
-                        stepIndicatorStyle: 'dot',
-                        maxIndicators: 5
-                    }"
-                />
-            </LogCard>
-            <p class="label">Numbered</p>
-            <LogCard
-                title="What is your current level of pain?"
-            >
-                <LogHappinessSlider
-                    v-model="sliderValue"
-                    v-model:color="sliderColor"
-                    :min="1"
-                    :max="5"
-                    :indicators="{
-                        showStepIndicators: true,
                         stepIndicatorStyle: 'numbered',
-                        maxIndicators: 5
-                    }"
-                />
-            </LogCard>
-            <p class="label">Numbered line</p>
-            <LogCard
-                title="What is your current level of pain?"
-                style="margin-bottom: 4rem;"
-            >
-                <LogHappinessSlider
-                    v-model="sliderValue"
-                    v-model:color="sliderColor"
-                    :min="1"
-                    :max="5"
-                    :indicators="{
-                        showStepIndicators: true,
-                        stepIndicatorStyle: 'numbered-line',
-                        maxIndicators: 5
-                    }"
-                />
-            </LogCard>
-            <p>
-                These inputs have a range of 1-5, and are discrete, meaning you can only place the slider on the values
-                (1, 2, 3, 4, or 5)
-            </p>
-            <LogCard
-                title="What is your current level of pain?"
-            >
-                <LogHappinessSlider
-                    v-model="sliderValue"
-                    v-model:color="sliderColor"
-                    :min="1"
-                    :max="5"
-                    :valueConfig="{
-                        step: 1
-                    }"
-                    :indicators="{
-                        showStepIndicators: true,
-                        stepIndicatorStyle: 'line'
-                    }"
-                />
-            </LogCard>
-            <LogCard
-                title="What is your current level of pain?"
-            >
-                <LogHappinessSlider
-                    v-model="sliderValue"
-                    v-model:color="sliderColor"
-                    :min="1"
-                    :max="5"
-                    :valueConfig="{
-                        step: 1
-                    }"
-                    :indicators="{
-                        showStepIndicators: true,
-                        stepIndicatorStyle: 'dot'
-                    }"
-                />
-            </LogCard>
-            <LogCard
-                title="What is your current level of pain?"
-            >
-                <LogHappinessSlider
-                    v-model="sliderValue"
-                    v-model:color="sliderColor"
-                    :min="1"
-                    :max="5"
-                    :valueConfig="{
-                        step: 1
-                    }"
-                    :indicators="{
-                        showStepIndicators: true,
-                        stepIndicatorStyle: 'numbered'
-                    }"
-                />
-            </LogCard>
-            <LogCard
-                title="What is your current level of pain?"
-                style="margin-bottom: 4rem;"
-            >
-                <LogHappinessSlider
-                    v-model="sliderValue"
-                    v-model:color="sliderColor"
-                    :min="1"
-                    :max="5"
-                    :valueConfig="{
-                        step: 1
-                    }"
-                    :indicators="{
-                        showStepIndicators: true,
-                        stepIndicatorStyle: 'numbered-line'
+                        maxIndicators: 10
                     }"
                 />
             </LogCard>
