@@ -3,22 +3,19 @@
         <div class="slider-wrapper">
             <ESlider
                 class="happiness-slider-input"
-                v-model="sliderValue"
-                v-model:color="sliderColor"
-                :min="min"
-                :max="max"
-                :step="step"
-
-                :indicator-step="indicatorStep || 1"
-                :snap-to-nearest="snapToNearest"
-                :snap-tolerance="snapTolerance || 3"
-
+                :modelValue="modelValue"
+                :color="color"
+                :min="min || 1"
+                :max="max || 5"
+                :step="1"
+                :indicator-step="1"
+                :snap-tolerance="3"
                 :color-variables="colorVariables"
-                :bounceEffect="bounceEffect || 'medium'"
-                :showStepIndicators="showStepIndicators"
-                :step-indicator-style="stepIndicatorStyle || 'line'"
-                :numberFormat="numberFormat || 'integer'"
-
+                :bounceEffect="'light'"
+                :showStepIndicators="true"
+                :step-indicator-style="indicators?.stepIndicatorStyle || 'line'"
+                :numberFormat="indicators?.numberFormat || 'integer'"
+                edge-easing-strength="subtle"
                 @update:modelValue="updateValue"
                 @update:color="updateColor"
             />
@@ -34,43 +31,56 @@
 </template>
   
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+// Animation configuration interface
+export interface SliderAnimationConfig {
+  bounceEffect?: 'none' | 'light' | 'medium' | 'strong';
+  useHardwareAcceleration?: boolean;
+  transitionSpeed?: 'instant' | 'fast' | 'normal' | 'slow' | 'very-slow';
+  maxBounceDistance?: number;
+  edgeEasingStrength?: 'none' | 'subtle' | 'medium' | 'strong';
+}
 
-const emit = defineEmits(['update:modelValue', 'update:happiness']);
+// Indicator configuration interface
+export interface SliderIndicatorConfig {
+  showStepIndicators?: boolean;
+  stepIndicatorStyle?: 'dot' | 'line' | 'numbered' | 'numbered-line';
+  maxIndicators?: number;
+  numberFormat?: 'decimal' | 'integer' | 'compact';
+}
 
-const props = withDefaults(defineProps<{
-    modelValue?: number;
-    min?: number;
-    max?: number;
-    step?: number;
-    indicatorStep?: number;
-    snapToNearest?: boolean;
-    snapTolerance?: number;
-    bounceEffect?: 'none' | 'light' | 'medium' | 'strong';
-    showStepIndicators?: boolean;
-    stepIndicatorStyle?: 'dot' | 'line' | 'numbered' | 'numbered-line';
-    numberFormat?: 'decimal' | 'integer' | 'compact';
-}>(), {
-    modelValue: undefined,
-    min: 1,
-    max: 10,
-    snapToNearest: true,
-    showStepIndicators: true
-});
+// Value configuration interface
+export interface SliderValueConfig {
+  step?: number;
+  indicatorStep?: number;
+  snapToNearest?: boolean;
+  snapTolerance?: number;
+  precision?: number;
+}
 
-// Calculate the default value based on min and max
-const defaultValue = computed(() => {
-    // If modelValue is provided, use it
-    if (props.modelValue !== undefined) {
-        return props.modelValue;
-    }
-    // Otherwise calculate the middle value
-    return props.min + (props.max - props.min) / 2;
-});
+// Main props interface with grouped configurations only
+export interface HappinessSliderProps {
+  modelValue?: number;
+  color?: string;
+  min?: number;
+  max?: number;
+  animation?: SliderAnimationConfig;
+  indicators?: SliderIndicatorConfig;
+  valueConfig?: SliderValueConfig;
+}
 
-const sliderValue = ref(defaultValue.value);
-const sliderColor = ref('');
+const props = defineProps<HappinessSliderProps>();
+
+const emit = defineEmits(['update:modelValue', 'update:color', 'update:happiness']);
+
+// Create a deep clone of the indicators object to prevent reference sharing
+// This is crucial to prevent all sliders from sharing the same indicators reference
+const clonedIndicators = computed(() => {
+  if (!props.indicators) return undefined;
   
+  // Create a new object by spreading the original
+  return { ...props.indicators };
+});
+
 // Color variables for the gradient effect (from your CSS variables)
 const colorVariables = [
   '--pain-0', // Green for happiness
@@ -81,120 +91,121 @@ const colorVariables = [
 
 // Computed values for face positions
 const facePositions = computed(() => {
-    const range = props.max - props.min;
-    return {
-        happy: props.min, // Happy at minimum value
-        neutral: props.min + range / 2, // Neutral in the middle
-        sad: props.max // Sad at maximum value
-    };
+  const rangeValue = (props.max || 10) - (props.min || 1);
+  return {
+    happy: props.min || 1,
+    neutral: (props.min || 1) + rangeValue / 2,
+    sad: props.max || 10
+  };
 });
   
 // Update the model value when slider changes
 const updateValue = (value: number) => {
-    sliderValue.value = value;
-    emit('update:modelValue', value);
-    emit('update:happiness', getHappinessLevel(value));
+  emit('update:modelValue', value);
+  emit('update:happiness', getHappinessLevel(value));
 };
   
 // Update the color when slider changes
-const updateColor = (color: string) => {
-    sliderColor.value = color;
+const updateColor = (newColor: string) => {
+  emit('update:color', newColor);
 };
   
 // Get happiness level description based on value
 const getHappinessLevel = (value: number) => {
-    const range = props.max - props.min;
-    const segment = range / 5; // Divide into 5 segments
-    
-    const normalizedValue = value - props.min; // Start from 0
-    
-    if (normalizedValue <= segment) {
-        return 'Very Happy';
-    } else if (normalizedValue <= segment * 2) {
-        return 'Happy';
-    } else if (normalizedValue <= segment * 3) {
-        return 'Neutral';
-    } else if (normalizedValue <= segment * 4) {
-        return 'Sad';
-    } else {
-        return 'Very Sad';
-    }
+  const minVal = props.min || 1;
+  const maxVal = props.max || 10;
+  const range = maxVal - minVal;
+  const segment = range / 5; // Divide into 5 segments
+  
+  const normalizedValue = value - minVal; // Start from 0
+  
+  if (normalizedValue <= segment) {
+    return 'Very Happy';
+  } else if (normalizedValue <= segment * 2) {
+    return 'Happy';
+  } else if (normalizedValue <= segment * 3) {
+    return 'Neutral';
+  } else if (normalizedValue <= segment * 4) {
+    return 'Sad';
+  } else {
+    return 'Very Sad';
+  }
 };
   
 // Calculate color for the face SVGs with proper transitions between active and inactive states
 const getFaceColor = (faceType: 'happy' | 'neutral' | 'sad') => {
-    // Base color for inactive state - using the semi-transparent gray
-    const baseR = 88;
-    const baseG = 88;
-    const baseB = 88;
-    const baseA = 0.39;
-    
-    // If no slider color yet, return base color
-    if (!sliderColor.value) return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
+  // Base color for inactive state - using the semi-transparent gray
+  const baseR = 88;
+  const baseG = 88;
+  const baseB = 88;
+  const baseA = 0.39;
+  
+  // If no slider color yet, return base color
+  if (!props.color) return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
 
-    // Parse the rgba from sliderColor
-    const rgbaMatch = sliderColor.value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\)/);
-    if (!rgbaMatch) return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
+  // Parse the rgba from color
+  const rgbaMatch = props.color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\)/);
+  if (!rgbaMatch) return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
 
-    if (!rgbaMatch[1] || !rgbaMatch[2] || !rgbaMatch[3]) {
-        return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
-    }
+  if (!rgbaMatch[1] || !rgbaMatch[2] || !rgbaMatch[3]) {
+    return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
+  }
 
-    const sliderR = parseInt(rgbaMatch[1]);
-    const sliderG = parseInt(rgbaMatch[2]);
-    const sliderB = parseInt(rgbaMatch[3]);
-    // Default to full opacity if not specified
-    const sliderA = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
+  const sliderR = parseInt(rgbaMatch[1]);
+  const sliderG = parseInt(rgbaMatch[2]);
+  const sliderB = parseInt(rgbaMatch[3]);
+  // Default to full opacity if not specified
+  const sliderA = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
 
-    // Get the position value for this face type
-    const facePosition = facePositions.value[faceType];
-    
-    // Calculate the distance between the slider value and this face position
-    const distance = Math.abs(sliderValue.value - facePosition);
-    
-    // Create a smooth transition factor
-    // Max distance to consider is the total range
-    const maxDistance = props.max - props.min;
-    
-    // Calculate the factor with a non-linear curve for a more pleasing transition
-    // This creates a smoother falloff (cubic easing)
-    const linearFactor = Math.max(0, 1 - (distance / maxDistance));
-    const factor = linearFactor * linearFactor * linearFactor;
-    
-    // Interpolate between base color and slider color based on factor
-    const r = Math.round(baseR + (sliderR - baseR) * factor);
-    const g = Math.round(baseG + (sliderG - baseG) * factor);
-    const b = Math.round(baseB + (sliderB - baseB) * factor);
-    const a = baseA + (sliderA - baseA) * factor;
-    
-    // Return the interpolated color with proper alpha
-    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  // Get the position value for this face type
+  const facePosition = facePositions.value[faceType];
+  
+  // Calculate the distance between the slider value and this face position
+  const distance = Math.abs((props.modelValue || 0) - facePosition);
+  
+  // Create a smooth transition factor
+  // Max distance to consider is the total range
+  const maxDistance = (props.max || 10) - (props.min || 1);
+  
+  // Calculate the factor with a non-linear curve for a more pleasing transition
+  // This creates a smoother falloff (cubic easing)
+  const linearFactor = Math.max(0, 1 - (distance / maxDistance));
+  const factor = linearFactor * linearFactor * linearFactor;
+  
+  // Interpolate between base color and slider color based on factor
+  const r = Math.round(baseR + (sliderR - baseR) * factor);
+  const g = Math.round(baseG + (sliderG - baseG) * factor);
+  const b = Math.round(baseB + (sliderB - baseB) * factor);
+  const a = baseA + (sliderA - baseA) * factor;
+  
+  // Return the interpolated color with proper alpha
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
 </script>
 
 <style scoped>
 .happiness-slider {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .slider-wrapper {
-    width: 100%;
-    padding: 0 1rem;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 0 1rem;
+  box-sizing: border-box;
 }
 
 .svg-container {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 6px;
-    margin: 0 auto;
-    box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 6px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .face {
-    transition: color 0.3s ease;
+  transition: color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 </style>
