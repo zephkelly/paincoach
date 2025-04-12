@@ -20,17 +20,19 @@
                 @update:color="updateColor"
             />
         </div>
-        <div class="svg-container">
-            <svg class="face happy-face" :style="{ color: getFaceColor('happy') }" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2s4-2 4-2M9 9h.01M15 9h.01"/></g></svg>
-        
-            <svg class="face neutral-face" :style="{ color: getFaceColor('neutral') }" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 15h8M8 9h2m4 0h2"/></g></svg>
-        
-            <svg class="face sad-face" :style="{ color: getFaceColor('sad') }" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Lucide by Lucide Contributors - https://github.com/lucide-icons/lucide/blob/main/LICENSE --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2s-4 2-4 2m1-7h.01M15 9h.01"/></g></svg>
+        <div class="svg-container" ref="svgContainer">
+            <svg :style="{color: getFaceColor(0)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2 4-7 4s-7-4-7-4"/></g></svg>
+            <svg :style="{color: getFaceColor(1)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m0 13l14-2"/></g></svg>
+            
+            <svg :style="{color: getFaceColor(2)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2-4-7-4s-7 4-7 4"/></g></svg>
+            
+            <svg :style="{color: getFaceColor(3)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="m33 25l-4-2m-11 0l-4 2m17 10s-2-4-7-4s-7 4-7 4"/></g></svg>
         </div>
     </div>
 </template>
   
 <script setup lang="ts">
+// Animation configuration interface
 // Animation configuration interface
 export interface SliderAnimationConfig {
   bounceEffect?: 'none' | 'light' | 'medium' | 'strong';
@@ -89,51 +91,79 @@ const colorVariables = [
   '--pain-3',
 ];
 
-// Computed values for face positions
-const facePositions = computed(() => {
-  const rangeValue = (props.max || 10) - (props.min || 1);
-  return {
-    happy: props.min || 1,
-    neutral: (props.min || 1) + rangeValue / 2,
-    sad: props.max || 10
-  };
+// Get face elements from the DOM
+const svgContainer = ref<HTMLElement | null>(null);
+const faceElements = ref<Element[]>([]);
+
+// Setup face elements after component mount
+onMounted(() => {
+  svgContainer.value = document.querySelector('.svg-container');
+  if (svgContainer.value) {
+    faceElements.value = Array.from(svgContainer.value.querySelectorAll('svg'));
+  }
 });
+
+// Dynamically compute positions for each face based on the number of faces
+const facePositions = computed(() => {
+  const faceCount = faceElements.value.length;
+  if (faceCount === 0) return {};
   
+  const min = props.min || 1;
+  const max = props.max || 5;
+  const range = max - min;
+  
+  // Create an object with dynamic positions
+  const positions: Record<number, number> = {};
+  
+  // Distribute positions evenly across the range
+  for (let i = 0; i < faceCount; i++) {
+    const position = min + (range * i / (faceCount - 1));
+    positions[i] = position;
+  }
+  
+  return positions;
+});
+
 // Update the model value when slider changes
 const updateValue = (value: number) => {
   emit('update:modelValue', value);
   emit('update:happiness', getHappinessLevel(value));
 };
-  
+
 // Update the color when slider changes
 const updateColor = (newColor: string) => {
   emit('update:color', newColor);
 };
-  
+
 // Get happiness level description based on value
 const getHappinessLevel = (value: number) => {
   const minVal = props.min || 1;
-  const maxVal = props.max || 10;
+  const maxVal = props.max || 5;
   const range = maxVal - minVal;
-  const segment = range / 5; // Divide into 5 segments
   
+  // Dynamically determine segments based on face count
+  const faceCount = faceElements.value.length;
+  if (faceCount === 0) return 'Unknown';
+  
+  const segment = range / faceCount;
   const normalizedValue = value - minVal; // Start from 0
   
-  if (normalizedValue <= segment) {
-    return 'Very Happy';
-  } else if (normalizedValue <= segment * 2) {
-    return 'Happy';
-  } else if (normalizedValue <= segment * 3) {
-    return 'Neutral';
-  } else if (normalizedValue <= segment * 4) {
-    return 'Sad';
-  } else {
-    return 'Very Sad';
+  // Determine which segment the value falls into
+  for (let i = 0; i < faceCount; i++) {
+    if (normalizedValue <= segment * (i + 1)) {
+      // Return dynamic happiness level based on position
+      // You can customize these descriptions as needed
+      const emotions = ['Very Happy', 'Happy', 'Neutral', 'Sad', 'Very Sad'];
+      // If we have more faces than predefined emotions, we'll generate descriptive names
+      return i < emotions.length ? emotions[i] : `Emotion Level ${i + 1}`;
+    }
   }
-};
   
-// Calculate color for the face SVGs with proper transitions between active and inactive states
-const getFaceColor = (faceType: 'happy' | 'neutral' | 'sad') => {
+  return `Emotion Level ${faceCount}`; // Fallback
+};
+
+// Get face color for any face at the given index
+const getFaceColor = (faceIndex: number) => {
   // Base color for inactive state - using the semi-transparent gray
   const baseR = 88;
   const baseG = 88;
@@ -157,15 +187,20 @@ const getFaceColor = (faceType: 'happy' | 'neutral' | 'sad') => {
   // Default to full opacity if not specified
   const sliderA = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
 
-  // Get the position value for this face type
-  const facePosition = facePositions.value[faceType];
+  // Get the position value for this face index
+  const positions = facePositions.value;
+  if (!positions[faceIndex]) {
+    return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
+  }
+  
+  const facePosition = positions[faceIndex];
   
   // Calculate the distance between the slider value and this face position
   const distance = Math.abs((props.modelValue || 0) - facePosition);
   
   // Create a smooth transition factor
   // Max distance to consider is the total range
-  const maxDistance = (props.max || 10) - (props.min || 1);
+  const maxDistance = (props.max || 5) - (props.min || 1);
   
   // Calculate the factor with a non-linear curve for a more pleasing transition
   // This creates a smoother falloff (cubic easing)
