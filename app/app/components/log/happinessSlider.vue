@@ -18,21 +18,21 @@
                 edge-easing-strength="subtle"
                 @update:modelValue="updateValue"
                 @update:color="updateColor"
+                @slider-moving="onSliderMoving"
             />
         </div>
         <div class="svg-container" ref="svgContainer">
-            <svg :style="{color: getFaceColor(0)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2 4-7 4s-7-4-7-4"/></g></svg>
-            <svg :style="{color: getFaceColor(1)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m0 13l14-2"/></g></svg>
-            
-            <svg :style="{color: getFaceColor(2)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2-4-7-4s-7 4-7 4"/></g></svg>
-            
-            <svg :style="{color: getFaceColor(3)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="m33 25l-4-2m-11 0l-4 2m17 10s-2-4-7-4s-7 4-7 4"/></g></svg>
+            <svg :style="{color: getAnimatedFaceColor(0)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2 4-7 4s-7-4-7-4"/></g></svg>
+            <svg :style="{color: getAnimatedFaceColor(1)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m0 13l14-2"/></g></svg>         
+            <svg :style="{color: getAnimatedFaceColor(2)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2-4-7-4s-7 4-7 4"/></g></svg>
+            <svg :style="{color: getAnimatedFaceColor(3)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="m33 25l-4-2m-11 0l-4 2m17 10s-2-4-7-4s-7 4-7 4"/></g></svg>
         </div>
     </div>
 </template>
-  
+
 <script setup lang="ts">
-// Animation configuration interface
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+
 // Animation configuration interface
 export interface SliderAnimationConfig {
   bounceEffect?: 'none' | 'light' | 'medium' | 'strong';
@@ -95,12 +95,22 @@ const colorVariables = [
 const svgContainer = ref<HTMLElement | null>(null);
 const faceElements = ref<Element[]>([]);
 
+// Visual position for animation
+const animatedPosition = ref(props.modelValue || (props.min || 1));
+const isAnimating = ref(false);
+const animationFrameId = ref<number | null>(null);
+let animationStartTime = 0;
+const ANIMATION_DURATION = 350; // in ms
+
 // Setup face elements after component mount
 onMounted(() => {
   svgContainer.value = document.querySelector('.svg-container');
   if (svgContainer.value) {
     faceElements.value = Array.from(svgContainer.value.querySelectorAll('svg'));
   }
+  
+  // Initialize animation position to current modelValue
+  animatedPosition.value = props.modelValue || (props.min || 1);
 });
 
 // Dynamically compute positions for each face based on the number of faces
@@ -128,11 +138,85 @@ const facePositions = computed(() => {
 const updateValue = (value: number) => {
   emit('update:modelValue', value);
   emit('update:happiness', getHappinessLevel(value));
+  
+  // Start animation to the new value
+  animateToPosition(value);
 };
 
 // Update the color when slider changes
 const updateColor = (newColor: string) => {
   emit('update:color', newColor);
+};
+
+// Handle slider moving events from the ESlider component
+const onSliderMoving = (position: number) => {
+  // Update animated position directly during dragging
+  animatedPosition.value = position;
+};
+
+// Animate the position value for smooth transitions
+const animateToPosition = (targetValue: number) => {
+  // Clear any existing animation
+  if (animationFrameId.value !== null) {
+    cancelAnimationFrame(animationFrameId.value);
+    animationFrameId.value = null;
+  }
+  
+  // Skip animation if the difference is very small
+  if (Math.abs(targetValue - animatedPosition.value) < 0.01) {
+    animatedPosition.value = targetValue;
+    return;
+  }
+  
+  // Start animation
+  isAnimating.value = true;
+  animationStartTime = performance.now();
+  const startPosition = animatedPosition.value;
+  const positionDelta = targetValue - startPosition;
+  
+  const animate = (timestamp: number) => {
+    const elapsed = timestamp - animationStartTime;
+    const progress = Math.min(elapsed / ANIMATION_DURATION, 1);
+    
+    // Use cubic-bezier easing for smooth animation
+    // This approximates the cubic-bezier(0.075, 0.82, 0.165, 1) from the CSS
+    const easedProgress = cubicBezier(0.075, 0.82, 0.165, 1, progress);
+    
+    animatedPosition.value = startPosition + positionDelta * easedProgress;
+    
+    if (progress < 1) {
+      animationFrameId.value = requestAnimationFrame(animate);
+    } else {
+      animatedPosition.value = targetValue;
+      isAnimating.value = false;
+      animationFrameId.value = null;
+    }
+  };
+  
+  animationFrameId.value = requestAnimationFrame(animate);
+};
+
+// Cubic bezier easing function
+const cubicBezier = (x1: number, y1: number, x2: number, y2: number, t: number): number => {
+  // Simple implementation of cubic bezier
+  const cx = 3 * x1;
+  const bx = 3 * (x2 - x1) - cx;
+  const ax = 1 - cx - bx;
+  
+  const cy = 3 * y1;
+  const by = 3 * (y2 - y1) - cy;
+  const ay = 1 - cy - by;
+  
+  // Newton-Raphson iterations to solve for t
+  let x = t, i = 0;
+  while (i < 5) {
+    const xTm = x * (cx + x * (bx + x * ax));
+    if (Math.abs(xTm - t) < 0.001) break;
+    x = x - (xTm - t) / (cx + x * (2 * bx + 3 * ax * x));
+    i++;
+  }
+  
+  return x * (cy + x * (by + x * ay));
 };
 
 // Get happiness level description based on value
@@ -216,6 +300,68 @@ const getFaceColor = (faceIndex: number) => {
   // Return the interpolated color with proper alpha
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
+
+// New function for animated face color
+const getAnimatedFaceColor = (faceIndex: number) => {
+  // Base color for inactive state - using the semi-transparent gray
+  const baseR = 88;
+  const baseG = 88;
+  const baseB = 88;
+  const baseA = 0.39;
+  
+  // If no slider color yet, return base color
+  if (!props.color) return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
+
+  // Parse the rgba from color
+  const rgbaMatch = props.color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\)/);
+  if (!rgbaMatch) return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
+
+  if (!rgbaMatch[1] || !rgbaMatch[2] || !rgbaMatch[3]) {
+    return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
+  }
+
+  const sliderR = parseInt(rgbaMatch[1]);
+  const sliderG = parseInt(rgbaMatch[2]);
+  const sliderB = parseInt(rgbaMatch[3]);
+  // Default to full opacity if not specified
+  const sliderA = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
+
+  // Get the position value for this face index
+  const positions = facePositions.value;
+  if (!positions[faceIndex]) {
+    return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
+  }
+  
+  const facePosition = positions[faceIndex];
+  
+  // Calculate the distance between the ANIMATED slider value and this face position
+  const distance = Math.abs(animatedPosition.value - facePosition);
+  
+  // Create a smooth transition factor
+  // Max distance to consider is the total range
+  const maxDistance = (props.max || 5) - (props.min || 1);
+  
+  // Calculate the factor with a non-linear curve for a more pleasing transition
+  // This creates a smoother falloff (cubic easing)
+  const linearFactor = Math.max(0, 1 - (distance / maxDistance));
+  const factor = linearFactor * linearFactor * linearFactor;
+  
+  // Interpolate between base color and slider color based on factor
+  const r = Math.round(baseR + (sliderR - baseR) * factor);
+  const g = Math.round(baseG + (sliderG - baseG) * factor);
+  const b = Math.round(baseB + (sliderB - baseB) * factor);
+  const a = baseA + (sliderA - baseA) * factor;
+  
+  // Return the interpolated color with proper alpha
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+};
+
+// Clean up animations when component is unmounted
+onUnmounted(() => {
+  if (animationFrameId.value !== null) {
+    cancelAnimationFrame(animationFrameId.value);
+  }
+});
 </script>
 
 <style scoped>

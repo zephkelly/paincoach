@@ -8,16 +8,22 @@
                     :class="[
                         'slider-step-indicator',
                         `slider-step-${stepIndicatorStyle}`, 
-                        { 'active': indicatorPosition >= position.value, 'edge-indicator': position.percent === 2 || position.percent === 98 }
+                        { 
+                            'active': Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
+                                    animatedIndicatorPosition >= position.value, 
+                            'edge-indicator': position.percent === 2 || position.percent === 98 
+                        }
                     ]"
                     :style="getStepStyle(position)"
                     @click.stop="handleStepClick(position.value)">
                     <div v-if="stepIndicatorStyle === 'numbered' || stepIndicatorStyle === 'numbered-line'" class="slider-step-number"
-                         :class="{ 
-                            'active': indicatorPosition >= position.value,
+                        :class="{ 
+                            'active': Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
+                                    animatedIndicatorPosition >= position.value,
                             'with-line': stepIndicatorStyle === 'numbered-line'
-                         }"
-                         :style="{ color: indicatorPosition >= position.value ? currentColorValue : '' }">
+                        }"
+                        :style="{ color: (Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
+                                        animatedIndicatorPosition >= position.value) ? currentColorValue : '' }">
                         {{ formatNumber(position.value) }}
                     </div>
                 </div>
@@ -29,10 +35,10 @@
             </div>
         </div>
         
-        <div class="slider-labels">
+        <div class="slider-labels" v-if="options && options.length > 0">
             <div v-for="option in options" :key="option.value" class="slider-label"
                 :class="{ 'active': modelValue === option.value }"
-                :style="{ color: modelValue === option.value ? currentColorValue : undefined }">
+                :style="{ color: animatedIndicatorPosition >= option.value ? currentColorValue : undefined }">
                 {{ option.label }}
             </div>
         </div>
@@ -89,7 +95,7 @@
         numberFormat: 'decimal'
     });
 
-    const emit = defineEmits(['update:modelValue', 'update:color']);
+    const emit = defineEmits(['update:modelValue', 'update:color', 'slider-moving']);
 
     const track = ref<HTMLElement | null>(null);
     const thumb = ref<HTMLElement | null>(null);
@@ -122,6 +128,9 @@
     const isAnimating = ref(false);
     const startingPosition = ref(initialValue.value);
     const targetPosition = ref(initialValue.value);
+    
+    // New ref for animated indicator position
+    const animatedIndicatorPosition = ref(initialValue.value);
 
     const indicatorPosition = computed(() => {
         return isDragging.value ? dragValue.value : currentValue.value;
@@ -274,7 +283,14 @@
     };
 
     const getStepStyle = (position: { value: number, percent: number }) => {
-        const isActive = indicatorPosition.value >= position.value;
+        // Calculate distance to the indicator position
+        const distance = Math.abs(animatedIndicatorPosition.value - position.value);
+        
+        // Define a threshold (as a percentage of the total range)
+        const activationThreshold = range.value * 0.03; // 3% of the total range
+        
+        // Use activationThreshold or standard comparison
+        const isActive = distance <= activationThreshold || animatedIndicatorPosition.value >= position.value;
         
         if (props.stepIndicatorStyle === 'line' || props.stepIndicatorStyle === 'numbered-line') {
             return {
@@ -410,6 +426,13 @@
         
         dragValue.value = newValue;
         visualPosition.value = newValue;
+        
+        // Update animated indicator position during drag
+        animatedIndicatorPosition.value = newValue;
+        
+        // Emit slider-moving event with current position
+        emit('slider-moving', newValue);
+        
         updateModelValue(newValue);
     };
 
@@ -560,6 +583,46 @@
                 return 0.6;
         }
     });
+    
+    // Separate animation for the indicator position
+    const animateIndicatorPosition = (targetValue: number) => {
+        // Start from the current animated indicator position
+        const startPosition = animatedIndicatorPosition.value;
+        const distance = targetValue - startPosition;
+        
+        // If distance is very small, update immediately
+        if (Math.abs(distance) < ANIMATION_PRECISION) {
+            animatedIndicatorPosition.value = targetValue;
+            return;
+        }
+        
+        // Calculate animation duration based on distance (faster for small changes)
+        const duration = 350; // Match CSS transition duration (0.35s)
+        const startTime = performance.now();
+        
+        const animate = (time: number) => {
+            const elapsed = time - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Use cubic-bezier easing for smooth animation
+            // This matches your CSS transition: cubic-bezier(0.075, 0.82, 0.165, 1)
+            const t = progress;
+            // Simplified cubic-bezier calculation
+            const easedProgress = 3 * (1 - t) * (1 - t) * t * 0.075 + 
+                                 3 * (1 - t) * t * t * 0.82 + 
+                                 t * t * t * 0.165;
+            
+            animatedIndicatorPosition.value = startPosition + distance * easedProgress;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                animatedIndicatorPosition.value = targetValue;
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    };
 
     const animateToValue = (targetValue: number) => {
         if (!isBrowser.value) return;
@@ -573,6 +636,7 @@
         
         if (Math.abs(targetValue - visualPosition.value) < ANIMATION_PRECISION) {
             visualPosition.value = targetValue;
+            animateIndicatorPosition(targetValue); // Animate indicator position
             return;
         }
         
@@ -600,6 +664,12 @@
             if (Math.abs(displacement) < ANIMATION_PRECISION && Math.abs(velocity) < ANIMATION_PRECISION) {
                 visualPosition.value = targetValue;
                 isAnimating.value = false;
+                
+                // Update animated indicator position at the end
+                animatedIndicatorPosition.value = targetValue;
+                
+                // Emit the final position
+                emit('slider-moving', visualPosition.value);
                 
                 if (targetValue === props.min || targetValue === props.max) {
                     visualPosition.value = targetValue;
@@ -685,6 +755,13 @@
             
             visualPosition.value = newPosition;
             
+            // Animate the indicator position to follow the thumb position
+            // This makes indicators light up only as the thumb passes them
+            animatedIndicatorPosition.value = newPosition;
+            
+            // Emit slider-moving event for external components
+            emit('slider-moving', visualPosition.value);
+  
             animationFrameId.value = requestAnimationFrame(performSpringAnimation);
         }
     };
@@ -707,6 +784,10 @@
         }
         
         dragValue.value = newValue;
+        
+        // Keep the animatedIndicatorPosition at its current value
+        // This prevents indicators from flashing to the target value before animation
+        
         snapToNearestValue();
     };
 
@@ -722,6 +803,8 @@
                     animateToValue(newValue);
                 } else {
                     visualPosition.value = newValue;
+                    // Only update animatedIndicatorPosition if not in the browser
+                    animatedIndicatorPosition.value = newValue;
                 }
             }
         }
@@ -740,6 +823,7 @@
             startingPosition.value = initialVal;
             targetPosition.value = initialVal;
             currentValue.value = initialVal;
+            animatedIndicatorPosition.value = initialVal;
             
             if (props.modelValue === undefined) {
                 updateModelValue(initialVal);
