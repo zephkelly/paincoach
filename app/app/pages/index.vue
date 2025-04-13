@@ -4,7 +4,7 @@
             <LogCard
                 title="What would you rate your pain today?"
             >
-                <LogHappinessSlider
+                <LogPainSlider
                     v-model="sliderValue"
                     v-model:color="sliderColor"
                     :min="0"
@@ -15,6 +15,24 @@
                     :indicators="{
                         showStepIndicators: true,
                         stepIndicatorStyle: 'numbered',
+                        maxIndicators: 11
+                    }"
+                />
+            </LogCard>
+            <LogCard
+                title="What would you rate your pain today?"
+            >
+                <LogPainSlider
+                    v-model="sliderValue"
+                    v-model:color="sliderColor"
+                    :min="0"
+                    :max="10"
+                    :animation="{
+                        edgeEasingStrength: 'subtle'
+                    }"
+                    :indicators="{
+                        showStepIndicators: true,
+                        stepIndicatorStyle: 'numbered-line',
                         maxIndicators: 11
                     }"
                 />

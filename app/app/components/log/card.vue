@@ -8,7 +8,6 @@
         </div>
         <div class="log-card-content">
             <slot name="default">
-                <!-- Default content can go here if needed -->
             </slot>
         </div>
     </div>
@@ -26,7 +25,7 @@ const props = defineProps<LogCardProps>();
 .log-card {
     background-color: var(--panel-color);
     border-radius: 8px;
-    padding: clamp(1rem, 6vw, 1.5rem) clamp(1.5rem, 6vw, 2rem);
+    padding: clamp(1rem, 6vw, 1.5rem) clamp(1rem, 6vw, 1.5rem);
     width: 100%;
     box-sizing: border-box;
     max-width: 500px;
