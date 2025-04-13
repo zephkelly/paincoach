@@ -24,7 +24,8 @@
                             :class="{ 
                                 'active': Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
                                         animatedIndicatorPosition >= position.value,
-                                'with-line': stepIndicatorStyle === 'numbered-line'
+                                'with-line': stepIndicatorStyle === 'numbered-line',
+                                'double-digit': position.value > 9
                             }"
                             :style="{ color: (Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
                                             animatedIndicatorPosition >= position.value) ? currentColorValue : '' }">
@@ -987,11 +988,17 @@
   user-select: none;
   z-index: 5;
   pointer-events: none;
+
+  
 }
 
 .slider-step-indicator.slider-step-numbered-line {
     .slider-step-number {
         left: -3px;
+
+        &.double-digit {
+            left: -6px;
+        }
     }
 }
 
@@ -1032,6 +1039,8 @@
     width: 2px;
     height: 8px;
     border-radius: 1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
     background-color: var(--pain-none, #e0e0e0);
     top: -8px;
     transform: translate(-50%, 0);
