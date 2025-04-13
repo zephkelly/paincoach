@@ -306,7 +306,6 @@ watchEffect(() => {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    padding: 0 6px;
     box-sizing: border-box;
 }
 

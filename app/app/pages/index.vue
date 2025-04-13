@@ -21,10 +21,11 @@
             </LogCard>
             <LogCard
                 title="What would you rate your pain today?"
+                style="margin-top: 2rem;"
             >
                 <LogPainSlider
-                    v-model="sliderValue"
-                    v-model:color="sliderColor"
+                    v-model="sliderValue2"
+                    v-model:color="sliderColor2"
                     :min="0"
                     :max="10"
                     :animation="{
@@ -43,8 +44,11 @@
 
 
 <script setup lang="ts">
-const sliderValue = ref(3);
+const sliderValue = ref(5);
 const sliderColor = ref('#888888');
+
+const sliderValue2 = ref(5);
+const sliderColor2 = ref('#888888');
 
 console.log(`Slider value changed: ${sliderValue.value}`);
 
