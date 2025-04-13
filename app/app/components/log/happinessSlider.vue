@@ -356,7 +356,6 @@ watchEffect(() => {
   justify-content: space-between;
   width: 100%;
   padding: 0 6px;
-  margin: 0.5rem auto 0;
   box-sizing: border-box;
 }
 
