@@ -1,37 +1,42 @@
 <template>
     <div class="slider-container">
-        <div class="slider-track" ref="track" @click="handleTrackClick">
-            <div class="slider-fill" :style="{ width: fillWidth + '%', backgroundColor: currentColorValue }"></div>
-            
-            <template v-if="showStepIndicators">
-                <div v-for="position in stepPositions" :key="position.value"
-                    :class="[
-                        'slider-step-indicator',
-                        `slider-step-${stepIndicatorStyle}`, 
-                        { 
-                            'active': Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
-                                    animatedIndicatorPosition >= position.value, 
-                            'edge-indicator': position.percent === 2 || position.percent === 98 
-                        }
-                    ]"
-                    :style="getStepStyle(position)"
-                    @click.stop="handleStepClick(position.value)">
-                    <div v-if="stepIndicatorStyle === 'numbered' || stepIndicatorStyle === 'numbered-line'" class="slider-step-number"
-                        :class="{ 
-                            'active': Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
-                                    animatedIndicatorPosition >= position.value,
-                            'with-line': stepIndicatorStyle === 'numbered-line'
-                        }"
-                        :style="{ color: (Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
-                                        animatedIndicatorPosition >= position.value) ? currentColorValue : '' }">
-                        {{ formatNumber(position.value) }}
-                    </div>
-                </div>
-            </template>
+        <div class="slider-track-touch-area" @click="handleTrackClick">
+            <div class="slider-track" ref="track">
+                <div class="slider-fill" :style="{ width: fillWidth + '%', backgroundColor: currentColorValue }"></div>
                 
-            <div class="slider-thumb-container" :style="{ left: thumbPosition + '%' }">
-                <div class="slider-thumb-touch-target" @touchstart="startDrag" @mousedown="startDrag"></div>
-                <div class="slider-thumb" ref="thumb" :style="{ backgroundColor: currentColorValue }"></div>
+                <template v-if="showStepIndicators">
+                    <div v-for="position in stepPositions" :key="position.value"
+                        :class="[
+                            'slider-step-indicator',
+                            `slider-step-${stepIndicatorStyle}`, 
+                            { 
+                                'active': Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
+                                        animatedIndicatorPosition >= position.value, 
+                                'edge-indicator': position.percent === 2 || position.percent === 98 
+                            }
+                        ]"
+                        :style="getStepStyle(position)"
+                        @click.stop="handleStepClick(position.value)">
+                        
+                        <div class="slider-step-touch-target" @click.stop="handleStepClick(position.value)"></div>
+                        
+                        <div v-if="stepIndicatorStyle === 'numbered' || stepIndicatorStyle === 'numbered-line'" class="slider-step-number"
+                            :class="{ 
+                                'active': Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
+                                        animatedIndicatorPosition >= position.value,
+                                'with-line': stepIndicatorStyle === 'numbered-line'
+                            }"
+                            :style="{ color: (Math.abs(animatedIndicatorPosition - position.value) <= (range * 0.03) || 
+                                            animatedIndicatorPosition >= position.value) ? currentColorValue : '' }">
+                            {{ formatNumber(position.value) }}
+                        </div>
+                    </div>
+                </template>
+                    
+                <div class="slider-thumb-container" :style="{ left: thumbPosition + '%' }">
+                    <div class="slider-thumb-touch-target" @touchstart="startDrag" @mousedown="startDrag"></div>
+                    <div class="slider-thumb" ref="thumb" :style="{ backgroundColor: currentColorValue }"></div>
+                </div>
             </div>
         </div>
         
@@ -109,16 +114,16 @@
 
         switch (props.initialPosition) {
             case 'min':
-                return props.min;
+            return props.min;
             case 'max':
-                return props.max;
+            return props.max;
             case 'mid': 
             default:
-                if (props.options && props.options.length > 0) {
-                    const middleIndex = Math.floor(props.options.length / 2);
-                    return props.options[middleIndex]?.value ?? (props.min + (props.max - props.min) / 2);
-                }
-                return props.min + (props.max - props.min) / 2;
+            if (props.options && props.options.length > 0) {
+                const middleIndex = Math.floor(props.options.length / 2);
+                return props.options[middleIndex]?.value ?? (props.min + (props.max - props.min) / 2);
+            }
+            return props.min + (props.max - props.min) / 2;
         }
     });
 
@@ -129,16 +134,18 @@
     const startingPosition = ref(initialValue.value);
     const targetPosition = ref(initialValue.value);
     
-    // New ref for animated indicator position
     const animatedIndicatorPosition = ref(initialValue.value);
 
-    const indicatorPosition = computed(() => {
-        return isDragging.value ? dragValue.value : currentValue.value;
+    const range = computed(() => {
+        const calculatedRange = props.max - props.min;
+        return calculatedRange <= 0 ? 0.001 : calculatedRange;
     });
 
-    const range = computed(() => props.max - props.min);
-
     const fillWidth = computed(() => {
+        if (props.max === props.min) {
+            return visualPosition.value >= props.min ? 100 : 0;
+        }
+        
         let percent = ((visualPosition.value - props.min) / range.value) * 100;
         
         if (percent <= 0) {
@@ -148,25 +155,25 @@
             percent = 100;
         }
         
-        // The fill width should span the full width, not constrained by padding
         return percent;
     });
 
-    const visualPadding = 1.5; // Visual padding percentage on each side
+    const visualPadding = 1.5;
     
     const thumbPosition = computed(() => {
-        // Calculate the normal percentage
+        if (props.max === props.min) {
+            return visualPadding + ((100 - (visualPadding * 2)) / 2);
+        }
+
         let percent = ((visualPosition.value - props.min) / range.value) * 100;
         
-        // Clamp the percent to 0-100 range
         if (percent <= 0) {
             percent = 0;
         }
         else if (percent >= 100) {
             percent = 100;
         }
-        
-        // Map the 0-100 range to visualPadding-(100-visualPadding) range 
+
         return visualPadding + ((100 - (visualPadding * 2)) * percent / 100);
     });
 
@@ -283,13 +290,10 @@
     };
 
     const getStepStyle = (position: { value: number, percent: number }) => {
-        // Calculate distance to the indicator position
         const distance = Math.abs(animatedIndicatorPosition.value - position.value);
         
-        // Define a threshold (as a percentage of the total range)
         const activationThreshold = range.value * 0.03; // 3% of the total range
         
-        // Use activationThreshold or standard comparison
         const isActive = distance <= activationThreshold || animatedIndicatorPosition.value >= position.value;
         
         if (props.stepIndicatorStyle === 'line' || props.stepIndicatorStyle === 'numbered-line') {
@@ -350,17 +354,15 @@
         }
         
         stepValues.forEach((value, index) => {
-            // Calculate base percentage
             let percent = ((value - props.min) / range.value) * 100;
             
-            // Map to the visual padded range for step indicators
             percent = visualPadding + ((100 - (visualPadding * 2)) * percent / 100);
             
-            // Special handling for first and last indicators
             if (index === 0) {
-                percent = visualPadding; // First step at left padding
-            } else if (index === stepValues.length - 1) {
-                percent = 100 - visualPadding; // Last step at right padding
+                percent = visualPadding;
+            }
+            else if (index === stepValues.length - 1) {
+                percent = 100 - visualPadding;
             }
             
             positions.push({ value, percent });
@@ -855,7 +857,7 @@
 <style scoped>
 .slider-container {
     width: 100%;
-    padding: 16px 0;
+    padding: 0.5rem 0;
     -webkit-tap-highlight-color: transparent;
     touch-action: none;
 }
@@ -869,6 +871,15 @@
     cursor: pointer;
     will-change: contents;
     width: 100%;
+}
+
+.slider-track-touch-area {
+    position: relative;
+    width: 100%;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
 }
 
 .slider-track-inner {
@@ -951,6 +962,33 @@
     transition: background-color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
+:deep(.slider-step-touch-target) {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  top: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: transparent;
+  border-radius: 50%;
+  z-index: 10;
+  cursor: pointer;
+}
+
+:deep(.slider-step-number) {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  transition: color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), font-weight 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+  position: relative;
+  top: -22px;
+  left: -1px;
+  user-select: none;
+  z-index: 5;
+  pointer-events: none;
+}
+
 .slider-step-indicator.slider-step-numbered-line {
     .slider-step-number {
         left: -3px;
@@ -1011,6 +1049,7 @@
     position: relative;
     top: -22px;
     left: -1px;
+    user-select: none;
 }
 
 .slider-step-numbered-line.active {

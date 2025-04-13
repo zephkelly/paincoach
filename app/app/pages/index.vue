@@ -15,7 +15,7 @@
                     :indicators="{
                         showStepIndicators: true,
                         stepIndicatorStyle: 'numbered',
-                        maxIndicators: 10
+                        maxIndicators: 11
                     }"
                 />
             </LogCard>
