@@ -2,7 +2,7 @@
     <MobilePage>
         <div class="settings-inner-wrapper">
             <LogCard
-                title="What would you rate your pain today?"
+                title="What was your level of pain today?"
             >
                 <LogPainSlider
                     v-model="sliderValue"
