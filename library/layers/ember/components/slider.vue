@@ -18,7 +18,6 @@
                         :style="getStepStyle(position)"
                         @click.stop="handleStepClick(position.value)">
                         
-                        <!-- Add the touch target for all indicator types -->
                         <div class="slider-step-touch-target" @click.stop="handleStepClick(position.value)"></div>
                         
                         <div v-if="stepIndicatorStyle === 'numbered' || stepIndicatorStyle === 'numbered-line'" class="slider-step-number"
@@ -135,21 +134,14 @@
     const startingPosition = ref(initialValue.value);
     const targetPosition = ref(initialValue.value);
     
-    // New ref for animated indicator position
     const animatedIndicatorPosition = ref(initialValue.value);
-
-    const indicatorPosition = computed(() => {
-        return isDragging.value ? dragValue.value : currentValue.value;
-    });
 
     const range = computed(() => {
         const calculatedRange = props.max - props.min;
-        // Return a very small non-zero value if range is zero to prevent division by zero
         return calculatedRange <= 0 ? 0.001 : calculatedRange;
     });
 
     const fillWidth = computed(() => {
-        // Handle special case when min and max are equal
         if (props.max === props.min) {
             return visualPosition.value >= props.min ? 100 : 0;
         }
@@ -163,30 +155,25 @@
             percent = 100;
         }
         
-        // The fill width should span the full width, not constrained by padding
         return percent;
     });
 
-    const visualPadding = 1.5; // Visual padding percentage on each side
+    const visualPadding = 1.5;
     
     const thumbPosition = computed(() => {
-        // Handle special case when min and max are equal
         if (props.max === props.min) {
-            return visualPadding + ((100 - (visualPadding * 2)) / 2); // Center position
+            return visualPadding + ((100 - (visualPadding * 2)) / 2);
         }
-        
-        // Calculate the normal percentage
+
         let percent = ((visualPosition.value - props.min) / range.value) * 100;
         
-        // Clamp the percent to 0-100 range
         if (percent <= 0) {
             percent = 0;
         }
         else if (percent >= 100) {
             percent = 100;
         }
-        
-        // Map the 0-100 range to visualPadding-(100-visualPadding) range 
+
         return visualPadding + ((100 - (visualPadding * 2)) * percent / 100);
     });
 
@@ -303,13 +290,10 @@
     };
 
     const getStepStyle = (position: { value: number, percent: number }) => {
-        // Calculate distance to the indicator position
         const distance = Math.abs(animatedIndicatorPosition.value - position.value);
         
-        // Define a threshold (as a percentage of the total range)
         const activationThreshold = range.value * 0.03; // 3% of the total range
         
-        // Use activationThreshold or standard comparison
         const isActive = distance <= activationThreshold || animatedIndicatorPosition.value >= position.value;
         
         if (props.stepIndicatorStyle === 'line' || props.stepIndicatorStyle === 'numbered-line') {
@@ -370,17 +354,15 @@
         }
         
         stepValues.forEach((value, index) => {
-            // Calculate base percentage
             let percent = ((value - props.min) / range.value) * 100;
             
-            // Map to the visual padded range for step indicators
             percent = visualPadding + ((100 - (visualPadding * 2)) * percent / 100);
             
-            // Special handling for first and last indicators
             if (index === 0) {
-                percent = visualPadding; // First step at left padding
-            } else if (index === stepValues.length - 1) {
-                percent = 100 - visualPadding; // Last step at right padding
+                percent = visualPadding;
+            }
+            else if (index === stepValues.length - 1) {
+                percent = 100 - visualPadding;
             }
             
             positions.push({ value, percent });
@@ -875,7 +857,7 @@
 <style scoped>
 .slider-container {
     width: 100%;
-    padding: 16px 0;
+    padding: 0.5rem 0;
     -webkit-tap-highlight-color: transparent;
     touch-action: none;
 }
@@ -894,7 +876,7 @@
 .slider-track-touch-area {
     position: relative;
     width: 100%;
-    height: 44px; /* Same size as thumb touch target */
+    height: 44px;
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -991,11 +973,8 @@
   border-radius: 50%;
   z-index: 10;
   cursor: pointer;
-  /* Optional: visual indicator during development */
-  /* background-color: rgba(255, 0, 0, 0.1); */
 }
 
-/* Ensure the numbered indicators are properly positioned relative to touch target */
 :deep(.slider-step-number) {
   font-size: 0.8rem;
   font-weight: 600;
@@ -1007,7 +986,7 @@
   left: -1px;
   user-select: none;
   z-index: 5;
-  pointer-events: none; /* Make sure numbers don't interfere with touch target */
+  pointer-events: none;
 }
 
 .slider-step-indicator.slider-step-numbered-line {
