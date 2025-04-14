@@ -37,14 +37,15 @@
             </template>
         </div>
 
-        <div class="descriptor-container">
+        <div class="descriptor-container" v-if="processedDescriptors.length > 0">
             <p>{{ getCurrentDescriptor() }}</p>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watchEffect, useSlots } from 'vue';
+import { cubicBezier } from '@@/shared/utils/transitions/cubic'
+import { debounce } from '@@/shared/utils/debounce'
 
 export interface DescriptorItem {
     label: string;
@@ -89,6 +90,19 @@ const props = defineProps<IconSliderProps>();
 
 const emit = defineEmits(['update:modelValue', 'update:color', 'update:icon']);
 
+
+const slots = useSlots();
+
+const iconSlots = computed(() => {
+    if (props.iconCount !== undefined) {
+        return Array(props.iconCount).fill(null);
+    }
+    
+    const iconSlotCount = Object.keys(slots).filter(name => name.startsWith('icon-')).length;
+    
+    return Array(iconSlotCount || 3).fill(null);
+});
+
 const colorVariables = [
     '--pain-0',
     '--pain-1',
@@ -105,37 +119,26 @@ const animationFrameId = ref<number | null>(null);
 let animationStartTime = 0;
 const ANIMATION_DURATION = 350;
 
-// Get slots to determine how many icons were provided
-const slots = useSlots();
 
-// Calculate the icon slots from named slots or fallback to default count
-const iconSlots = computed(() => {
-    if (props.iconCount !== undefined) {
-        return Array(props.iconCount).fill(null);
-    }
-    
-    // Check for named icon slots
-    const iconSlotCount = Object.keys(slots).filter(name => name.startsWith('icon-')).length;
-    
-    // If no slots provided, default to 3 icons
-    return Array(iconSlotCount || 3).fill(null);
-});
+const debouncedDescriptorValue = ref(props.modelValue ?? props.min);
+const descriptorDebounceActive = ref(false);
 
-// Process descriptors based on the input format
+const updateDebouncedDescriptorValue = debounce((value: number) => {
+    debouncedDescriptorValue.value = value;
+    descriptorDebounceActive.value = false;
+}, 300, { trailing: true });
+
+
 const processedDescriptors = computed(() => {
     if (!props.descriptors || props.descriptors.length === 0) {
-        // Return default descriptor if available
-        return props.descriptor ? [{ label: props.descriptor, value: props.min }] : [];
+        return [];
     }
 
-    // Check if descriptors is an array of strings
     if (typeof props.descriptors[0] === 'string') {
         const stringDescriptors = props.descriptors as string[];
         const range = props.max - props.min;
         
-        // Distribute descriptors evenly across the range
         return stringDescriptors.map((label, index) => {
-            // Calculate value based on position in array
             const value = props.min + (range * index / (stringDescriptors.length - 1 || 1));
             return { label, value };
         });
@@ -146,155 +149,65 @@ const processedDescriptors = computed(() => {
 
 const lastActiveDescriptor = ref('');
 
-// Fixed getCurrentDescriptor function with proper Vue syntax and safety checks
 const getCurrentDescriptor = () => {
     if (!processedDescriptors.value || !Array.isArray(processedDescriptors.value) || processedDescriptors.value.length === 0) {
-        return props.descriptor || "No pain"; // Fallback to default
+        return props.descriptor || '"No pain"';
     }
     
-    // Use slider's current value for finding descriptor
-    const currentValue = isDragging.value || isTransitioningFromDrag.value 
-        ? rawDragPosition.value 
-        : animatedPosition.value;
+    let currentValue: number;
     
-    // Sort by value to ensure we compare in ascending order
-    // Create a safe copy and filter out any invalid entries
+    if (isDragging.value || isTransitioningFromDrag.value) {
+        currentValue = rawDragPosition.value;
+        
+        if (!descriptorDebounceActive.value) {
+            descriptorDebounceActive.value = true;
+        }
+        updateDebouncedDescriptorValue(currentValue);
+        
+    }
+    else if (descriptorDebounceActive.value) {
+        currentValue = debouncedDescriptorValue.value;
+    }
+    else {
+        currentValue = animatedPosition.value;
+    }
+    
     const validDescriptors = processedDescriptors.value
         .filter(d => d && typeof d === 'object' && d.label && d.value !== undefined)
         .sort((a, b) => a.value - b.value);
     
-    // Safety check for empty array after filtering and sorting
     if (!validDescriptors.length) {
         return props.descriptor || "No pain";
     }
     
-    // Get max value descriptor (last in sorted array)
-    const maxDescriptor = validDescriptors[validDescriptors.length - 1];
-    const minDescriptor = validDescriptors[0];
+    const DESCRIPTOR_BUFFER = 0.25;
     
-    // Define margins for end zones 
-    const END_ZONE_MARGIN = 0.3; // Proximity to either end to trigger end zone behavior
-    
-    // Special case: End zones (near min or max) - always show extreme descriptor
-    if (maxDescriptor && props.max !== undefined) {
-        // Check if we're close enough to the max value to trigger the highest pain descriptor
-        if (currentValue >= (props.max - END_ZONE_MARGIN)) {
-            const maxLabel = maxDescriptor.label || "Worst pain imaginable";
-            lastActiveDescriptor.value = maxLabel;
-            return maxLabel;
-        }
-    }
-    
-    if (minDescriptor && props.min !== undefined) {
-        // Check if we're close enough to the min value to trigger the lowest pain descriptor
-        if (currentValue <= (props.min + END_ZONE_MARGIN)) {
-            const minLabel = minDescriptor.label || "No pain";
-            lastActiveDescriptor.value = minLabel;
-            return minLabel;
-        }
-    }
-    
-    // Define hysteresis buffer for regular operation (away from extremes)
-    const HYSTERESIS = 0.5; // Half a unit buffer
-    
-    // Get last active descriptor for comparison (from ref)
-    const lastDescriptor = lastActiveDescriptor.value;
-    
-    // If we have a last active descriptor and we're not dragging, apply hysteresis
-    if (lastDescriptor && !isDragging.value) {
-        // Find the descriptor object that matches the last active label (with safety check)
-        const lastDescriptorObj = validDescriptors.find(d => d && d.label === lastDescriptor);
-        
-        if (lastDescriptorObj) {
-            const lastDescriptorValue = lastDescriptorObj.value;
-            
-            // Find index of last active descriptor (with safety check)
-            const lastIndex = validDescriptors.findIndex(d => d && d.label === lastDescriptor);
-            
-            // Verify valid index was found
-            if (lastIndex !== -1) {
-                // Check if we need to change the descriptor based on current direction and buffer
-                if (lastIndex < validDescriptors.length - 1) {
-                    // There is a higher descriptor
-                    const nextDescriptor = validDescriptors[lastIndex + 1];
-                    if (nextDescriptor && typeof nextDescriptor.value === 'number') {
-                        const nextDescriptorValue = nextDescriptor.value;
-                        
-                        // We need to exceed the next threshold by the buffer to change up
-                        if (currentValue < nextDescriptorValue - HYSTERESIS) {
-                            // Not enough movement to change to higher descriptor
-                            
-                            // Also check if we should move to a lower descriptor
-                            if (lastIndex > 0) {
-                                const lowerDescriptor = validDescriptors[lastIndex - 1];
-                                if (lowerDescriptor && typeof lowerDescriptor.value === 'number') {
-                                    const lowerDescriptorValue = lowerDescriptor.value;
-                                    // Need to go below threshold minus buffer to change down
-                                    if (currentValue < lowerDescriptorValue - HYSTERESIS) {
-                                        // Find highest appropriate descriptor
-                                        for (let i = lastIndex - 1; i >= 0; i--) {
-                                            const descriptor = validDescriptors[i];
-                                            if (descriptor && typeof descriptor.value === 'number' && 
-                                                currentValue >= descriptor.value - HYSTERESIS) {
-                                                const newLabel = descriptor.label || "No descriptor";
-                                                lastActiveDescriptor.value = newLabel;
-                                                return newLabel;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            // Stay on current descriptor if within buffer
-                            if (currentValue >= lastDescriptorValue - HYSTERESIS) {
-                                return lastDescriptor;
-                            }
-                        }
-                    }
-                }
-                
-                if (lastIndex > 0) {
-                    // There is a lower descriptor
-                    const lowerDescriptor = validDescriptors[lastIndex - 1];
-                    if (lowerDescriptor && typeof lowerDescriptor.value === 'number') {
-                        // If we're still above the last threshold minus buffer, keep the current descriptor
-                        if (currentValue >= lastDescriptorValue - HYSTERESIS) {
-                            return lastDescriptor;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    // If dragging or no hysteresis rule applied, find appropriate descriptor without buffer
-    // Find the highest threshold descriptor that the current value meets or exceeds
     for (let i = validDescriptors.length - 1; i >= 0; i--) {
         const descriptor = validDescriptors[i];
-        if (descriptor && typeof descriptor.value === 'number' && currentValue >= descriptor.value) {
+        
+        if (!descriptor || typeof descriptor.value !== 'number') {
+            continue;
+        }
+        
+        if (currentValue >= descriptor.value) {
             const newLabel = descriptor.label || "No descriptor";
-            lastActiveDescriptor.value = newLabel; // Store for hysteresis
+            lastActiveDescriptor.value = newLabel;
+            return newLabel;
+        }
+        
+        if (currentValue >= descriptor.value - DESCRIPTOR_BUFFER) {
+            const newLabel = descriptor.label || "No descriptor";
+            lastActiveDescriptor.value = newLabel;
             return newLabel;
         }
     }
     
-    // If no descriptor threshold is met
     const firstDescriptor = validDescriptors[0];
     const defaultLabel = (firstDescriptor && firstDescriptor.label) || props.descriptor || "No pain";
     lastActiveDescriptor.value = defaultLabel;
     return defaultLabel;
-}
+};
 
-onMounted(() => {
-    setTimeout(() => {
-        svgContainer.value = document.querySelector('.svg-container');
-        if (svgContainer.value) {
-            faceElements.value = Array.from(svgContainer.value.querySelectorAll('.svg-touch-container'));
-        }
-        
-        animatedPosition.value = props.modelValue ?? props.min;
-    }, 0);
-});
 
 const facePositions = computed(() => {
     const faceCount = iconSlots.value.length;
@@ -316,15 +229,11 @@ const updateValue = (value: number) => {
     emit('update:modelValue', value);
     emit('update:icon', getIconLevel(value));
     
-    // If we're in transition from drag, update rawDragPosition to target value
-    // This gives a smooth color transition as the thumb animates to the snapped position
     if (isTransitioningFromDrag.value) {
-        // Start gradually updating rawDragPosition toward the target value
-        // to create smooth color transition
         rawDragPosition.value = value;
     }
     
-    // Always animate to new position
+    updateDebouncedDescriptorValue(value);
     animateToPosition(value);
 };
 
@@ -359,8 +268,13 @@ const onSliderMoving = (position: number) => {
 const onSliderStop = () => {
     isTransitioningFromDrag.value = true;
     
+    updateDebouncedDescriptorValue.flush();
+    
     setTimeout(() => {
         isDragging.value = false;
+
+        debouncedDescriptorValue.value = animatedPosition.value;
+        descriptorDebounceActive.value = false;
     }, 50);
 };
 
@@ -372,7 +286,7 @@ const animateToPosition = (targetValue: number) => {
     
     if (Math.abs(targetValue - animatedPosition.value) < 0.01) {
         animatedPosition.value = targetValue;
-        isTransitioningFromDrag.value = false; // Clear transition flag when position is reached
+        isTransitioningFromDrag.value = false;
         return;
     }
     
@@ -394,7 +308,7 @@ const animateToPosition = (targetValue: number) => {
         } else {
             animatedPosition.value = targetValue;
             isAnimating.value = false;
-            isTransitioningFromDrag.value = false; // Clear transition flag when animation completes
+            isTransitioningFromDrag.value = false;
             animationFrameId.value = null;
         }
     };
@@ -402,25 +316,6 @@ const animateToPosition = (targetValue: number) => {
     animationFrameId.value = requestAnimationFrame(animate);
 };
 
-const cubicBezier = (x1: number, y1: number, x2: number, y2: number, t: number): number => {
-    const cx = 3 * x1;
-    const bx = 3 * (x2 - x1) - cx;
-    const ax = 1 - cx - bx;
-    
-    const cy = 3 * y1;
-    const by = 3 * (y2 - y1) - cy;
-    const ay = 1 - cy - by;
-    
-    let x = t, i = 0;
-    while (i < 5) {
-        const xTm = x * (cx + x * (bx + x * ax));
-        if (Math.abs(xTm - t) < 0.001) break;
-        x = x - (xTm - t) / (cx + x * (2 * bx + 3 * ax * x));
-        i++;
-    }
-    
-    return x * (cy + x * (by + x * ay));
-};
 
 const getIconLevel = (value: number) => {
     const range = props.max - props.min;
@@ -470,8 +365,6 @@ const getAnimatedIconColor = (faceIndex: number) => {
     
     const facePosition = positions[faceIndex];
     
-    // KEY CHANGE: Use raw drag position during dragging OR transition phase
-    // This ensures smooth color transition when snapping after drag
     const positionForColor = (isDragging.value || isTransitioningFromDrag.value) 
         ? rawDragPosition.value 
         : animatedPosition.value;
@@ -496,6 +389,19 @@ const getAnimatedIconColor = (faceIndex: number) => {
     
     return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
+
+
+onMounted(() => {
+    setTimeout(() => {
+        svgContainer.value = document.querySelector('.svg-container');
+        if (svgContainer.value) {
+            faceElements.value = Array.from(svgContainer.value.querySelectorAll('.svg-touch-container'));
+        }
+        
+        animatedPosition.value = props.modelValue ?? props.min;
+        debouncedDescriptorValue.value = props.modelValue ?? props.min;
+    }, 0);
+});
 
 onUnmounted(() => {
     if (animationFrameId.value !== null) {

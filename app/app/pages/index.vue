@@ -62,6 +62,13 @@
                         stepIndicatorStyle: 'numbered',
                         maxIndicators: 5
                     }"
+                    :descriptors="[
+                        { label: 'Very poor', value: 1 },
+                        { label: 'Poor', value: 2 },
+                        { label: 'Acceptable', value: 3 },
+                        { label: 'Good', value: 4 },
+                        { label: 'Very good', value: 5 },
+                    ]"
                 />
             </LogCard>
         </div>
