@@ -86,7 +86,7 @@
     }>(), {
         modelValue: undefined,
         initialPosition: 'mid',
-        bounceEffect: 'medium',
+        bounceEffect: 'light',
         useHardwareAcceleration: true,
         transitionSpeed: 'normal',
         maxBounceDistance: 100,
@@ -94,14 +94,16 @@
         stepIndicatorStyle: 'dot',
         defaultColor: '#888888',
         precision: -1,
-        edgeEasingStrength: 'medium',
-        maxIndicators: 10,
+        edgeEasingStrength: 'subtle',
+        indicatorStep: 1,
+        maxIndicators: 5,
         snapToNearest: false,
-        snapTolerance: 5,
-        numberFormat: 'decimal'
+        snapTolerance: 3,
+        numberFormat: 'integer',
+        step: 1,
     });
 
-    const emit = defineEmits(['update:modelValue', 'update:color', 'slider-moving']);
+    const emit = defineEmits(['update:modelValue', 'update:color', 'slider-moving', 'slider-stopped']);
 
     const track = ref<HTMLElement | null>(null);
     const thumb = ref<HTMLElement | null>(null);
@@ -234,6 +236,8 @@
             return props.defaultColor;
         }
         
+        // Use visualPosition instead of the model value
+        // This ensures the color is tied directly to the thumb's visual position
         const normalizedPosition = (visualPosition.value - props.min) / range.value;
         
         if (!props.colorVariables[0]) {
@@ -245,16 +249,8 @@
             return getCssVarValue(props.colorVariables[0]);
         }
         
-        const weightFactor = 0.18;
-        
-        let adjustedPosition;
-        if (normalizedPosition < weightFactor) {
-            adjustedPosition = (normalizedPosition / weightFactor) * 0.15;
-        } else {
-            adjustedPosition = 0.15 + ((normalizedPosition - weightFactor) / (1 - weightFactor)) * 0.85;
-        }
-        
-        const segmentPosition = adjustedPosition * segmentCount;
+        // Linear interpolation between color variables based on visual position
+        const segmentPosition = normalizedPosition * segmentCount;
         const segmentIndex = Math.min(Math.floor(segmentPosition), segmentCount - 1);
         const segmentProgress = segmentPosition - segmentIndex;
         
@@ -291,11 +287,10 @@
     };
 
     const getStepStyle = (position: { value: number, percent: number }) => {
-        const distance = Math.abs(animatedIndicatorPosition.value - position.value);
-        
+        const distance = Math.abs(visualPosition.value - position.value);
         const activationThreshold = range.value * 0.03; // 3% of the total range
         
-        const isActive = distance <= activationThreshold || animatedIndicatorPosition.value >= position.value;
+        const isActive = distance <= activationThreshold || visualPosition.value >= position.value;
         
         if (props.stepIndicatorStyle === 'line' || props.stepIndicatorStyle === 'numbered-line') {
             return {
@@ -427,16 +422,30 @@
         let newValue = props.min + percentage * range.value;
         newValue = Math.max(props.min, Math.min(props.max, newValue));
         
+        // Important: During drag, we update these values without snapping
         dragValue.value = newValue;
         visualPosition.value = newValue;
         
         // Update animated indicator position during drag
         animatedIndicatorPosition.value = newValue;
         
-        // Emit slider-moving event with current position
+        // CRITICAL: Emit slider-moving event with actual drag position WITHOUT any snapping
+        // This ensures the icon color follows the exact position of the thumb
         emit('slider-moving', newValue);
         
-        updateModelValue(newValue);
+        // Emit the color based on visual position immediately
+        emit('update:color', currentColorValue.value);
+        
+        // During drag, update the model value with a precision-rounded value
+        // but don't apply any snapping logic
+        const roundedValue = roundToPrecision(newValue);
+        currentValue.value = roundedValue;
+        
+        // Update the model value without snapping - this is fine since we'll snap on stopDrag
+        emit('update:modelValue', roundedValue);
+        
+        startingPosition.value = visualPosition.value;
+        targetPosition.value = roundedValue;
     };
 
     const stopDrag = () => {
@@ -448,7 +457,10 @@
         document.removeEventListener('mouseup', stopDrag);
         document.removeEventListener('touchend', stopDrag);
         
+        // Only call snapToNearestValue when dragging stops
         snapToNearestValue();
+
+        emit('slider-stopped');
     };
 
     const updateModelValue = (value: number) => {
@@ -511,6 +523,7 @@
         
         snappedValue = roundToPrecision(snappedValue);
         
+        // Update model value with the snapped value only now that dragging has stopped
         updateModelValue(snappedValue);
     };
 
@@ -757,14 +770,16 @@
             newPosition = Math.max(props.min, Math.min(props.max, newPosition));
             
             visualPosition.value = newPosition;
+        
+            // Emit color update with the new visual position
+            emit('update:color', currentColorValue.value);
             
             // Animate the indicator position to follow the thumb position
-            // This makes indicators light up only as the thumb passes them
             animatedIndicatorPosition.value = newPosition;
             
             // Emit slider-moving event for external components
             emit('slider-moving', visualPosition.value);
-  
+            
             animationFrameId.value = requestAnimationFrame(performSpringAnimation);
         }
     };
@@ -788,9 +803,7 @@
         
         dragValue.value = newValue;
         
-        // Keep the animatedIndicatorPosition at its current value
-        // This prevents indicators from flashing to the target value before animation
-        
+        // For click, we can directly snap to nearest value
         snapToNearestValue();
     };
 
@@ -799,6 +812,12 @@
             if (!isDragging.value) {
                 currentValue.value = newValue;
                 
+                // Emit color update with the new value immediately
+                nextTick(() => {
+                    emit('update:color', currentColorValue.value);
+                });
+                
+                // Continue with animation for visual position only
                 startingPosition.value = visualPosition.value;
                 targetPosition.value = newValue;
                 
@@ -806,16 +825,21 @@
                     animateToValue(newValue);
                 } else {
                     visualPosition.value = newValue;
-                    // Only update animatedIndicatorPosition if not in the browser
                     animatedIndicatorPosition.value = newValue;
                 }
             }
         }
-    });
+    }, { immediate: true });
 
     watch(() => currentColorValue.value, (newColor) => {
         emit('update:color', newColor);
     });
+
+    watch(() => visualPosition.value, (newPosition) => {
+        // Emit the color and position whenever visualPosition changes
+        emit('slider-moving', newPosition);
+        emit('update:color', currentColorValue.value);
+    }, { immediate: true });
 
     onMounted(() => {
         nextTick(() => {

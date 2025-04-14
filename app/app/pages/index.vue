@@ -4,37 +4,47 @@
             <LogCard
                 title="What was your level of pain today?"
             >
-                <LogPainSlider
-                    v-model="sliderValue"
-                    v-model:color="sliderColor"
+                <LogIconSlider
                     :min="0"
                     :max="10"
-                    :animation="{
-                        edgeEasingStrength: 'subtle'
+                    v-model="sliderValue"
+                    v-model:color="sliderColor"
+                    :value-config="{
+                        precision: 0
                     }"
                     :indicators="{
-                        showStepIndicators: true,
                         stepIndicatorStyle: 'numbered',
                         maxIndicators: 11
                     }"
-                />
+                >
+                    <template #icon-0>
+                        <svg xmlns="http://www.w3.org/2000/svg" stroke="currentColor" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2 4-7 4s-7-4-7-4"/></g></svg>
+                    </template>
+
+                    <template #icon-1>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2-4-7-4s-7 4-7 4"/></g></svg>
+                    </template>
+
+                    <template #icon-2>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="m33 25l-4-2m-11 0l-4 2m17 10s-2-4-7-4s-7 4-7 4"/></g></svg>
+                    </template>
+                </LogIconSlider>
             </LogCard>
             <LogCard
-                title="What would you rate your pain today?"
+                title="How would you rate your mood today?"
                 style="margin-top: 2rem;"
             >
-                <LogPainSlider
+                <LogIconSlider
+                    :min="1"
+                    :max="5"
                     v-model="sliderValue2"
                     v-model:color="sliderColor2"
-                    :min="0"
-                    :max="10"
-                    :animation="{
-                        edgeEasingStrength: 'subtle'
+                    :value-config="{
+                        precision: 0
                     }"
                     :indicators="{
-                        showStepIndicators: true,
-                        stepIndicatorStyle: 'numbered-line',
-                        maxIndicators: 11
+                        stepIndicatorStyle: 'numbered',
+                        maxIndicators: 5
                     }"
                 />
             </LogCard>
@@ -50,7 +60,6 @@ const sliderColor = ref('#888888');
 const sliderValue2 = ref(5);
 const sliderColor2 = ref('#888888');
 
-console.log(`Slider value changed: ${sliderValue.value}`);
 
 watch(sliderValue, (newValue) => {
     console.log(`Slider changed: ${newValue}`);

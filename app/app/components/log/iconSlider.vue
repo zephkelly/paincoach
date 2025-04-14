@@ -1,43 +1,50 @@
 <template>
-    <div class="happiness-slider">
+    <div class="icon-slider">
         <div class="slider-wrapper">
             <ESlider
-                class="happiness-slider-input"
+                class="icon-slider-input"
                 :modelValue="modelValue"
                 :color="color"
-                :min="(min !== undefined) ? min : 1"
-                :max="(max !== undefined) ? max : 5"
+                :min="min"
+                :max="max"
                 :max-indicators="(indicators?.maxIndicators !== undefined) ? indicators?.maxIndicators : 5"
-                :step="1"
-                :indicator-step="1"
-                :snap-tolerance="3"
+                :precision="0"
                 :color-variables="colorVariables"
-                :bounceEffect="'light'"
-                :showStepIndicators="true"
-                :step-indicator-style="indicators?.stepIndicatorStyle || 'line'"
-                :numberFormat="indicators?.numberFormat || 'integer'"
-                edge-easing-strength="subtle"
+                :step-indicator-style="indicators?.stepIndicatorStyle"
+                :transition-speed="animation?.transitionSpeed"
+                :bounceEffect="animation?.bounceEffect"
+                :edge-easing-strength="animation?.edgeEasingStrength"
                 @update:modelValue="updateValue"
                 @update:color="updateColor"
                 @slider-moving="onSliderMoving"
+                @slider-stopped="onSliderStop"
             />
         </div>
+        
         <div class="svg-container" ref="svgContainer">
-            <div class="svg-touch-container" @click="handleFaceClick(0)">
-                <svg :style="{color: getAnimatedFaceColor(0)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2 4-7 4s-7-4-7-4"/></g></svg>
-            </div>
-            <div class="svg-touch-container" @click="handleFaceClick(1)">
-                <svg :style="{color: getAnimatedFaceColor(1)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2-4-7-4s-7 4-7 4"/></g></svg>
-            </div>
-            <div class="svg-touch-container" @click="handleFaceClick(2)">
-                <svg :style="{color: getAnimatedFaceColor(2)}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="m33 25l-4-2m-11 0l-4 2m17 10s-2-4-7-4s-7 4-7 4"/></g></svg>
-            </div>
+            <!-- Iterate through the slot icons using the named slots -->
+            <template v-for="(_, index) in iconSlots" :key="index">
+                <div class="svg-touch-container" @click="handleFaceClick(index)">
+                    <div class="icon-wrapper" :style="{color: getAnimatedIconColor(index)}">
+                        <slot :name="`icon-${index}`">
+                            <!-- Default icons as fallback if no slot is provided -->
+                            <svg v-if="index === 0" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2 4-7 4s-7-4-7-4"/></g></svg>
+                            <svg v-else-if="index === 1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><!-- Icon from IconPark Outline by ByteDance - https://github.com/bytedance/IconPark/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m0 12h14"/></g></svg>
+                            <svg v-else-if="index === 2" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2-4-7-4s-7 4-7 4"/></g></svg>
+                        </slot>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <div class="descriptor-container">
+            <p>{{ descriptor || "No pain" }}</p>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watchEffect } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watchEffect, useSlots } from 'vue';
 
 export interface SliderAnimationConfig {
     bounceEffect?: 'none' | 'light' | 'medium' | 'strong';
@@ -48,10 +55,8 @@ export interface SliderAnimationConfig {
 }
 
 export interface SliderIndicatorConfig {
-    showStepIndicators?: boolean;
     stepIndicatorStyle?: 'dot' | 'line' | 'numbered' | 'numbered-line';
     maxIndicators?: number;
-    numberFormat?: 'decimal' | 'integer' | 'compact';
 }
 
 export interface SliderValueConfig {
@@ -62,22 +67,21 @@ export interface SliderValueConfig {
     precision?: number;
 }
 
-export interface HappinessSliderProps {
+export interface IconSliderProps {
+    min: number;
+    max: number;
     modelValue?: number;
     color?: string;
-    min?: number;
-    max?: number;
     animation?: SliderAnimationConfig;
     indicators?: SliderIndicatorConfig;
     valueConfig?: SliderValueConfig;
+    descriptor?: string;
+    iconCount?: number;
 }
 
-const props = withDefaults(defineProps<HappinessSliderProps>(), {
-    min: 0,
-    max: 10,
-});
+const props = defineProps<IconSliderProps>();
 
-const emit = defineEmits(['update:modelValue', 'update:color', 'update:happiness']);
+const emit = defineEmits(['update:modelValue', 'update:color', 'update:icon']);
 
 const colorVariables = [
     '--pain-0',
@@ -95,11 +99,27 @@ const animationFrameId = ref<number | null>(null);
 let animationStartTime = 0;
 const ANIMATION_DURATION = 350;
 
+// Get slots to determine how many icons were provided
+const slots = useSlots();
+
+// Calculate the icon slots from named slots or fallback to default count
+const iconSlots = computed(() => {
+    if (props.iconCount !== undefined) {
+        return Array(props.iconCount).fill(null);
+    }
+    
+    // Check for named icon slots
+    const iconSlotCount = Object.keys(slots).filter(name => name.startsWith('icon-')).length;
+    
+    // If no slots provided, default to 3 icons
+    return Array(iconSlotCount || 3).fill(null);
+});
+
 onMounted(() => {
     setTimeout(() => {
         svgContainer.value = document.querySelector('.svg-container');
         if (svgContainer.value) {
-            faceElements.value = Array.from(svgContainer.value.querySelectorAll('svg'));
+            faceElements.value = Array.from(svgContainer.value.querySelectorAll('.svg-touch-container'));
         }
         
         animatedPosition.value = props.modelValue ?? props.min;
@@ -107,18 +127,15 @@ onMounted(() => {
 });
 
 const facePositions = computed(() => {
-    const faceCount = faceElements.value.length || 3;
+    const faceCount = iconSlots.value.length;
+    const range = props.max - props.min;
     
-    const min = props.min;
-    const max = props.max;
-    const range = max - min;
-    
-    if (range === 0 || faceCount <= 1) return { 0: min };
+    if (range === 0 || faceCount <= 1) return { 0: props.min };
     
     const positions: Record<number, number> = {};
     
     for (let i = 0; i < faceCount; i++) {
-        const position = min + (range * i / (faceCount - 1));
+        const position = props.min + (range * i / (faceCount - 1));
         positions[i] = position;
     }
     
@@ -127,10 +144,20 @@ const facePositions = computed(() => {
 
 const updateValue = (value: number) => {
     emit('update:modelValue', value);
-    emit('update:happiness', getHappinessLevel(value));
+    emit('update:icon', getIconLevel(value));
     
+    // If we're in transition from drag, update rawDragPosition to target value
+    // This gives a smooth color transition as the thumb animates to the snapped position
+    if (isTransitioningFromDrag.value) {
+        // Start gradually updating rawDragPosition toward the target value
+        // to create smooth color transition
+        rawDragPosition.value = value;
+    }
+    
+    // Always animate to new position
     animateToPosition(value);
 };
+
 
 const handleFaceClick = (faceIndex: number) => {
     const positions = facePositions.value;
@@ -145,8 +172,26 @@ const updateColor = (newColor: string) => {
     emit('update:color', newColor);
 };
 
+const isDragging = ref(false);
+const rawDragPosition = ref(props.modelValue ?? props.min);
+const isTransitioningFromDrag = ref(false);
+
 const onSliderMoving = (position: number) => {
-    animatedPosition.value = position;
+    rawDragPosition.value = position;
+    
+    if (!isDragging.value) {
+        animatedPosition.value = position;
+    }
+    
+    isDragging.value = true;
+};
+
+const onSliderStop = () => {
+    isTransitioningFromDrag.value = true;
+    
+    setTimeout(() => {
+        isDragging.value = false;
+    }, 50);
 };
 
 const animateToPosition = (targetValue: number) => {
@@ -157,6 +202,7 @@ const animateToPosition = (targetValue: number) => {
     
     if (Math.abs(targetValue - animatedPosition.value) < 0.01) {
         animatedPosition.value = targetValue;
+        isTransitioningFromDrag.value = false; // Clear transition flag when position is reached
         return;
     }
     
@@ -178,6 +224,7 @@ const animateToPosition = (targetValue: number) => {
         } else {
             animatedPosition.value = targetValue;
             isAnimating.value = false;
+            isTransitioningFromDrag.value = false; // Clear transition flag when animation completes
             animationFrameId.value = null;
         }
     };
@@ -205,18 +252,16 @@ const cubicBezier = (x1: number, y1: number, x2: number, y2: number, t: number):
     return x * (cy + x * (by + x * ay));
 };
 
-const getHappinessLevel = (value: number) => {
-    const minVal = props.min;
-    const maxVal = props.max;
-    const range = maxVal - minVal;
+const getIconLevel = (value: number) => {
+    const range = props.max - props.min;
     
-    const faceCount = faceElements.value.length || 3;
+    const faceCount = iconSlots.value.length;
     if (faceCount === 0) return 'Unknown';
     
     if (range === 0 || faceCount <= 1) return 'Emotion Level 1';
     
     const segment = range / faceCount;
-    const normalizedValue = value - minVal;
+    const normalizedValue = value - props.min;
     
     for (let i = 0; i < faceCount; i++) {
         if (normalizedValue <= segment * (i + 1)) {
@@ -228,7 +273,7 @@ const getHappinessLevel = (value: number) => {
     return `Emotion Level ${faceCount}`;
 };
 
-const getAnimatedFaceColor = (faceIndex: number) => {
+const getAnimatedIconColor = (faceIndex: number) => {
     const baseR = 88;
     const baseG = 88;
     const baseB = 88;
@@ -255,12 +300,18 @@ const getAnimatedFaceColor = (faceIndex: number) => {
     
     const facePosition = positions[faceIndex];
     
-    const distance = Math.abs(animatedPosition.value - facePosition);
+    // KEY CHANGE: Use raw drag position during dragging OR transition phase
+    // This ensures smooth color transition when snapping after drag
+    const positionForColor = (isDragging.value || isTransitioningFromDrag.value) 
+        ? rawDragPosition.value 
+        : animatedPosition.value;
+        
+    const distance = Math.abs(positionForColor - facePosition);
     
     const maxDistance = props.max - props.min;
     
     if (maxDistance === 0) {
-        return animatedPosition.value === facePosition
+        return positionForColor === facePosition
             ? `rgba(${sliderR}, ${sliderG}, ${sliderB}, ${sliderA})`
             : `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
     }
@@ -289,8 +340,22 @@ watchEffect(() => {
 });
 </script>
 
-<style scoped>
-.happiness-slider {
+<style lang="scss" scoped>
+.descriptor-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+
+    margin-bottom: 1.2rem;
+    font-weight: 500;
+
+    p {
+        color: v-bind(color);
+        opacity: 1;
+    }
+} 
+.icon-slider {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -307,6 +372,8 @@ watchEffect(() => {
     justify-content: space-between;
     width: 100%;
     box-sizing: border-box;
+    position: relative;
+    top: -0.8rem;
 }
 
 .svg-touch-container {
@@ -320,16 +387,21 @@ watchEffect(() => {
     border-radius: 50%;
 }
 
-.svg-touch-container svg {
+.svg-touch-container :deep(svg) {
     display: block;
+    position: relative;
+    width: 28px;
+    height: 28px;
     transition: color 0.35s cubic-bezier(0.075, 0.82, 0.165, 1), transform 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+    color: inherit;
 }
 
-.svg-touch-container:hover svg {
+.svg-touch-container:hover :deep(svg) {
     transform: scale(1.05);
 }
 
-.svg-touch-container:active svg {
+.svg-touch-container:active :deep(svg) {
     transform: scale(0.90);
 }
+
 </style>
