@@ -38,13 +38,18 @@
         </div>
 
         <div class="descriptor-container">
-            <p>{{ descriptor || "No pain" }}</p>
+            <p>{{ getCurrentDescriptor() }}</p>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watchEffect, useSlots } from 'vue';
+
+export interface DescriptorItem {
+    label: string;
+    value: number;
+}
 
 export interface SliderAnimationConfig {
     bounceEffect?: 'none' | 'light' | 'medium' | 'strong';
@@ -76,6 +81,7 @@ export interface IconSliderProps {
     indicators?: SliderIndicatorConfig;
     valueConfig?: SliderValueConfig;
     descriptor?: string;
+    descriptors?: string[] | DescriptorItem[];
     iconCount?: number;
 }
 
@@ -114,6 +120,170 @@ const iconSlots = computed(() => {
     // If no slots provided, default to 3 icons
     return Array(iconSlotCount || 3).fill(null);
 });
+
+// Process descriptors based on the input format
+const processedDescriptors = computed(() => {
+    if (!props.descriptors || props.descriptors.length === 0) {
+        // Return default descriptor if available
+        return props.descriptor ? [{ label: props.descriptor, value: props.min }] : [];
+    }
+
+    // Check if descriptors is an array of strings
+    if (typeof props.descriptors[0] === 'string') {
+        const stringDescriptors = props.descriptors as string[];
+        const range = props.max - props.min;
+        
+        // Distribute descriptors evenly across the range
+        return stringDescriptors.map((label, index) => {
+            // Calculate value based on position in array
+            const value = props.min + (range * index / (stringDescriptors.length - 1 || 1));
+            return { label, value };
+        });
+    }
+    
+    return props.descriptors as DescriptorItem[];
+});
+
+const lastActiveDescriptor = ref('');
+
+// Fixed getCurrentDescriptor function with proper Vue syntax and safety checks
+const getCurrentDescriptor = () => {
+    if (!processedDescriptors.value || !Array.isArray(processedDescriptors.value) || processedDescriptors.value.length === 0) {
+        return props.descriptor || "No pain"; // Fallback to default
+    }
+    
+    // Use slider's current value for finding descriptor
+    const currentValue = isDragging.value || isTransitioningFromDrag.value 
+        ? rawDragPosition.value 
+        : animatedPosition.value;
+    
+    // Sort by value to ensure we compare in ascending order
+    // Create a safe copy and filter out any invalid entries
+    const validDescriptors = processedDescriptors.value
+        .filter(d => d && typeof d === 'object' && d.label && d.value !== undefined)
+        .sort((a, b) => a.value - b.value);
+    
+    // Safety check for empty array after filtering and sorting
+    if (!validDescriptors.length) {
+        return props.descriptor || "No pain";
+    }
+    
+    // Get max value descriptor (last in sorted array)
+    const maxDescriptor = validDescriptors[validDescriptors.length - 1];
+    const minDescriptor = validDescriptors[0];
+    
+    // Define margins for end zones 
+    const END_ZONE_MARGIN = 0.3; // Proximity to either end to trigger end zone behavior
+    
+    // Special case: End zones (near min or max) - always show extreme descriptor
+    if (maxDescriptor && props.max !== undefined) {
+        // Check if we're close enough to the max value to trigger the highest pain descriptor
+        if (currentValue >= (props.max - END_ZONE_MARGIN)) {
+            const maxLabel = maxDescriptor.label || "Worst pain imaginable";
+            lastActiveDescriptor.value = maxLabel;
+            return maxLabel;
+        }
+    }
+    
+    if (minDescriptor && props.min !== undefined) {
+        // Check if we're close enough to the min value to trigger the lowest pain descriptor
+        if (currentValue <= (props.min + END_ZONE_MARGIN)) {
+            const minLabel = minDescriptor.label || "No pain";
+            lastActiveDescriptor.value = minLabel;
+            return minLabel;
+        }
+    }
+    
+    // Define hysteresis buffer for regular operation (away from extremes)
+    const HYSTERESIS = 0.5; // Half a unit buffer
+    
+    // Get last active descriptor for comparison (from ref)
+    const lastDescriptor = lastActiveDescriptor.value;
+    
+    // If we have a last active descriptor and we're not dragging, apply hysteresis
+    if (lastDescriptor && !isDragging.value) {
+        // Find the descriptor object that matches the last active label (with safety check)
+        const lastDescriptorObj = validDescriptors.find(d => d && d.label === lastDescriptor);
+        
+        if (lastDescriptorObj) {
+            const lastDescriptorValue = lastDescriptorObj.value;
+            
+            // Find index of last active descriptor (with safety check)
+            const lastIndex = validDescriptors.findIndex(d => d && d.label === lastDescriptor);
+            
+            // Verify valid index was found
+            if (lastIndex !== -1) {
+                // Check if we need to change the descriptor based on current direction and buffer
+                if (lastIndex < validDescriptors.length - 1) {
+                    // There is a higher descriptor
+                    const nextDescriptor = validDescriptors[lastIndex + 1];
+                    if (nextDescriptor && typeof nextDescriptor.value === 'number') {
+                        const nextDescriptorValue = nextDescriptor.value;
+                        
+                        // We need to exceed the next threshold by the buffer to change up
+                        if (currentValue < nextDescriptorValue - HYSTERESIS) {
+                            // Not enough movement to change to higher descriptor
+                            
+                            // Also check if we should move to a lower descriptor
+                            if (lastIndex > 0) {
+                                const lowerDescriptor = validDescriptors[lastIndex - 1];
+                                if (lowerDescriptor && typeof lowerDescriptor.value === 'number') {
+                                    const lowerDescriptorValue = lowerDescriptor.value;
+                                    // Need to go below threshold minus buffer to change down
+                                    if (currentValue < lowerDescriptorValue - HYSTERESIS) {
+                                        // Find highest appropriate descriptor
+                                        for (let i = lastIndex - 1; i >= 0; i--) {
+                                            const descriptor = validDescriptors[i];
+                                            if (descriptor && typeof descriptor.value === 'number' && 
+                                                currentValue >= descriptor.value - HYSTERESIS) {
+                                                const newLabel = descriptor.label || "No descriptor";
+                                                lastActiveDescriptor.value = newLabel;
+                                                return newLabel;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Stay on current descriptor if within buffer
+                            if (currentValue >= lastDescriptorValue - HYSTERESIS) {
+                                return lastDescriptor;
+                            }
+                        }
+                    }
+                }
+                
+                if (lastIndex > 0) {
+                    // There is a lower descriptor
+                    const lowerDescriptor = validDescriptors[lastIndex - 1];
+                    if (lowerDescriptor && typeof lowerDescriptor.value === 'number') {
+                        // If we're still above the last threshold minus buffer, keep the current descriptor
+                        if (currentValue >= lastDescriptorValue - HYSTERESIS) {
+                            return lastDescriptor;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // If dragging or no hysteresis rule applied, find appropriate descriptor without buffer
+    // Find the highest threshold descriptor that the current value meets or exceeds
+    for (let i = validDescriptors.length - 1; i >= 0; i--) {
+        const descriptor = validDescriptors[i];
+        if (descriptor && typeof descriptor.value === 'number' && currentValue >= descriptor.value) {
+            const newLabel = descriptor.label || "No descriptor";
+            lastActiveDescriptor.value = newLabel; // Store for hysteresis
+            return newLabel;
+        }
+    }
+    
+    // If no descriptor threshold is met
+    const firstDescriptor = validDescriptors[0];
+    const defaultLabel = (firstDescriptor && firstDescriptor.label) || props.descriptor || "No pain";
+    lastActiveDescriptor.value = defaultLabel;
+    return defaultLabel;
+}
 
 onMounted(() => {
     setTimeout(() => {
