@@ -36,6 +36,7 @@ nav {
     padding-bottom: 2rem;
 
     background-color: var(--panel-color);
+    border-top: 1px solid var(--border-color);
 
     z-index: 100;
 }
@@ -79,6 +80,8 @@ li {
         color: var(--text-color);
         opacity: 0.5;
         transition: opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+        width: 26px;
+        height: 26px;
     }
 }
 </style>

@@ -1,8 +1,14 @@
+<script setup lang="ts">
+import RecordRequestModal from '~/components/recordRequestModal.vue';
+
+</script>
+
 <template>
     <div class="default-layout">
         <main>
             <slot />
         </main>
+        <RecordRequestModal />
         <Navbar />
     </div>
 </template>
