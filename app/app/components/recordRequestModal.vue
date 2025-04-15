@@ -1,11 +1,14 @@
 <template>
     <EnhancedModal
+        ref="modalRef"
         identifier="recordRequestModal"
         :open="recordRequestModalOpen"
         :trigger-event="lastClickEvent"
         :enable-drag="true"
         :is-full-page="isFullPageMode"
         :current-page="currentPage"
+        :total-pages="totalPages"
+        :count-first-page="false"
         placement="bottom"
         @close="closeModal"
         @update:is-full-page="isFullPageMode = $event"
@@ -18,7 +21,7 @@
                 <div class="progress-bar">
                     <div class="progress" :style="{ width: `${progressPercentage}%` }"></div>
                 </div>
-                <div class="progress-text">{{ currentPage }} / {{ totalPages }}</div>
+                <div class="progress-text">{{ displayCurrentPage }} / {{ displayTotalPages }}</div>
             </div>
         </template>
         
@@ -106,6 +109,8 @@
 </template>
 
 <script setup lang="ts">
+import EnhancedModal from './enhancedModal.vue';
+
 const {
     recordRequestModalOpen,
     lastClickEvent,
@@ -119,7 +124,16 @@ const totalPages = 3;
 const entryText = ref('');
 const selectedMood = ref('');
 
-// Moods for the selector
+const modalRef = ref<InstanceType<typeof EnhancedModal> | null>(null);
+
+const displayCurrentPage = computed(() => {
+    return modalRef.value?.displayCurrentPage || 0;
+});
+
+const displayTotalPages = computed(() => {
+    return modalRef.value?.displayTotalPages || 0;
+});
+
 const moods = [
     { value: 'great', label: 'Great', emoji: '😁' },
     { value: 'good', label: 'Good', emoji: '🙂' },
@@ -128,9 +142,11 @@ const moods = [
     { value: 'bad', label: 'Bad', emoji: '😫' }
 ];
 
-// Computed properties
 const progressPercentage = computed(() => {
-    return ((Number(currentPage.value) - 1) / (totalPages - 1)) * 100;
+    if (currentPage.value === 1) {
+        return 0;
+    }
+    return (displayCurrentPage.value / displayTotalPages.value) * 100;
 });
 
 // Methods
@@ -140,7 +156,9 @@ const openModal = (event: MouseEvent) => {
 };
 
 const closeModal = () => {
+    // Always completely close the modal
     recordRequestModalOpen.value = false;
+    
     // Reset state when closed
     setTimeout(() => {
         currentPage.value = 1;
@@ -150,12 +168,24 @@ const closeModal = () => {
     }, 300);
 };
 
+// Add this function if you want to implement a confirmation dialog for unsaved data
+const confirmClose = () => {
+    // Example logic for adding confirmation
+    if (entryText.value || selectedMood.value) {
+        // Could show a confirmation dialog here
+        if (confirm("You have unsaved changes. Are you sure you want to close?")) {
+            closeModal();
+        }
+    } else {
+        closeModal();
+    }
+};
+
 const startRecording = () => {
-    // Transition to full page mode and go to next page
     isFullPageMode.value = true;
-    setTimeout(() => {
+    // setTimeout(() => {
         currentPage.value = 2;
-    }, 300); // Wait for the full-page transition to complete
+    // }, 100); // Wait for the full-page transition to complete
 };
 
 const saveEntry = () => {
@@ -327,6 +357,7 @@ defineExpose({
         text-transform: uppercase;
         letter-spacing: 1px;
         padding: 1.35rem 1.5rem;
+        margin-bottom: 1rem;
         background-color: var(--lifestyle-color);
         border-color: var(--lifestyle-color);
         color: var(--text-color);
@@ -338,93 +369,3 @@ defineExpose({
     }
 }
 </style>
-
-
-
-<!-- <template>
-    <EModalBase
-        identifier="recordRequestModal"
-        :open="recordRequestModalOpen"
-        :trigger-event="lastClickEvent"
-        :enable-drag="true"
-        placement="auto"
-        @close="recordRequestModalOpen = false"
-    >
-        <div class="modal-inner">
-            <h2>It's time to make an entry</h2>
-            <p>Click the button below to start recording.</p>
-            <div class="graphic-container">
-                <LogContributionChart />
-            </div>
-            <div class="modal-actions">
-                <EButton
-                    class="modal-button"
-                >
-                    Start now
-                </EButton>
-            </div>
-        </div>
-    </EModalBase>
-
-</template>
-
-<script setup lang="ts">
-import { useRecordRequest } from '~/composables/useRecordRequest';
-
-const {
-    recordRequestModalOpen,
-    lastClickEvent,
-} = useRecordRequest();
-</script>
-
-<style lang="scss" scoped>
-.modal-inner {
-    padding: 1rem;
-    padding-bottom: 1.5rem;
-
-    h2 {
-        font-size: 1.35rem;
-        font-weight: 600;
-        margin-bottom: 0.8rem;
-        text-align: center;
-    }
-
-    p {
-        font-size: 1rem;
-        margin-bottom: var(--margin-medium);
-        font-weight: 300;
-        color: var(--text-3-color);
-        text-align: center;
-    }
-
-    .graphic-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 2rem;
-        margin-top: 2rem;
-        width: 100%;
-        transform: scale(0.9);
-    }
-}
-
-.modal-actions {
-    .modal-button {
-        width: 100%;
-        font-size: 0.9rem;
-        font-weight: 600;
-        font-family: var(--inter-font-family);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        padding: 1.35rem 1.5rem;
-        background-color: var(--lifestyle-color);
-        border-color: var(--lifestyle-color);
-        color: var(--text-color);
-
-        &:active, &:hover {
-            background-color: var(--lifestyle-2-color);
-            border-color: var(--lifestyle-2-color);
-        }
-    }
-}
-</style> -->

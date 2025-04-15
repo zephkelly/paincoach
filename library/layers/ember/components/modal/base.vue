@@ -1,29 +1,32 @@
 <template>
     <Teleport to="#teleports">
         <Transition name="modal">
-            <div v-if="open" class="modal" @mousedown="!isDragging && $emit('close')" @touchstart="!isDragging && $emit('close')">
+            <div v-if="open" class="modal" @mousedown="handleBackdropClick" @touchstart="handleBackdropTouch">
                 <div 
                     ref="modalRef"
+                    :id="identifier"
                     class="modal-container" 
-                    :class="{ 'is-dragging': isDragging }"
-                    :style="[modalPosition, modalTransform]"
+                    :class="{ 
+                        'is-dragging': isDragging,
+                        'full-page-mode': isFullPageMode,
+                        'transitioning-to-full': isTransitioningToFull
+                    }"
+                    :style="[computedModalStyle]"
                     @touchstart.passive="handleTouchStart"
                     @touchmove.prevent="handleTouchMove"
                     @touchend="handleTouchEnd"
-                    @touchcancel="handleTouchEnd"
-                    @mousedown="handleMouseDown"
+                    @touchcancel="handleTouchCancel"
+                    @mousedown="handleModalMouseDown"
                     @mousemove="handleMouseMove"
                     @mouseup="handleMouseUp"
-                    @mouseleave="handleMouseUp"
+                    @mouseleave="handleMouseLeave"
                     @click.stop
                 >
                     <div class="modal-content">
-                        <!-- Mobile drag handle -->
-                        <div v-if="isMobileView && enableDrag" class="drag-handle" aria-hidden="true">
+                        <div v-if="isMobileView && enableDrag && !isFullPageMode" class="drag-handle" aria-hidden="true">
                             <div class="drag-handle-bar"></div>
                         </div>
                         
-                        <!-- Main content slot -->
                         <slot></slot>
                     </div>
                 </div>
@@ -37,15 +40,20 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 
 interface Props {
+    identifier: string;
     open: boolean;
     triggerEvent?: MouseEvent | null;
     enableDrag?: boolean;
     placement?: 'bottom' | 'top' | 'auto';
+    isFullPageMode?: boolean;  // New prop to detect full page mode
+    isTransitioningToFull?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     enableDrag: true,
-    placement: 'auto'
+    placement: 'auto',
+    isFullPageMode: false,
+    isTransitioningToFull: false
 });
 
 const emit = defineEmits<{
@@ -53,18 +61,29 @@ const emit = defineEmits<{
 }>();
 
 const modalRef = ref<HTMLElement | null>(null);
-const modalPosition = ref({
+
+type ModalPosition = {
+  top?: string;
+  left?: string;
+  bottom?: string;
+  right?: string;
+};
+const modalPosition = ref<ModalPosition>({
     top: '0px',
     left: '0px'
 });
 
-const isMobileView = computed(() => window.innerWidth < 500);
+const isMobileView = computed(() => window.innerWidth < 768);
+
+// Computed to check if dragging should be enabled
+const canDrag = computed(() => props.enableDrag && !props.isFullPageMode);
 
 // Position logic
 const updateModalPosition = () => {
-    if (!props.triggerEvent?.target || !props.open || !modalRef.value) return;
+    if (!props.triggerEvent?.target || !props.open || !modalRef.value || 
+        props.isFullPageMode || props.isTransitioningToFull) return;
     
-    let newPosition = {
+    let newPosition: ModalPosition = {
         top: '-9999px',
         left: '-9999px',
         bottom: 'auto',
@@ -72,13 +91,22 @@ const updateModalPosition = () => {
     };
     
     if (isMobileView.value || props.placement === 'bottom') {
-        newPosition = {
-            bottom: '0px',
-            left: '0px',
-            right: '0px',
-            top: 'auto'
-        };
-    } else {
+        if (props.isTransitioningToFull) {
+            newPosition = {
+                top: '0px',
+                left: '0px',
+                right: '0px',
+                bottom: '0px',
+            };
+        } else {
+            newPosition = {
+                bottom: '0px',
+                left: '0px',
+                right: '0px',
+            };
+        }
+    }
+    else {
         const triggerElement = props.triggerEvent.target as HTMLElement;
         const triggerRect = triggerElement.getBoundingClientRect();
         const modalRect = modalRef.value.getBoundingClientRect();
@@ -114,6 +142,9 @@ const dragThreshold = 80;
 const maxUpwardDrag = -50;
 
 const modalTransform = computed(() => {
+    // Don't allow dragging in full page mode
+    if (props.isFullPageMode) return '';
+    
     if (!isDragging.value && !isClosing.value || !isMobileView.value) return '';
     
     if (isClosing.value) {
@@ -130,6 +161,41 @@ const modalTransform = computed(() => {
     return `transform: translateY(${upwardResistance}px)`;
 });
 
+const computedModalStyle = computed(() => {
+    const positionStyle = {...modalPosition.value};
+    
+    if (props.isTransitioningToFull) {
+        
+        // if (isMobileView.value) {
+        // }
+        // else {
+        //     const modalRect = modalRef.value?.getBoundingClientRect() || {top: 0, left: 0, width: 0};
+        //     return {
+        //         // ...positionStyle,
+        //         // height: '100vh',
+        //         // maxHeight: '100vh',
+        //         width: '100%',
+        //         maxWidth: '100%',
+        //     };
+        // }
+        return {
+            bottom: '0',
+            left: '0',
+            right: '0',
+        };
+    }
+    
+    if ((isDragging.value || isClosing.value) && !props.isFullPageMode && isMobileView.value) {
+        const dragTransform = modalTransform.value;
+        return {
+            ...positionStyle,
+            ...(dragTransform ? {transform: dragTransform.split(': ')[1]} : {})
+        };
+    }
+    
+    return positionStyle;
+});
+
 const overlayStyle = computed(() => {
     if (!isMobileView.value) return {};
     
@@ -137,7 +203,7 @@ const overlayStyle = computed(() => {
         return { opacity: 0 };
     }
     
-    if (isDragging.value) {
+    if (isDragging.value && !props.isFullPageMode) {
         const delta = currentY.value - startY.value;
         const dragRatio = 0.6;
         const opacity = Math.max(0, 1 - (delta * dragRatio) / window.innerHeight);
@@ -147,23 +213,42 @@ const overlayStyle = computed(() => {
     return { opacity: 1 };
 });
 
-// Touch and mouse event handlers
+const handleBackdropClick = (event: MouseEvent) => {
+    if (!isDragging.value && !props.isFullPageMode && event.target === event.currentTarget) {
+        emit('close');
+    }
+};
+
+const handleBackdropTouch = (event: TouchEvent) => {
+    if (!isDragging.value && !props.isFullPageMode && event.target === event.currentTarget) {
+        emit('close');
+    }
+};
+
 const handleTouchStart = (event: TouchEvent) => {
-    if (!isMobileView.value || !props.enableDrag) return;
+    if (!canDrag.value || !isMobileView.value) return;
     
     const touch = event.touches[0];
     if (!touch) return;
     startDrag(touch.clientY);
 };
 
-const handleMouseDown = (event: MouseEvent) => {
-    if (!isMobileView.value || !props.enableDrag) return;
-    
-    isMouseDown.value = true;
-    startDrag(event.clientY);
+const handleModalMouseDown = (event: MouseEvent) => {
+    if (!canDrag.value || !isMobileView.value) return;
+
+    const target = event.target as HTMLElement;
+    const isClickingDragHandle = target.closest('.drag-handle') !== null;
+
+    if (isClickingDragHandle || isMobileView.value) {
+        isMouseDown.value = true;
+        startDrag(event.clientY);
+        event.preventDefault(); // Prevent text selection during drag
+    }
 };
 
 const startDrag = (clientY: number) => {
+    if (!canDrag.value) return;
+    
     startY.value = clientY;
     currentY.value = clientY;
     lastY.value = clientY;
@@ -173,25 +258,25 @@ const startDrag = (clientY: number) => {
 };
 
 const handleTouchMove = (event: TouchEvent) => {
-    if (!isDragging.value) return;
+    if (!isDragging.value || !canDrag.value) return;
 
     if (event.touches[0] === undefined) return;
     handleDragMove(event.touches[0].clientY);
 };
 
 const handleMouseMove = (event: MouseEvent) => {
-    if (!isDragging.value || !isMouseDown.value) return;
+    if (!isDragging.value || !isMouseDown.value || !canDrag.value) return;
     handleDragMove(event.clientY);
 };
 
 const handleDragMove = (clientY: number) => {
+    if (!canDrag.value) return;
+    
     const now = Date.now();
     const deltaTime = now - lastTime.value;
     
-    // Calculate the delta from the start position
     const deltaY = clientY - startY.value;
     
-    // Apply upward resistance for both touch and mouse events
     if (deltaY < 0) {
         currentY.value = startY.value + Math.max(maxUpwardDrag, deltaY * Math.exp(deltaY / 200));
     } else {
@@ -207,19 +292,27 @@ const handleDragMove = (clientY: number) => {
 };
 
 const handleTouchEnd = () => {
+    // Abort if we can't drag
+    if (!canDrag.value) return;
+    
     handleDragEnd();
     setTimeout(() => { isDragging.value = false; }, 50);
 };
 
+const handleTouchCancel = handleTouchEnd;
+
 const handleMouseUp = () => {
-    if (!isMouseDown.value) return;
+    if (!isMouseDown.value || !canDrag.value) return;
+    
     isMouseDown.value = false;
     handleDragEnd();
     setTimeout(() => { isDragging.value = false; }, 50);
 };
 
+const handleMouseLeave = handleMouseUp;
+
 const handleDragEnd = () => {
-    if (!isDragging.value) return;
+    if (!isDragging.value || !canDrag.value) return;
     
     const delta = currentY.value - startY.value;
     const speed = Math.abs(velocity.value);
@@ -255,17 +348,35 @@ const handleDragEnd = () => {
     velocity.value = 0;
 };
 
-// Lifecycle hooks
+watch(() => props.isFullPageMode, (isFullPage) => {
+    if (isFullPage) {
+        isDragging.value = false;
+        isMouseDown.value = false;
+        isClosing.value = false;
+        velocity.value = 0;
+    }
+    else {
+        nextTick(() => {
+            updateModalPosition();
+            requestAnimationFrame(updateModalPosition);
+        });
+    }
+});
+
 const handleResize = () => {
-    requestAnimationFrame(updateModalPosition);
+    if (!props.isFullPageMode) {
+        requestAnimationFrame(updateModalPosition);
+    }
 };
 
 watch(() => props.open, (open) => {
     if (open) {
         modalPosition.value = { top: '-9999px', left: '-9999px' };
         nextTick(() => {
-            updateModalPosition();
-            requestAnimationFrame(updateModalPosition);
+            if (!props.isFullPageMode) {
+                updateModalPosition();
+                requestAnimationFrame(updateModalPosition);
+            }
         });
         window.addEventListener('resize', handleResize);
     } else {
@@ -304,10 +415,10 @@ onUnmounted(() => {
     background-color: rgba(0, 0, 0, 0.5);
     opacity: 1;
     will-change: opacity;
-    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 
-    @media (max-width: 500px) {
-        &.is-dragging {
+    @media (max-width: 768px) {
+        &.is-dragging:not(.full-page-mode) {
             transition: none;
         }
     }
@@ -315,13 +426,16 @@ onUnmounted(() => {
 
 .modal-container {
     position: fixed;
-    background-color: var(--background-secondary);
-    border: 1px solid var(--border-main);
-    border-radius: 8px;
+    border-radius: 12px;
     z-index: 1001;
     will-change: transform;
     box-sizing: border-box;
-    // width: calc(100% - 24px);
+    background-color: var(--panel-color);
+    border: 1px solid var(--panel-color);
+    transform-origin: bottom center;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     
     &::before {
         content: '';
@@ -330,6 +444,7 @@ onUnmounted(() => {
         border-radius: inherit;
         box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
         z-index: -2;
+        transition: box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     &::after {
@@ -340,13 +455,36 @@ onUnmounted(() => {
         right: -1px;
         top: 100%;
         height: 100vh;
-        background-color: var(--background-secondary);
-        border-left: 1px solid var(--border-main);
-        border-right: 1px solid var(--border-main);
         z-index: -1;
+        background-color: var(--panel-color);
+        // border-left: 1px solid var(--border-color);
+        // border-right: 1px solid var(--border-color);
+    }
+    
+    &.transitioning-to-full {
+        position: fixed;
+        border-radius: 12px;
+        border-radius: 12px 12px 0 0;
+        
+        // Animate border radius separately
+        transition: border-radius 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        
+        @media (min-width: 769px) {
+            border-radius: 12px;
+        }
     }
 
-    @media (max-width: 500px) {
+    &.full-page-mode:not(.transitioning-to-full) {
+        border-radius: 0 !important;
+        border-color: var(--panel-color) !important;
+        transform-origin: bottom center;
+        
+        &::before {
+            box-shadow: none;
+        }
+    }
+
+    @media (max-width: 768px) {
         width: 100%;
         bottom: 0;
         left: 0;
@@ -354,16 +492,20 @@ onUnmounted(() => {
         border-bottom: none;
         border-radius: 12px 12px 0 0;
         transform-origin: bottom center;
-        padding-bottom: 2rem;
-        padding-top: 1rem;
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1),
+                    border-radius 0.4s cubic-bezier(0.075, 0.82, 0.165, 1),
+                    border-color 0.4s cubic-bezier(0.075, 0.82, 0.165, 1);
         
         &::after {
             display: block;
         }
 
-        &.is-dragging {
+        &.is-dragging:not(.full-page-mode) {
             transition: none;
+        }
+        
+        &.full-page-mode {
+            border-radius: 0 !important;
         }
     }
 }
@@ -372,21 +514,24 @@ onUnmounted(() => {
     position: relative;
     top: 0;
     width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 
     .drag-handle {
         display: flex;
         justify-content: center;
         padding: 0.75rem 0;
-        margin: -1rem -1rem 0 -1rem;
+        padding-bottom: 0.5rem;
         cursor: grab;
         touch-action: none;
         user-select: none;
         width: 100%;
 
         .drag-handle-bar {
-            width: 32px;
+            width: 36px;
             height: 4px;
-            background-color: var(--border-main);
+            background-color: var(--border-color);
             border-radius: 2px;
         }
     }
@@ -396,13 +541,18 @@ onUnmounted(() => {
 .modal-leave-active {
     .modal-overlay {
         opacity: 1;
-        transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: opacity 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
     }
 
     .modal-container {
-        @media (max-width: 500px) {
+        @media (max-width: 768px) {
             will-change: transform;
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+            
+            &.full-page-mode {
+                transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1),
+                            border-radius 0.4s cubic-bezier(0.075, 0.82, 0.165, 1);
+            }
         }
     }
 }
@@ -414,8 +564,12 @@ onUnmounted(() => {
     }
 
     .modal-container {
-        @media (max-width: 500px) {
+        @media (max-width: 768px) {
             transform: translateY(100%);
+            
+            &.full-page-mode {
+                transform: none !important;
+            }
         }
     }
 }
