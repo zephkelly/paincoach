@@ -1,5 +1,9 @@
 <template>
     <div class="icon-slider">
+        
+        <div class="descriptor-container" v-if="processedDescriptors.length > 0">
+            <p>{{ getCurrentDescriptor() }}</p>
+        </div>
         <div class="slider-wrapper">
             <ESlider
                 class="icon-slider-input"
@@ -14,6 +18,7 @@
                 :transition-speed="animation?.transitionSpeed"
                 :bounceEffect="animation?.bounceEffect"
                 :edge-easing-strength="animation?.edgeEasingStrength"
+                :invertColors="invertColors"
                 @update:modelValue="updateValue"
                 @update:color="updateColor"
                 @slider-moving="onSliderMoving"
@@ -21,7 +26,7 @@
             />
         </div>
         
-        <div class="svg-container" ref="svgContainer">
+        <div v-if="!noIcons" class="svg-container" ref="svgContainer">
             <!-- Iterate through the slot icons using the named slots -->
             <template v-for="(_, index) in iconSlots" :key="index">
                 <div class="svg-touch-container" @click="handleFaceClick(index)">
@@ -37,9 +42,6 @@
             </template>
         </div>
 
-        <div class="descriptor-container" v-if="processedDescriptors.length > 0">
-            <p>{{ getCurrentDescriptor() }}</p>
-        </div>
     </div>
 </template>
 
@@ -84,6 +86,8 @@ export interface IconSliderProps {
     descriptor?: string;
     descriptors?: string[] | DescriptorItem[];
     iconCount?: number;
+    invertColors?: boolean;
+    noIcons?: boolean;
 }
 
 const props = defineProps<IconSliderProps>();
@@ -102,6 +106,8 @@ const iconSlots = computed(() => {
     
     return Array(iconSlotCount || 3).fill(null);
 });
+
+const internalColor = ref(props.color);
 
 const colorVariables = [
     '--pain-0',
@@ -126,7 +132,7 @@ const descriptorDebounceActive = ref(false);
 const updateDebouncedDescriptorValue = debounce((value: number) => {
     debouncedDescriptorValue.value = value;
     descriptorDebounceActive.value = false;
-}, 300, { trailing: true });
+}, 50, { trailing: true, leading: false });
 
 
 const processedDescriptors = computed(() => {
@@ -163,7 +169,6 @@ const getCurrentDescriptor = () => {
             descriptorDebounceActive.value = true;
         }
         updateDebouncedDescriptorValue(currentValue);
-        
     }
     else if (descriptorDebounceActive.value) {
         currentValue = debouncedDescriptorValue.value;
@@ -227,7 +232,6 @@ const facePositions = computed(() => {
 
 const updateValue = (value: number) => {
     emit('update:modelValue', value);
-    emit('update:icon', getIconLevel(value));
     
     if (isTransitioningFromDrag.value) {
         rawDragPosition.value = value;
@@ -248,6 +252,7 @@ const handleFaceClick = (faceIndex: number) => {
 };
 
 const updateColor = (newColor: string) => {
+    internalColor.value = newColor;
     emit('update:color', newColor);
 };
 
@@ -316,37 +321,15 @@ const animateToPosition = (targetValue: number) => {
     animationFrameId.value = requestAnimationFrame(animate);
 };
 
-
-const getIconLevel = (value: number) => {
-    const range = props.max - props.min;
-    
-    const faceCount = iconSlots.value.length;
-    if (faceCount === 0) return 'Unknown';
-    
-    if (range === 0 || faceCount <= 1) return 'Emotion Level 1';
-    
-    const segment = range / faceCount;
-    const normalizedValue = value - props.min;
-    
-    for (let i = 0; i < faceCount; i++) {
-        if (normalizedValue <= segment * (i + 1)) {
-            const emotions = ['Very Happy', 'Happy', 'Neutral'];
-            return i < emotions.length ? emotions[i] : `Emotion Level ${i + 1}`;
-        }
-    }
-    
-    return `Emotion Level ${faceCount}`;
-};
-
 const getAnimatedIconColor = (faceIndex: number) => {
     const baseR = 88;
     const baseG = 88;
     const baseB = 88;
     const baseA = 0.39;
     
-    if (!props.color) return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
+    if (!internalColor.value) return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
 
-    const rgbaMatch = props.color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\)/);
+    const rgbaMatch = internalColor.value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\)/);
     if (!rgbaMatch) return `rgba(${baseR}, ${baseG}, ${baseB}, ${baseA})`;
 
     if (!rgbaMatch[1] || !rgbaMatch[2] || !rgbaMatch[3]) {
@@ -368,7 +351,7 @@ const getAnimatedIconColor = (faceIndex: number) => {
     const positionForColor = (isDragging.value || isTransitioningFromDrag.value) 
         ? rawDragPosition.value 
         : animatedPosition.value;
-        
+    
     const distance = Math.abs(positionForColor - facePosition);
     
     const maxDistance = props.max - props.min;
@@ -392,7 +375,7 @@ const getAnimatedIconColor = (faceIndex: number) => {
 
 
 onMounted(() => {
-    setTimeout(() => {
+    nextTick(() => {
         svgContainer.value = document.querySelector('.svg-container');
         if (svgContainer.value) {
             faceElements.value = Array.from(svgContainer.value.querySelectorAll('.svg-touch-container'));
@@ -400,7 +383,11 @@ onMounted(() => {
         
         animatedPosition.value = props.modelValue ?? props.min;
         debouncedDescriptorValue.value = props.modelValue ?? props.min;
-    }, 0);
+
+        if (props.color) {
+            internalColor.value = props.color;
+        }
+    });
 });
 
 onUnmounted(() => {
@@ -414,6 +401,12 @@ watchEffect(() => {
         animatedPosition.value = props.min;
     }
 });
+
+watchEffect(() => {
+    if (props.color) {
+        internalColor.value = props.color;
+    }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -423,24 +416,29 @@ watchEffect(() => {
     align-items: center;
     width: 100%;
 
-    margin-bottom: 1.2rem;
+    margin-bottom: 1rem;
     font-weight: 500;
 
     p {
-        color: v-bind(color);
+        color: v-bind(internalColor);
+        font-size: 1rem;
         opacity: 1;
     }
 } 
 .icon-slider {
     width: 100%;
     display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
 }
 
 .slider-wrapper {
+    position: relative;
     width: 100%;
     padding: 0 1rem;
     box-sizing: border-box;
+    top: 0.4rem;
 }
 
 .svg-container {
@@ -449,7 +447,7 @@ watchEffect(() => {
     width: 100%;
     box-sizing: border-box;
     position: relative;
-    top: -0.8rem;
+    top: -0.4rem;
 }
 
 .svg-touch-container {

@@ -83,6 +83,7 @@
         edgeEasingStrength?: 'none' | 'subtle' | 'medium' | 'strong';
         maxIndicators?: number;
         numberFormat?: 'decimal' | 'integer' | 'compact';
+        invertColors?: boolean;
     }>(), {
         modelValue: undefined,
         initialPosition: 'mid',
@@ -101,6 +102,7 @@
         snapTolerance: 3,
         numberFormat: 'integer',
         step: 1,
+        invertColors: false,
     });
 
     const emit = defineEmits(['update:modelValue', 'update:color', 'slider-moving', 'slider-stopped']);
@@ -240,6 +242,9 @@
         // This ensures the color is tied directly to the thumb's visual position
         const normalizedPosition = (visualPosition.value - props.min) / range.value;
         
+        // When invertColors is true, we need to invert the normalized position
+        const effectivePosition = props.invertColors ? 1 - normalizedPosition : normalizedPosition;
+        
         if (!props.colorVariables[0]) {
             return props.defaultColor;
         }
@@ -250,7 +255,7 @@
         }
         
         // Linear interpolation between color variables based on visual position
-        const segmentPosition = normalizedPosition * segmentCount;
+        const segmentPosition = effectivePosition * segmentCount;
         const segmentIndex = Math.min(Math.floor(segmentPosition), segmentCount - 1);
         const segmentProgress = segmentPosition - segmentIndex;
         
@@ -288,9 +293,11 @@
 
     const getStepStyle = (position: { value: number, percent: number }) => {
         const distance = Math.abs(visualPosition.value - position.value);
-        const activationThreshold = range.value * 0.03; // 3% of the total range
+        const activationThreshold = range.value * 0.03;
         
-        const isActive = distance <= activationThreshold || visualPosition.value >= position.value;
+        const isActive = props.invertColors 
+            ? distance <= activationThreshold || visualPosition.value <= position.value
+            : distance <= activationThreshold || visualPosition.value >= position.value;
         
         if (props.stepIndicatorStyle === 'line' || props.stepIndicatorStyle === 'numbered-line') {
             return {
