@@ -26,7 +26,7 @@ const props = defineProps<LogCardProps>();
     background-color: var(--panel-color);
     border-radius: 8px;
     padding: 2rem 1rem;
-    padding-bottom: 1.5rem;
+    padding-bottom: 1rem;
     width: 100%;
     box-sizing: border-box;
     max-width: 500px;
@@ -36,7 +36,7 @@ const props = defineProps<LogCardProps>();
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.8rem;
 }
 .log-card-icon {
     margin-right: 16px;
@@ -53,6 +53,4 @@ const props = defineProps<LogCardProps>();
     text-wrap: stable;
     text-align: center;
 }
-
-
 </style>

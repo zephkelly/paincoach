@@ -3,9 +3,13 @@
     --system-font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     --inter-font-family: 'Inter', var(--system-font-stack);
 
+    --margin-medium: 1.5rem;
+    --margin-small: 1rem;
+    --margin-xsmall: 0.5rem;
+
     --pain-missing: transparent;
     --pain-none: #58585863;
-    --pain-0: #83A45D;
+    --pain-0: #8bb65a;
     --pain-0-hover: #6a8b46;
     --pain-1: #fed698;
     --pain-1-accessible-visual: #e2b771;
@@ -16,9 +20,13 @@
     --pain-3: #D24646;
     --pain-3-hover: #ba3030;
 
-    --lifestyle-1: #39abc4;
-    --lifestyle-2: #2ca7c2;
-    --lifestyle-3: #3da4bc;
+    --lifestyle-color: #0f8dcc;
+    --lifestyle-1-color: #219ad6;
+    --lifestyle-2-color: #2ca4e0;
+    --lifestyle-3-color: #39abe4;
+    --lifestyle-4-color: #4eb6ea;
+    --lifestyle-5-color: #5fbae8;
+    --lifestyle-6-color: #74c7f0;
 }
 
 // Dark
@@ -26,6 +34,7 @@
     --text-color-dark: #f2f2f2;
     --text-1-color-dark: #dcdcdc;
     --text-2-color-dark: #c7c7c7;
+    --text-3-color-dark: #b3b3b3;
 
     --background-color-dark: #121212;
 
@@ -52,6 +61,7 @@
     --text-color: var(--text-color-dark);
     --text-1-color: var(--text-1-color-dark);
     --text-2-color: var(--text-2-color-dark);
+    --text-3-color: var(--text-3-color-dark);
     --text-color-invert: var(--text-color-light);
     
     --background-color: var(--background-color-dark);

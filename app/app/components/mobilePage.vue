@@ -21,7 +21,9 @@ const hasHeaderContent = ref(false);
 
 const maxWidthStyle = props.maxWidth ? `${props.maxWidth}px` : 'auto';
 const paddingStyle = props.padBody ? '0rem 1rem' : '0rem';
-const bottomMarginStyle = props.bottomMargin ? '4rem' : '0';
+const contentContainerBottomMarginStyle = props.bottomMargin ? '4rem' : '0';
+const pageContainerBottomMarginStyle = props.bottomMargin ? '86px' : '0';
+const pageContainerMinHeightStyle = props.bottomMargin ? 'calc(100dvh - 2rem - 86px)' : 'calc(100dvh - 2rem)';
 const headingPadding = props.padHeader ? '0rem 0rem' : '0rem 1rem';
 
 // Check if header slot has content
@@ -42,9 +44,10 @@ onUpdated(checkHeaderContent);
     flex-grow: 1;
     padding: 0 1rem;
     padding-top: 1rem;
-    margin-bottom: 86px;
-    min-height: calc(100vh - 1rem - 86px);
+    margin-bottom: v-bind(pageContainerBottomMarginStyle);
+    min-height: v-bind(pageContainerMinHeightStyle);
     background-color: var(--background-color);
+    padding-bottom: 1rem;
 }
 
 .page-content {
@@ -55,7 +58,7 @@ onUpdated(checkHeaderContent);
     width: 100%;
     padding: v-bind(paddingStyle);
     // margin-top: 1.5rem;
-    margin-bottom: v-bind(bottomMarginStyle);
+    margin-bottom: v-bind(contentContainerBottomMarginStyle);
 }
 
 .page-header {

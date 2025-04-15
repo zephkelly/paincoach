@@ -18,7 +18,7 @@
     "pg": "^8.13.3",
     "vue": "latest",
     "vue-router": "latest",
-    "zod": "^3.24.2"
+    "zod": "4.0.0-beta.20250412T085909"
   },
   "devDependencies": {
     "vite-plugin-pwa": "^1.0.0"
