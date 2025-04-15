@@ -18,17 +18,17 @@
             }"
         >
             <div class="shared-components" v-if="isFullPage || isTransitioningToFull">
-                <slot name="shared"></slot>
-                
                 <button 
                     class="close-button" 
                     @click="handleClose"
-                >
+                    >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                 </button>
+
+                <slot name="shared"></slot>
             </div>
             
             <div class="content-container">
@@ -244,6 +244,7 @@ onBeforeUnmount(() => {
 .shared-components {
     position: relative;
     width: 100%;
+    height: 4rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -252,12 +253,11 @@ onBeforeUnmount(() => {
     
     .close-button {
         position: absolute;
-        right: 1rem;
-        top: 1rem;
+        left: 1rem;
+        top: 1.25rem;
         background: transparent;
         border: none;
         cursor: pointer;
-        padding: 0.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -285,6 +285,7 @@ onBeforeUnmount(() => {
 
 .page-content {
     width: 100%;
+    height: 100%;
 }
 
 /* Simple transitions */

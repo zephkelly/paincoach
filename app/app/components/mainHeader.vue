@@ -2,7 +2,7 @@
     <section class="header overview">
         <header class="overview-header">
             <div class="wrapper timeline">
-                <component :is="dynamicDropdownComponent" />
+                <slot name="dropdown" />
             </div>
             <div class="wrapper">
                 <h1>{{ title }}</h1>
@@ -20,7 +20,6 @@
 //define props for the h1 element title
 const props = defineProps<{
     title: string;
-    dynamicDropdownComponent: object;
 }>();
 
 
@@ -32,8 +31,6 @@ section {
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 2rem;
-    padding: 0 1rem;
-    padding-top: 1rem;
 }
 
 .overview-header {
