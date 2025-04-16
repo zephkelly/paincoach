@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 import { PHONE_REGEX } from '@@/shared/constants/phone';
 import { UUIDSchema, BigIntSchema } from '../../primitives';
@@ -35,7 +34,7 @@ export const DBBaseUserSchema = z.object({
     verified: z.boolean(),
     
     phone_number: z.string()
-        .regex(PHONE_REGEX, 'Invalid phone number format')
+        .regex(PHONE_REGEX, { error: 'Invalid phone number format' })
         .max(50, 'Phone number must be less than 50 characters')
         .nullable().optional(),
 
@@ -111,7 +110,7 @@ export const BaseUserWithRolesSchema = BaseUserSchema.extend({
 export function validateUserStatus(data: unknown): z.infer<typeof DBUserStatusSchema> {
     const parsedResult = DBUserStatusSchema.safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid user status';
     }
     return parsedResult.data;
 }

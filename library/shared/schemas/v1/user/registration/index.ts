@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 import { UUIDSchema, BigIntSchema } from "@@/shared/schemas/primitives";
 
@@ -48,29 +47,10 @@ export const UserRegisterStrictSchema = UserRegisterSchema.refine((data) => {
 });
 
 export const UserRegisterPartialSchema = UserRegisterSchema.partial().extend({
-    // invitation_token: UUIDSchema,
     medications: z.array(CreateEncryptedPainMedicationDataV1RequestPartialSchema).min(1).nullable().optional(),
     role_data: z.array(DBUserRegistrationDataPartialSchema).min(1),
 })
 
-
-
-// export function validateUserRegister(data: unknown): z.infer<typeof UserRegisterSchema> {
-//     const parsedResult = UserRegisterSchema.safeParse(data);
-//     if (!parsedResult.success) {
-//         throw createZodValidationError(parsedResult.error);
-//     }
-//     return parsedResult.data;
-// }
-
 export const userRegisterValidator = createSchemaValidator(UserRegisterSchema);
 
 export const userRegisterStrictValidator = createSchemaValidator(UserRegisterStrictSchema);
-
-// export function validateUserRegisterPartial(data: unknown): z.infer<typeof UserRegisterPartialSchema> {
-//     const parsedResult = UserRegisterPartialSchema.safeParse(data);
-//     if (!parsedResult.success) {
-//         throw createZodValidationError(parsedResult.error);
-//     }
-//     return parsedResult.data;
-// }

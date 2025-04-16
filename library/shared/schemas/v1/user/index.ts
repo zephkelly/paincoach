@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { createZodValidationError } from "@@/shared/utils/zod/error";
 
 import {
     DBOwnerUserSchema,
@@ -45,7 +44,7 @@ export const DBUserSchema = z.discriminatedUnion('primary_role', [
 export function validateDBUser(data: unknown): z.infer<typeof DBUserSchema> {
     const parsedResult = DBUserSchema.safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid user';
     }
     return parsedResult.data;
 }
@@ -53,7 +52,7 @@ export function validateDBUser(data: unknown): z.infer<typeof DBUserSchema> {
 export function validateDBUsers(data: unknown): z.infer<typeof DBUserSchema>[] {
     const parsedResult = z.array(DBUserSchema).safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid users';
     }
     return parsedResult.data;
 }   
@@ -70,7 +69,7 @@ export const DBUserWithRolesSchema = z.discriminatedUnion('primary_role', [
 export function validateDBUserWithRoles(data: unknown): z.infer<typeof DBUserWithRolesSchema> {
     const parsedResult = DBUserWithRolesSchema.safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid user with roles';
     }
     return parsedResult.data;
 }
@@ -87,7 +86,7 @@ export const UserSchema = z.discriminatedUnion('primary_role', [
 export function validateUser(data: unknown): z.infer<typeof UserSchema> {
     const parsedResult = UserSchema.safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid user';
     }
     return parsedResult.data;
 }
@@ -95,7 +94,7 @@ export function validateUser(data: unknown): z.infer<typeof UserSchema> {
 export function validateUsers(data: unknown): z.infer<typeof UserSchema>[] {
     const parsedResult = z.array(UserSchema).safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid users';
     }
     return parsedResult.data;
 }
@@ -112,7 +111,7 @@ export const UserWithRolesSchema = z.discriminatedUnion('primary_role', [
 export function validateUserWithRoles(data: unknown): z.infer<typeof UserWithRolesSchema> {
     const parsedResult = UserWithRolesSchema.safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid user with roles';
     }
     return parsedResult.data;
 }
@@ -120,7 +119,7 @@ export function validateUserWithRoles(data: unknown): z.infer<typeof UserWithRol
 export function validateUsersWithRoles(data: unknown): z.infer<typeof UserWithRolesSchema>[] {
     const parsedResult = z.array(UserWithRolesSchema).safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid users with roles';
     }
     return parsedResult.data;
 }

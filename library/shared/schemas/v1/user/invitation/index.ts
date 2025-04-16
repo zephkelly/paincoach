@@ -1,5 +1,4 @@
-import { z } from "zod";
-import { createZodValidationError } from "@@/shared/utils/zod/error";
+import * as z from "zod";
 
 import { UUIDSchema, BigIntSchema } from "@@/shared/schemas/primitives";
 
@@ -45,21 +44,3 @@ export const DBUserInvitationSchema = DBBaseUserWithRolesSchema.pick({
 export const DBUserInvitationPartialSchema = DBUserInvitationSchema.partial()
 
 export const DBUserInvitationValidator = createSchemaValidator(DBUserInvitationSchema);
-
-
-
-// export function validateDBUserInvitation(data: unknown): z.infer<typeof DBUserInvitationSchema> {
-//     const parsedResult = DBUserInvitationSchema.safeParse(data);
-//     if (!parsedResult.success) {
-//         throw createZodValidationError(parsedResult.error);
-//     }
-//     return parsedResult.data;
-// }
-
-// export function validateDBUserInvitationPartial(data: unknown): z.infer<typeof DBUserInvitationPartialSchema> {
-//     const parsedResult = DBUserInvitationPartialSchema.safeParse(data);
-//     if (!parsedResult.success) {
-//         throw createZodValidationError(parsedResult.error);
-//     }
-//     return parsedResult.data;
-// }
