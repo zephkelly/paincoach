@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 import { UUIDSchema, BigIntSchema } from "@@/shared/schemas/primitives";
 
@@ -8,7 +7,7 @@ import { DBBaseUserWithRolesSchema } from "@@/shared/schemas/v1/user/base";
 import { DBUserRegistrationDataSchema, DBUserRegistrationDataPartialSchema } from "@@/shared/schemas/v1/user/registration/data";
 
 import { CreateEncryptedPainMedicationDataV1RequestSchema, CreateEncryptedPainMedicationDataV1RequestPartialSchema } from "@@/shared/schemas/v1/medication/v1";
-import { createSchemaValidator } from '@@/shared/utils/zod/new';
+import { createSchemaValidator } from '@@/layers/ember/utils/validator';
 
 
 
@@ -48,29 +47,10 @@ export const UserRegisterStrictSchema = UserRegisterSchema.refine((data) => {
 });
 
 export const UserRegisterPartialSchema = UserRegisterSchema.partial().extend({
-    // invitation_token: UUIDSchema,
     medications: z.array(CreateEncryptedPainMedicationDataV1RequestPartialSchema).min(1).nullable().optional(),
     role_data: z.array(DBUserRegistrationDataPartialSchema).min(1),
 })
 
-
-
-// export function validateUserRegister(data: unknown): z.infer<typeof UserRegisterSchema> {
-//     const parsedResult = UserRegisterSchema.safeParse(data);
-//     if (!parsedResult.success) {
-//         throw createZodValidationError(parsedResult.error);
-//     }
-//     return parsedResult.data;
-// }
-
 export const userRegisterValidator = createSchemaValidator(UserRegisterSchema);
 
 export const userRegisterStrictValidator = createSchemaValidator(UserRegisterStrictSchema);
-
-// export function validateUserRegisterPartial(data: unknown): z.infer<typeof UserRegisterPartialSchema> {
-//     const parsedResult = UserRegisterPartialSchema.safeParse(data);
-//     if (!parsedResult.success) {
-//         throw createZodValidationError(parsedResult.error);
-//     }
-//     return parsedResult.data;
-// }

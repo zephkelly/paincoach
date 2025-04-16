@@ -21,7 +21,7 @@
                 <div class="progress-bar">
                     <div class="progress" :style="{ width: `${progressPercentage}%` }"></div>
                 </div>
-                <div class="progress-text">{{ displayCurrentPage }} / {{ displayTotalPages }}</div>
+                <!-- <div class="progress-text">{{ displayCurrentPage }} / {{ displayTotalPages }}</div> -->
             </div>
         </template>
         
@@ -46,6 +46,66 @@
         
         <!-- Second page (Full page mode) -->
         <template #page-2>
+            <div class="modal-inner full-page pain-level">
+                <LogCard
+                    title="What was your level of pain today?"
+                >
+                    <LogIconSlider
+                        :min="0"
+                        :max="10"
+                        v-model="painLevel"
+                        :value-config="{
+                            precision: 0
+                        }"
+                        :indicators="{
+                            stepIndicatorStyle: 'numbered',
+                            maxIndicators: 11
+                        }"
+                        :descriptors="[
+                            { label: 'No Pain', value: 0 },
+                            { label: 'Mild', value: 2 },
+                            { label: 'Moderate', value: 4 },
+                            { label: 'Severe', value: 6 },
+                            { label: 'Very severe', value: 8 },
+                            { label: 'Worst pain imaginable', value: 10 }
+                        ]"
+                    >
+                        <template #icon-0>
+                            <svg xmlns="http://www.w3.org/2000/svg" stroke="currentColor" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2 4-7 4s-7-4-7-4"/></g></svg>
+                        </template>
+
+                        <template #icon-1>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><!-- Icon from IconPark Outline by ByteDance - https://github.com/bytedance/IconPark/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m0 12h14"/></g></svg>
+                        </template>
+
+                        <template #icon-2>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><!-- Icon from IconPark Outline by ByteDance - https://github.com/bytedance/IconPark/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m0 13l14-2"/></g></svg>
+                        </template>
+
+                        <template #icon-3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2-4-7-4s-7 4-7 4"/></g></svg>
+                        </template>
+
+                        <template #icon-4>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="m33 25l-4-2m-11 0l-4 2m17 10s-2-4-7-4s-7 4-7 4"/></g></svg>
+                        </template>
+                    </LogIconSlider>
+                    <div class="modal-actions">
+                        <EButton
+                            identifier="recordRequestModal"
+                            class="modal-button"
+                            @click="saveEntry"
+                        >
+                            Continue
+                        </EButton>
+                    </div>
+                </LogCard>
+
+            </div>
+        </template>
+        
+        <!-- Third page -->
+        <template #page-3>
             <div class="modal-inner full-page">
                 <h2>Record your entry</h2>
                 <p>Share what's on your mind today.</p>
@@ -58,41 +118,6 @@
                         placeholder="Type your entry here..."
                         class="entry-textarea"
                     ></textarea>
-                </div>
-                
-                <div class="modal-actions">
-                    <EButton
-                        class="modal-button"
-                        @click="saveEntry"
-                    >
-                        Continue
-                    </EButton>
-                </div>
-            </div>
-        </template>
-        
-        <!-- Third page -->
-        <template #page-3>
-            <div class="modal-inner full-page">
-                <h2>Add details</h2>
-                <p>Add some context to your entry.</p>
-                
-                <div class="details-container">
-                    <!-- Content for the third page -->
-                    <div class="form-group">
-                        <label>How are you feeling?</label>
-                        <div class="mood-selector">
-                            <button 
-                                v-for="mood in moods" 
-                                :key="mood.value"
-                                :class="['mood-button', { active: selectedMood === mood.value }]"
-                                @click="selectedMood = mood.value"
-                            >
-                                {{ mood.emoji }}
-                                <span>{{ mood.label }}</span>
-                            </button>
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="modal-actions">
@@ -133,14 +158,6 @@ const displayCurrentPage = computed(() => {
 const displayTotalPages = computed(() => {
     return modalRef.value?.displayTotalPages || 0;
 });
-
-const moods = [
-    { value: 'great', label: 'Great', emoji: '😁' },
-    { value: 'good', label: 'Good', emoji: '🙂' },
-    { value: 'okay', label: 'Okay', emoji: '😐' },
-    { value: 'sad', label: 'Sad', emoji: '😔' },
-    { value: 'bad', label: 'Bad', emoji: '😫' }
-];
 
 const progressPercentage = computed(() => {
     if (currentPage.value === 1) {
@@ -190,7 +207,7 @@ const startRecording = () => {
 
 const saveEntry = () => {
     // Go to next page
-    currentPage.value = 3;
+    currentPage.value = currentPage.value + 1;
 };
 
 const finishEntry = () => {
@@ -216,12 +233,21 @@ defineExpose({
 .modal-inner {
     padding: 1rem;
     padding-bottom: 1.5rem;
+    position: relative;
     
     &.full-page {
-        padding: 1.5rem;
+        padding: 1rem;
+        padding-bottom: 1.5rem;
         min-height: calc(100vh - 150px);
+        height: calc(100% - 20px - 1.5rem);
         display: flex;
         flex-direction: column;
+
+        & > * {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
     }
     
     h2 {
@@ -254,12 +280,13 @@ defineExpose({
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
+    justify-content: center;
     padding: 0.5rem 0;
     
     .progress-bar {
-        width: 70%;
-        height: 4px;
+        width: calc(100% - 24px - 1rem - 8px);
+        height: 12px;
         background-color: var(--border-color);
         border-radius: 2px;
         overflow: hidden;
@@ -272,6 +299,7 @@ defineExpose({
     }
     
     .progress-text {
+        position: absolute;
         font-size: 0.8rem;
         margin-top: 0.5rem;
         color: var(--text-3-color);
@@ -349,6 +377,7 @@ defineExpose({
 }
 
 .modal-actions {
+    margin-top: 3.5rem;
     .modal-button {
         width: 100%;
         font-size: 0.9rem;
@@ -357,7 +386,7 @@ defineExpose({
         text-transform: uppercase;
         letter-spacing: 1px;
         padding: 1.35rem 1.5rem;
-        margin-bottom: 1rem;
+        // margin-bottom: 1rem;
         background-color: var(--lifestyle-color);
         border-color: var(--lifestyle-color);
         color: var(--text-color);

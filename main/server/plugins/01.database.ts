@@ -1,5 +1,6 @@
 import { DatabaseService } from '~~/server/services/databaseService'
 import { setupInvitationTables } from '../utils/database/invitation'
+import { createDailyPainRecordTable } from '../utils/database/record/daily/pain'
 
 
 
@@ -212,6 +213,8 @@ async function createTables(db: DatabaseService) {
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
     `);
+
+    await createDailyPainRecordTable(db)
 }
 
 async function seedPermissions(db: DatabaseService) {

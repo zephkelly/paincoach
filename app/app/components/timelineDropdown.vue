@@ -1,7 +1,7 @@
 <template>
     <div class="timeline" :class="{ open: isEnabled }">
         <button @click.prevent="debouncedToggleEnabled" class="main" :class="currentTimeline">
-            <div class="current-selection none"></div>
+            <p>{{ currentTimelineLength?.label }}</p>
             <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px"><path d="M480-397.85 311.85-566h336.3L480-397.85Z"/></svg>
         </button>
         <Transition name="fade">
@@ -9,6 +9,7 @@
                 <ul>
                     <li v-for="option in dropdownOptions" :key="option.value">
                         <button @click.prevent="debouncedSelectTimeline(option.value)" :class="option.value">
+                            <p>{{ option.label }}</p>
                         </button>
                     </li>
                 </ul>
@@ -56,10 +57,10 @@ const debouncedSelectTimeline = debounce((value: TimelineOverview) => {
     justify-content: flex-start;
     width: 100%;
     height: 100%;
-    max-width: 80px;
+    /* max-width: 160px; */
     margin-right: auto;
     border-radius: 10px;
-    background-color: var(--panel);
+    background-color: var(--panel-color);
     transition: background-color 0.2s cubic-bezier(0.075, 0.82, 0.165, 1), box-shadow 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
     box-shadow: none;
 }

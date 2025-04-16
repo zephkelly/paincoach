@@ -4,42 +4,44 @@
         <div class="descriptor-container" v-if="processedDescriptors.length > 0">
             <p>{{ getCurrentDescriptor() }}</p>
         </div>
-        <div class="slider-wrapper">
-            <ESlider
-                class="icon-slider-input"
-                :modelValue="modelValue"
-                :color="color"
-                :min="min"
-                :max="max"
-                :max-indicators="(indicators?.maxIndicators !== undefined) ? indicators?.maxIndicators : 5"
-                :precision="0"
-                :color-variables="colorVariables"
-                :step-indicator-style="indicators?.stepIndicatorStyle"
-                :transition-speed="animation?.transitionSpeed"
-                :bounceEffect="animation?.bounceEffect"
-                :edge-easing-strength="animation?.edgeEasingStrength"
-                :invertColors="invertColors"
-                @update:modelValue="updateValue"
-                @update:color="updateColor"
-                @slider-moving="onSliderMoving"
-                @slider-stopped="onSliderStop"
-            />
-        </div>
-        
-        <div v-if="!noIcons" class="svg-container" ref="svgContainer">
-            <!-- Iterate through the slot icons using the named slots -->
-            <template v-for="(_, index) in iconSlots" :key="index">
-                <div class="svg-touch-container" @click="handleFaceClick(index)">
-                    <div class="icon-wrapper" :style="{color: getAnimatedIconColor(index)}">
-                        <slot :name="`icon-${index}`">
-                            <!-- Default icons as fallback if no slot is provided -->
-                            <svg v-if="index === 0" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2 4-7 4s-7-4-7-4"/></g></svg>
-                            <svg v-else-if="index === 1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><!-- Icon from IconPark Outline by ByteDance - https://github.com/bytedance/IconPark/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m0 12h14"/></g></svg>
-                            <svg v-else-if="index === 2" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2-4-7-4s-7 4-7 4"/></g></svg>
-                        </slot>
+        <div class="group">
+            <div class="slider-wrapper">
+                <ESlider
+                    class="icon-slider-input"
+                    :modelValue="modelValue"
+                    :color="color"
+                    :min="min"
+                    :max="max"
+                    :max-indicators="(indicators?.maxIndicators !== undefined) ? indicators?.maxIndicators : 5"
+                    :precision="0"
+                    :color-variables="colorVariables"
+                    :step-indicator-style="indicators?.stepIndicatorStyle"
+                    :transition-speed="animation?.transitionSpeed"
+                    :bounceEffect="animation?.bounceEffect"
+                    :edge-easing-strength="animation?.edgeEasingStrength"
+                    :invertColors="invertColors"
+                    @update:modelValue="updateValue"
+                    @update:color="updateColor"
+                    @slider-moving="onSliderMoving"
+                    @slider-stopped="onSliderStop"
+                />
+            </div>
+            
+            <div v-if="!noIcons" class="svg-container" ref="svgContainer">
+                <!-- Iterate through the slot icons using the named slots -->
+                <template v-for="(_, index) in iconSlots" :key="index">
+                    <div class="svg-touch-container" @click="handleFaceClick(index)">
+                        <div class="icon-wrapper" :style="{color: getAnimatedIconColor(index)}">
+                            <slot :name="`icon-${index}`">
+                                <!-- Default icons as fallback if no slot is provided -->
+                                <svg v-if="index === 0" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2 4-7 4s-7-4-7-4"/></g></svg>
+                                <svg v-else-if="index === 1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><!-- Icon from IconPark Outline by ByteDance - https://github.com/bytedance/IconPark/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m0 12h14"/></g></svg>
+                                <svg v-else-if="index === 2" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4S4 12.954 4 24s8.954 20 20 20Z"/><path stroke-linecap="round" d="M31 18v1m-14-1v1m14 12s-2-4-7-4s-7 4-7 4"/></g></svg>
+                            </slot>
+                        </div>
                     </div>
-                </div>
-            </template>
+                </template>
+            </div>
         </div>
 
     </div>
@@ -428,9 +430,19 @@ watchEffect(() => {
 .icon-slider {
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     flex-direction: column;
+    height: 100%;
+    flex: 1;
+
+    .group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        width: 100%;
+    }
 }
 
 .slider-wrapper {

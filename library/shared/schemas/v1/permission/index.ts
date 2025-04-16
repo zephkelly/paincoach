@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 // Definition of permission components
 export const ResourceTypes = ['user', 'invitation', 'app'] as const;
@@ -370,7 +369,7 @@ export function validatePermission(permission: unknown): Permission {
   const parsedResult = PermissionSchema.safeParse(permission);
  
   if (!parsedResult.success) {
-    throw createZodValidationError(parsedResult.error);
+    throw 'Invalid permission format';
   }
   
   return parsedResult.data;
@@ -380,7 +379,7 @@ export function validatePermissions(permissions: unknown): Permission[] {
   const parsedResult = z.array(PermissionSchema).safeParse(permissions);
  
   if (!parsedResult.success) {
-    throw createZodValidationError(parsedResult.error);
+    throw 'Invalid permissions format';
   }
   
   return parsedResult.data;

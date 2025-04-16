@@ -6,16 +6,16 @@
 </template>
 
 <script setup lang="ts">
-import { type DayIndicatorLabelType } from '~~/layers/legacy/types/dayIndicator';
-import type { PainLevel } from '~~/layers/legacy/types/painLevel';
-import type { DayOfWeekLabel } from '~~/layers/legacy/types/day';
+import { type DayIndicatorLabelType } from '~~/shared/types/day';
+import type { PainLevel } from '~~/shared/types/pain';
+import type { DayOfWeekLabel } from '~~/shared/types/day';
 
 interface Props {
     isEmpty: boolean,
     labelType: DayIndicatorLabelType,
     labelContent: DayOfWeekLabel | number,
     dayIndex: number
-    painLevel: PainLevel | number | null,
+    painLevel: PainLevel
 }
 
 const props = defineProps<Props>();

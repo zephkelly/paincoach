@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createSchemaValidator } from "@@/shared/utils/zod/new";
+import { createSchemaValidator } from "@@/layers/ember/utils/validator";
 
 
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createSchemaValidator } from '@@/shared/utils/zod/new';
+import { createSchemaValidator } from '@@/layers/ember/utils/validator';
 import { UUIDSchema } from '@@/shared/schemas/primitives';
 
 import { RoleSchema } from '@@/shared/schemas/v1/role';

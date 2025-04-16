@@ -35,6 +35,8 @@ export async function getPainCoachSession(event: H3Event) {
 
     return {
         session,
+        registeredSession: session as UserSession,
+        unregisteredSession: session as UnregisteredUserSession,
         secureSession,
         userSession,
         

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { createZodValidationError } from '@@/shared/utils/zod/error';
 
 import { DBBaseUserSchema, DBBaseUserWithRolesSchema } from './base';
 
@@ -71,7 +70,7 @@ export const LimitedUserSchema = z.discriminatedUnion('primary_role', [
 export function validateLimitedUser(data: any) {
     const parsedResult = LimitedUserSchema.safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid limited user';
     }
     return parsedResult.data;
 }
@@ -85,14 +84,14 @@ export const LimitedUserWithRolesSchema = z.discriminatedUnion('primary_role', [
 export function validateLimitedUserWithRoles(data: any) {
     const parsedResult = LimitedUserWithRolesSchema.safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid limited user with roles';
     }
     return parsedResult.data;
 }
 export function validateLimitedUsersWithRoles(data: any[]) {
     const parsedResult = LimitedUserWithRolesSchema.array().safeParse(data);
     if (!parsedResult.success) {
-        throw createZodValidationError(parsedResult.error);
+        throw 'Invalid limited users with roles';
     }
     return parsedResult.data;
 }
