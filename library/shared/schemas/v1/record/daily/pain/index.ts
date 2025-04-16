@@ -1,5 +1,6 @@
 import * as z from "zod";
-import { UUIDSchema } from "../../primitives";
+import { UUIDSchema } from "../../../../primitives";
+import { createSchemaValidator } from "@@/layers/ember/utils/validator";
 
 
 
@@ -57,3 +58,5 @@ export const DBPainDailyRecord = z.interface({
 
     notes: z.string().max(500).optional(),
 })
+
+export const DBPainDailyRecordValidator = createSchemaValidator(DBPainDailyRecord);

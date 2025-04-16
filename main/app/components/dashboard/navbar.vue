@@ -94,7 +94,7 @@
             </NuxtLink>
         </div>
     </header>
-    <DashboardAccountOptionsModal />
+    <!-- <DashboardAccountOptionsModal /> -->
 </template>
 
 <script lang="ts" setup>

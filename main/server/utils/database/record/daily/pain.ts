@@ -68,6 +68,41 @@ export async function createDailyPainRecordTable(db: DatabaseService) {
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
+        
+        CREATE OR REPLACE VIEW record.last_30_days_daily_record_pain AS
+        SELECT
+            user_id,
+            date,
+            created_at,
+            updated_at,
+            version,
+
+            pain_level,
+
+            mood_level,
+            stress_level,
+            anxiety_level,
+
+            sleep_duration,
+            sleep_quality,
+            sleep_wake_ups,
+
+            plant_intake_level,
+            whole_food_intake_level,
+            sugar_intake_level,
+
+            exercise_duration,
+            exercise_intensity,
+            exercise_safety,
+
+            social_quality,
+            social_belonging,
+
+            notes
+        FROM record.daily_record_pain
+        WHERE date >= CURRENT_DATE - INTERVAL '30 days'
+        AND date <= CURRENT_DATE
+        ORDER BY date DESC;
     `)
 }
     // -- Create a trigger to call the function before update
@@ -75,3 +110,7 @@ export async function createDailyPainRecordTable(db: DatabaseService) {
     // BEFORE UPDATE ON record.daily_record_pain
     // FOR EACH ROW
     // EXECUTE FUNCTION record.update_timestamp();
+    
+    // 
+    
+    

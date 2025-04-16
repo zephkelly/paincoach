@@ -20,7 +20,18 @@ import { uuidv7 } from '@@/shared/utils/uuid';
 
 const newDate = ref(new Date())
 
-const uuid = uuidv7();
+async function getRecords() {
+    try {
+        const records = await $fetch('/api/v1/record/daily/pain/month');
+
+        console.log('Fetched records', records);
+    }
+    catch(error: any) {
+        console.error('Error fetching records:', error);
+    }
+}
+
+getRecords();
 
 type PainFactor = 'psychological distress' | 'sleep' | 'exercise' | 'nutrition' | 'social connection';
 type PainFactorID = 'psychological' | 'sleep' | 'exercise' | 'nutrition' | 'social';
