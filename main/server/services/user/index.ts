@@ -17,7 +17,7 @@ import type { UnregisteredUserSession } from '#auth-utils';
 import type { UserRegister } from '@@/shared/types/v1/user/registration';
 
 import { PERMISSIONS } from '@@/shared/schemas/v1/permission';
-import { UUID7 } from '@@/shared/utils/uuid';
+import { uuidv7 } from '@@/shared/utils/uuid';
 
 
 
@@ -110,7 +110,7 @@ export class UserService {
         // Create main user profile
         const hashedPassword = await hashPassword(userRegisterRequest.password);
 
-        const user_id: string = UUID7();
+        const user_id: string = uuidv7();
         const transaction = await DatabaseService.getInstance().createTransaction();
 
         try {

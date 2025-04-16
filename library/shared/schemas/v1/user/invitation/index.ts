@@ -5,7 +5,7 @@ import { UUIDSchema, BigIntSchema } from "@@/shared/schemas/primitives";
 
 import { DBBaseUserWithRolesSchema } from "../base";
 import { DBUserInvitationDataSchema } from "./data";
-import { createSchemaValidator } from "@@/shared/utils/zod/new";
+import { createSchemaValidator } from "@@/layers/ember/utils/validator";
 
 
 

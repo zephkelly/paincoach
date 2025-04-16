@@ -6,7 +6,9 @@
                 <TimelineDropdown :initialDate="newDate" />
             </template>
         </MainHeader>
-        <CalendarOverview :initialDate="newDate" /> 
+        <ECard>
+            <CalendarOverview :initialDate="newDate" /> 
+        </ECard>
             <!-- <OverviewLifestyleScore :lifestyleScore="82"/>
             <OverviewPainFactors :painFactors="factors" /> -->
     </MobilePage>
@@ -14,15 +16,14 @@
 
 
 <script setup lang="ts">
-const {
-    recordRequestModalOpen,
-    lastClickEvent
-} = useRecordRequest();
+import { uuidv7 } from '@@/shared/utils/uuid';
 
 const newDate = ref(new Date())
 
-export type PainFactor = 'psychological distress' | 'sleep' | 'exercise' | 'nutrition' | 'social connection';
-export type PainFactorID = 'psychological' | 'sleep' | 'exercise' | 'nutrition' | 'social';
+const uuid = uuidv7();
+
+type PainFactor = 'psychological distress' | 'sleep' | 'exercise' | 'nutrition' | 'social connection';
+type PainFactorID = 'psychological' | 'sleep' | 'exercise' | 'nutrition' | 'social';
 
 export interface PainFactorProps {
     factorID: PainFactorID

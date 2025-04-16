@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { DBUserInvitationSchema } from './index';
-import { createSchemaValidator } from '@@/shared/utils/zod/new';
+import { createSchemaValidator } from '@@/layers/ember/utils/validator';
 
 
 

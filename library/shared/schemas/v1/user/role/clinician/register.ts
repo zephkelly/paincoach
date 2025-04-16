@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createSchemaValidator } from "@@/shared/utils/zod/new";
+import { createSchemaValidator } from "@@/layers/ember/utils/validator";
 
 import { DBClinicianSpecialisations, DBClinicianUserDataSchema } from "./data";
 import { DBBaseUserRegistrationDataSchema } from "@@/shared/schemas/v1/user/registration/data/base";

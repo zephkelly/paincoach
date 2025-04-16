@@ -7,26 +7,26 @@
             </h3>
         </div>
         <div class="wrapper days">
-            <!-- <div ref="daysContainer" class="days-grid"> -->
-                <TransitionGroup name="list" tag="div" class="days-grid">
-                    <CalendarDayIndicator v-for="emptyDay in emptyDaysAtStart"
-                        :key="`empty-${emptyDay}`"
-                        :labelType="dayLabelType"
-                        :labelContent="daysOfWeekLabels[emptyDay - 1 % 7]"
-                        :painLevel="null"
-                        :isEmpty="true"
-                        :dayIndex="emptyDay"
-                    />
-                    <CalendarDayIndicator v-for="day in calendarDays"
-                        :key="day.index"
-                        :labelType="dayLabelType"
-                        :labelContent="daysOfWeekLabels[day.index % 7]"
-                        :painLevel="day.painLevel"
-                        :isEmpty="false"
-                        :dayIndex="day.index"
-                    />
-                </TransitionGroup>
-            <!-- </div> -->
+            <TransitionGroup name="list" tag="div" class="days-grid">
+                <!-- @vue-expect-error -->
+                <CalendarDayIndicator v-for="emptyDay in emptyDaysAtStart"
+                    :key="`empty-${emptyDay}`"
+                    :labelType="dayLabelType"
+                    :labelContent="daysOfWeekLabels[emptyDay - 1 % 7]"
+                    :painLevel="null"
+                    :isEmpty="true"
+                    :dayIndex="emptyDay"
+                />
+                <!-- @vue-expect-error -->
+                <CalendarDayIndicator v-for="day in calendarDays"
+                    :key="day.index"
+                    :labelType="dayLabelType"
+                    :labelContent="daysOfWeekLabels[day.index % 7]"
+                    :painLevel="day.painLevel"
+                    :isEmpty="false"
+                    :dayIndex="day.index"
+                />
+            </TransitionGroup>
         </div>
     </section>
 </template>
@@ -127,7 +127,7 @@ onMounted(() => {
 .headers.wrapper {
     display: flex;
     justify-content: flex-start;
-    margin-bottom: calc(1.5rem + 2rem);
+    margin-bottom: 4rem;
     width: 100%;
 }
 

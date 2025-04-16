@@ -1,5 +1,5 @@
 // Used for login verification
-import { createSchemaValidator } from '@@/shared/utils/zod/new';
+import { createSchemaValidator } from '@@/layers/ember/utils/validator';
 import { DBBaseUserWithRolesSchema } from '../base';
 
 

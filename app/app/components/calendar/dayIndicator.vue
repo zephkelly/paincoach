@@ -15,7 +15,7 @@ interface Props {
     labelType: DayIndicatorLabelType,
     labelContent: DayOfWeekLabel | number,
     dayIndex: number
-    painLevel: PainLevel | number | null,
+    painLevel: PainLevel
 }
 
 const props = defineProps<Props>();

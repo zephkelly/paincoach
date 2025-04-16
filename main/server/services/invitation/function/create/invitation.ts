@@ -1,7 +1,7 @@
 import type { UserSession, UnregisteredUserSession } from '#auth-utils';
 import { PERMISSIONS, type Permission } from '@@/shared/schemas/v1/permission';
 
-import { UUID7 } from '@@/shared/utils/uuid';
+import { uuidv7 } from '@@/shared/utils/uuid';
 import { validateUUID } from '@@/shared/schemas/primitives';
 import type { CreateUserInvitationRequest } from '@@/shared/types/v1/user/invitation/create';
 
@@ -56,7 +56,7 @@ export async function createInvitation(
         });
     }
 
-    const invitationToken = UUID7();
+    const invitationToken = uuidv7();
 
     const transaction = await DatabaseService.getInstance().createTransaction();
 

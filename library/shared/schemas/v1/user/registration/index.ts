@@ -8,7 +8,7 @@ import { DBBaseUserWithRolesSchema } from "@@/shared/schemas/v1/user/base";
 import { DBUserRegistrationDataSchema, DBUserRegistrationDataPartialSchema } from "@@/shared/schemas/v1/user/registration/data";
 
 import { CreateEncryptedPainMedicationDataV1RequestSchema, CreateEncryptedPainMedicationDataV1RequestPartialSchema } from "@@/shared/schemas/v1/medication/v1";
-import { createSchemaValidator } from '@@/shared/utils/zod/new';
+import { createSchemaValidator } from '@@/layers/ember/utils/validator';
 
 
 
