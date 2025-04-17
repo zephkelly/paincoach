@@ -226,7 +226,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 const props = defineProps({
   debug: {
     type: Boolean,
-    default: false
+    default: true
   },
   // Delay before showing install prompt on Chrome
   chromePromptDelay: {
