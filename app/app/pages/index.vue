@@ -22,9 +22,9 @@ const newDate = ref(new Date())
 
 async function getRecords() {
     try {
-        const records = await $fetch('/api/v1/record/daily/pain/month');
+        const { data } = await useFetch('/api/v1/record/daily/pain/month');
 
-        console.log('Fetched records', records);
+        console.log('Fetched records', data.value);
     }
     catch(error: any) {
         console.error('Error fetching records:', error);

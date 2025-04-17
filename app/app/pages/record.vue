@@ -344,9 +344,9 @@ const exerciseLevel = ref(3);
 const relationshipLevel = ref(3);
 const belongingLevel = ref(3);
 
-definePageMeta({
-    layout: 'empty'
-})
+// definePageMeta({
+//     layout: 'empty'
+// })
 </script>
 
 <style lang="scss" scoped>

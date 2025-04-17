@@ -163,32 +163,9 @@
             "type": "image/png",
             "purpose": "any maskable"
         }
-        ],
-        "screenshots": [
-        {
-            "src": "img/screenshots/screen1.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "App Homepage"
-        },
-        {
-            "src": "img/screenshots/screen2.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "App Features"
-        },
-        {
-            "src": "img/screenshots/mobile1.png",
-            "sizes": "750x1334",
-            "type": "image/png",
-            "form_factor": "narrow",
-            "label": "Mobile App Home"
-        }
     ],
     "categories": ["productivity", "utilities"],
-    "orientation": "vertical",
+    "orientation": "portrait",
     "lang": "en",
     "dir": "ltr",
     "prefer_related_applications": false

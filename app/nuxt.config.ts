@@ -18,6 +18,10 @@ export default defineNuxtConfig({
         '~/assets/scss/global.scss',
     ],
 
+    plugins: [
+        { src: '~/plugins/register-service-worker.client.ts', mode: 'client' }
+    ],
+
     app: {
         head: {
            link: [
