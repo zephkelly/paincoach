@@ -1,6 +1,5 @@
 <template>
     <div class="pwa-installer">
-      <!-- Installation prompt -->
       <div v-if="showInstallPrompt && !customInstructionsShown && !isStandalone" class="install-prompt">
         <div class="prompt-content">
           <div class="prompt-icon">📱</div>
@@ -15,7 +14,6 @@
         </div>
       </div>
       
-      <!-- Update prompt -->
       <div v-if="updateAvailable" class="update-prompt">
         <div class="prompt-content">
           <div class="prompt-icon">🔄</div>
@@ -30,7 +28,6 @@
         </div>
       </div>
   
-      <!-- iOS Installation Instructions Modal -->
       <div v-if="showIOSInstructions" class="pwa-install-instructions ios">
         <div class="instruction-modal">
           <div class="instruction-header">
@@ -57,7 +54,6 @@
         </div>
       </div>
   
-      <!-- Android Installation Instructions Modal -->
       <div v-if="showAndroidInstructions" class="pwa-install-instructions android">
         <div class="instruction-modal">
           <div class="instruction-header">
@@ -84,7 +80,6 @@
         </div>
       </div>
   
-      <!-- Desktop Installation Instructions Modal -->
       <div v-if="showDesktopInstructions" class="pwa-install-instructions desktop">
         <div class="instruction-modal">
           <div class="instruction-header">
@@ -231,7 +226,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 const props = defineProps({
   debug: {
     type: Boolean,
-    default: true
+    default: false
   },
   // Delay before showing install prompt on Chrome
   chromePromptDelay: {
@@ -290,9 +285,6 @@ declare global {
     'appinstalled': Event;
   }
 }
-
-console.log('PWA Installer Component Loading');
-console.log('Debug mode:', props.debug);
 
 // Platform detection state
 const platformInfo = ref({
@@ -899,6 +891,13 @@ const setupInstallabilityChecks = () => {
                 !hasUserDismissedPrompt() &&
                 !deferredPrompt.value) {
         logEvent('INFO', 'Eligible for installation but Chrome native prompt not available yet');
+
+        if (platformInfo.value.isIOS || platformInfo.value.browser === 'firefox') {
+          logEvent('ACTION', 'Showing manual installation instructions');
+          showAppropriateInstructions();
+        } else {
+          logEvent('INFO', 'Eligible for installation but no prompt available yet');
+        }
       }
     } else {
       // No need to keep checking if already installed or prompt has been handled
@@ -961,7 +960,6 @@ const monitorServiceWorkerState = () => {
           serviceWorkerState.value = e.target.state;
           logEvent('SERVICE_WORKER', `Service worker state changed to: ${e.target.state}`);
           
-          // Log when service worker is activated
           if (e.target.state === 'activated') {
             logEvent('SERVICE_WORKER', 'Service worker activated - PWA installation should now be possible');
           }
@@ -981,23 +979,18 @@ const monitorServiceWorkerState = () => {
   });
 };
 
-// Lifecycle hooks
 onMounted(() => {
   logEvent('LIFECYCLE', 'PWA Installer component mounted');
   
-  // Check for window/navigator availability (SSR safeguard)
   if (typeof window === 'undefined' || typeof navigator === 'undefined') {
     logEvent('ERROR', 'Window or navigator not available - likely running in SSR mode');
     return;
   }
   
-  // Add early event catcher script to catch events before component mounts
   addEarlyEventCatcher();
   
-  // Detect platform
   detectPlatform();
   
-  // Set up event listeners for tracking engagement
   document.addEventListener('click', trackUserEngagement);
   document.addEventListener('scroll', trackUserEngagement, { passive: true });
   
