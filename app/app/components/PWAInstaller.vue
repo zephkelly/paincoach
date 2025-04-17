@@ -277,6 +277,9 @@ declare global {
   }
   interface Navigator {
     standalone?: boolean;
+    userAgentData?: {
+      getHighEntropyValues: (hints: string[]) => Promise<{[key: string]: any}>;
+    };
     //@ts-expect-error
     maxTouchPoints?: number;
   }
@@ -381,23 +384,37 @@ const detectPlatform = () => {
   
   const ua = window.navigator.userAgent.toLowerCase();
   
+  // Feature-based detection for iOS (without using navigator.platform)
+  // iOS detection using multiple signals
+  const isIOS = /iphone|ipad|ipod|crios|fxios/.test(ua) || 
+                // Modern approach using maxTouchPoints for iOS detection
+                (navigator.maxTouchPoints && navigator.maxTouchPoints > 1 && 
+                 /macintosh/i.test(ua)) || 
+                // Specific check for Firefox on iOS
+                /fxios/.test(ua);
+  
   platformInfo.value = {
-    //@ts-expect-error
-    isIOS: /iphone|ipad|ipod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints && navigator.maxTouchPoints > 1),
+    isIOS: isIOS,
     isAndroid: /android/.test(ua),
-    isDesktop: !(/iphone|ipad|ipod|android/.test(ua)) && !(navigator.platform === 'MacIntel' && navigator.maxTouchPoints && navigator.maxTouchPoints > 1),
+    isDesktop: !isIOS && !/android/.test(ua),
     browser: '',
     version: ''
   };
   
   // Improved browser detection
-  if (/edg/.test(ua)) {
-    platformInfo.value.browser = 'edge';
-  } else if (/firefox|fxios/.test(ua)) {
+  if (/fxios/.test(ua)) {
     platformInfo.value.browser = 'firefox';
-  } else if (/chrome|chromium|crios/.test(ua)) {
+    logEvent('INFO', 'Detected Firefox on iOS');
+  } else if (/crios/.test(ua)) {
     platformInfo.value.browser = 'chrome';
-  } else if (/safari/.test(ua) && !/chrome|chromium|crios/.test(ua)) {
+    logEvent('INFO', 'Detected Chrome on iOS');
+  } else if (/edg/.test(ua)) {
+    platformInfo.value.browser = 'edge';
+  } else if (/firefox/.test(ua)) {
+    platformInfo.value.browser = 'firefox';
+  } else if (/chrome|chromium/.test(ua)) {
+    platformInfo.value.browser = 'chrome';
+  } else if (/safari/.test(ua) && !/chrome|chromium/.test(ua)) {
     platformInfo.value.browser = 'safari';
   } else if (/opera|opr/.test(ua)) {
     platformInfo.value.browser = 'opera';
@@ -405,10 +422,36 @@ const detectPlatform = () => {
     platformInfo.value.browser = 'ie';
   }
 
-  // Extract version number (simple implementation)
-  const versionMatch = ua.match(new RegExp(`${platformInfo.value.browser}\\/([\\d.]+)`));
+  // Extract version number
+  let versionMatch;
+  if (platformInfo.value.browser === 'firefox' && /fxios\/([\\d.]+)/.test(ua)) {
+    versionMatch = ua.match(/fxios\/([\\d.]+)/);
+  } else if (platformInfo.value.browser === 'chrome' && /crios\/([\\d.]+)/.test(ua)) {
+    versionMatch = ua.match(/crios\/([\\d.]+)/);
+  } else {
+    versionMatch = ua.match(new RegExp(`${platformInfo.value.browser}\\/([\\d.]+)`));
+  }
+  
   if (versionMatch && versionMatch[1]) {
     platformInfo.value.version = versionMatch[1];
+  }
+  
+  // Try to use more modern userAgentData if available
+  if (navigator.userAgentData) {
+    try {
+      // This is a more modern API but not available in all browsers
+      logEvent('INFO', 'Using modern userAgentData API for detection');
+      navigator.userAgentData.getHighEntropyValues(['platform', 'platformVersion'])
+        .then(data => {
+          logEvent('INFO', `Platform from userAgentData: ${data.platform}`);
+          // Could update with more detailed information here if needed
+        })
+        .catch(err => {
+          logEvent('WARNING', `Failed to get high entropy values: ${err}`);
+        });
+    } catch (e) {
+      logEvent('WARNING', `Error accessing userAgentData: ${e}`);
+    }
   }
   
   logEvent('INFO', `Platform detected: ${JSON.stringify(platformInfo.value)}`);
@@ -562,6 +605,21 @@ const handleAppInstalled = (): void => {
   statusMessage.value = 'App installed successfully';
 };
 
+const checkIfStandalone = () => {
+  if (typeof window === 'undefined') return false;
+  
+  // Various ways to detect standalone mode
+  const isStandalone = 
+    window.matchMedia('(display-mode: standalone)').matches || 
+    window.matchMedia('(display-mode: fullscreen)').matches ||
+    // For iOS Safari
+    (navigator as any).standalone ||
+    // For Android
+    document.referrer.includes('android-app://');
+    
+  return isStandalone;
+};
+
 // Comprehensive PWA eligibility check
 const checkPwaEligibility = () => {
   const diagnostics: string[] = [];
@@ -678,11 +736,17 @@ const showAppropriateInstructions = () => {
   if (platformInfo.value.isIOS) {
     logEvent('ACTION', 'Showing iOS installation instructions');
     showIOSInstructions.value = true;
+    showAndroidInstructions.value = false;
+    showDesktopInstructions.value = false;
   } else if (platformInfo.value.isAndroid) {
     logEvent('ACTION', 'Showing Android installation instructions');
+    showIOSInstructions.value = false;
     showAndroidInstructions.value = true;
+    showDesktopInstructions.value = false;
   } else if (platformInfo.value.isDesktop) {
     logEvent('ACTION', `Showing Desktop (${platformInfo.value.browser}) installation instructions`);
+    showIOSInstructions.value = false;
+    showAndroidInstructions.value = false;
     showDesktopInstructions.value = true;
   }
 };
@@ -873,6 +937,8 @@ const setupInstallabilityChecks = () => {
   const checkInterval = setInterval(() => {
     if (!isStandalone.value && !installPromptCalled.value) {
       logEvent('CHECK', 'Polling for installation eligibility');
+
+      isStandalone.value = checkIfStandalone();
       
       // Check if install conditions are met
       const isEligible = checkPwaEligibility();
@@ -995,9 +1061,7 @@ onMounted(() => {
   document.addEventListener('scroll', trackUserEngagement, { passive: true });
   
   // Check if already installed
-  isStandalone.value = window.matchMedia('(display-mode: standalone)').matches || 
-      (window.navigator as any).standalone || 
-      document.referrer.includes('android-app://');
+  isStandalone.value = checkIfStandalone();
   
   if (isStandalone.value) {
     logEvent('INFO', 'App is already installed in standalone mode');
