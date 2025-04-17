@@ -169,6 +169,36 @@ async function createTables(db: DatabaseService) {
     `);
 
     await db.query(`
+        CREATE TABLE IF NOT EXISTS private.app_profile (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+            user_id UUID NOT NULL REFERENCES private.user(id) ON DELETE CASCADE,
+            app_type TEXT NOT NULL, -- 'pain', 'mood', 'marriage', etc.
+            
+            -- App access and state
+            is_enabled BOOLEAN DEFAULT TRUE,
+            current_version TEXT NOT NULL,
+            
+            -- Onboarding and usage tracking
+            first_access_date TIMESTAMPTZ,
+            last_access_date TIMESTAMPTZ,
+            completed_onboarding BOOLEAN DEFAULT FALSE,
+            onboarding_completion_date TIMESTAMPTZ,
+            
+            -- App-specific preferences/settings (stored as JSONB for flexibility)
+            preferences JSONB DEFAULT '{}'::JSONB,
+            
+            -- Usage metrics
+            session_count INTEGER DEFAULT 0,
+            total_usage_minutes INTEGER DEFAULT 0,
+            
+            -- Metadata
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            
+            -- Unique constraint to ensure one profile per user per app type
+            UNIQUE(user_id, app_type)
+        );
+
         CREATE TABLE IF NOT EXISTS private.clinician_profile (
             user_id UUID PRIMARY KEY REFERENCES private.user(id) ON DELETE CASCADE,
             ahpra_registration_number TEXT NOT NULL,

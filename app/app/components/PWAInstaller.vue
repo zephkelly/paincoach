@@ -31,6 +31,7 @@
   </template>
   
   <script lang="ts">
+  console.log('PWA Installer Component Loaded');
 //   import apiService from '../services/ApiService';
   
   // Define type for BeforeInstallPromptEvent
@@ -75,6 +76,7 @@
       
       // Handle the beforeinstallprompt event
       const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent): void => {
+        console.log('Before Install Prompt Event Triggered');
         // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
         
