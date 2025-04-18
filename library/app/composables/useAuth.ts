@@ -170,10 +170,10 @@ export const useAuth = () => {
     }
 
     // Function to check if user has a specific role
-    const hasRole = (role: AllRoles, useActualRoles: boolean = false) => {
+    const hasRole = (role: AllRoles | AllRoles[], useActualRoles: boolean = false, requireAll: boolean = false) => {
         const rolesToCheck = useActualRoles ? actualUserRoles.value : userRoles.value
         if (!rolesToCheck) return false
-        return checkRole(rolesToCheck, role)
+        return checkRole(rolesToCheck, role, requireAll)
     }
 
     const verified = computed(() => {

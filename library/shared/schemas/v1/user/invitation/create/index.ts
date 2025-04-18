@@ -11,7 +11,7 @@ export const CreateUserInvitationRequestSchema = DBUserInvitationSchema.pick({
     primary_role: true,
     roles: true,
 }).extend({
-    confirm_email: z.string().email(),
+    confirm_email: z.email(),
 
     invitation_data: DBUserInvitationDataPartialSchema
 });

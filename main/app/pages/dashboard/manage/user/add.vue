@@ -2,8 +2,8 @@
     <Page :loading="!ready">
         <template #header>
             <h1>Add new users</h1>
-            <DashboardInvitationSenderForm :inviter-roles="userRoles" />
         </template>
+        <DashboardInvitationSenderForm :inviter-roles="userRoles" />
     </Page>
 </template>
 

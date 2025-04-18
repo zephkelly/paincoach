@@ -11,6 +11,7 @@ export const InputTypeSchema = z.enum([
     'number',
     'textarea',
     'select',
+    'multiselect',
     'checkbox',
     'button',
 ]);

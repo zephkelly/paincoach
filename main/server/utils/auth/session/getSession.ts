@@ -54,9 +54,10 @@ export async function getPainCoachSession(event: H3Event) {
         /**
          * Check if the user has a specific role or roles
          * @param role - Role or array of roles to check
+         * @param requireAll - If true, user must have ALL specified roles; if false, user only needs ONE of the roles
          * @returns {boolean}
          */
-        hasRole: (role: AllRoles | AllRoles[]) => checkRole((secureSession as SecureSessionData).roles, role),
+        hasRole: (role: AllRoles | AllRoles[], requireAll: boolean = false) => checkRole(secureSession, role, requireAll),
 
         permissions,
 

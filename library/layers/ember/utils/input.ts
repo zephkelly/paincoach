@@ -4,6 +4,7 @@ import EText from './../components/input.vue';
 import ENumberInput from './../components/numberInput.vue';
 import EButton from './../components/button.vue';
 import ESelect from './../components/select.vue';
+import EMultiSelect from '../components/multiSelect/index.vue';
 
 
 export function getComponent(input: InputType) {
@@ -14,6 +15,8 @@ export function getComponent(input: InputType) {
             return ENumberInput;
         case 'select':
             return ESelect;
+        case 'multiselect':
+            return EMultiSelect;
         case 'email':
             return EText;
         case 'password':

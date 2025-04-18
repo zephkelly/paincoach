@@ -42,17 +42,12 @@ export const DBUserRoleInvitationRoleDataPartialSchema = z.discriminatedUnion('r
 export const DBBaseInvitationUserDataSchema = DBBaseUserSchema.pick({
     first_name: true,
     last_name: true,
-    // title: true,
+    title: true,
     profile_url: true,
     data_sharing_enabled: true
 });
 
-export const DBBaseInvitationUserDataPartialSchema =z.object({
-    first_name: z.string().optional(),
-    last_name: z.string().optional(),
-    profile_url: z.string().optional(),
-    data_sharing_enabled: z.boolean().optional()
-});
+export const DBBaseInvitationUserDataPartialSchema = DBBaseInvitationUserDataSchema.partial();
 
 
 export const DBUserInvitationDataSchema = z.object({

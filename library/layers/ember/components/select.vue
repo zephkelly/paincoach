@@ -33,14 +33,14 @@
     </div>
   </template>
   
-<script lang="ts" setup>
+  <script lang="ts" setup>
   type SelectOption = {
     label: string;
-    value: string | null;
+    value: string | null | undefined;
   };
   
   type SelectProps = {
-      options: Array<string | SelectOption>;
+    options: Array<string | SelectOption>;
     id: string;
     label?: string;
     modelValue?: string | null;
@@ -52,6 +52,8 @@
     default?: string | null;
     validateOnSelect?: boolean;
     forceInvalid?: boolean;
+    noOptionUndefined?: boolean | string;
+    noOptionNull?: boolean | string;
   };
   
   const props = defineProps<SelectProps>();
@@ -62,14 +64,43 @@
   const touched = ref(false);
   const dirtyValue = ref(false);
   
-  // Normalize options to always have label and value
+  // Validate that both noOptionUndefined and noOptionNull aren't used together
+  onMounted(() => {
+    if (props.noOptionUndefined && props.noOptionNull) {
+      throw new Error('Select component: Cannot use both noOptionUndefined and noOptionNull props together');
+    }
+  });
+  
+  // Normalize options to always have label and value, and add default options if specified
   const normalizedOptions = computed<SelectOption[]>(() => {
-    return props.options.map(option => {
+    const result: SelectOption[] = [];
+    
+    // Add undefined option if requested
+    if (props.noOptionUndefined) {
+      const label = typeof props.noOptionUndefined === 'string' 
+        ? props.noOptionUndefined 
+        : 'None';
+      result.push({ label, value: undefined });
+    }
+    
+    // Add null option if requested
+    if (props.noOptionNull) {
+      const label = typeof props.noOptionNull === 'string' 
+        ? props.noOptionNull 
+        : 'None';
+      result.push({ label, value: null });
+    }
+    
+    // Add the regular options
+    props.options.forEach(option => {
       if (typeof option === 'string') {
-        return { label: option, value: option };
+        result.push({ label: option, value: option });
+      } else {
+        result.push(option);
       }
-      return option;
     });
+    
+    return result;
   });
   
   // Check if an option is currently selected (handles both null and undefined cases)
@@ -89,12 +120,13 @@
   });
   
   // Helper function to check equality between option values and modelValue
-  // This properly handles null values
-  function isOptionValueEqual(optionValue: string | null, modelValue: string | null | undefined): boolean {
-    // If modelValue is undefined, nothing is selected
-    if (modelValue === undefined) return false;
+  // This properly handles null and undefined values
+  function isOptionValueEqual(optionValue: string | null | undefined, modelValue: string | null | undefined): boolean {
+    // Handle undefined and null separately to ensure proper comparison
+    if (optionValue === undefined && modelValue === undefined) return true;
+    if (optionValue === null && modelValue === null) return true;
     
-    // Now we can safely compare, including null values
+    // For all other cases, use regular equality
     return optionValue === modelValue;
   }
   
@@ -119,7 +151,7 @@
   }
   
   // Select an option
-  function selectOption(value: string | null) {
+  function selectOption(value: string | null | undefined) {
     emit('update:modelValue', value);
     isOpen.value = false;
     dirtyValue.value = true;
