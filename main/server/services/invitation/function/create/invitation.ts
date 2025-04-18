@@ -100,7 +100,4 @@ export async function createInvitation(
             });
         }
     }
-
-
-
 }

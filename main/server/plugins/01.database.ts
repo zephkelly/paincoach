@@ -176,7 +176,6 @@ async function createTables(db: DatabaseService) {
             
             -- App access and state
             is_enabled BOOLEAN DEFAULT TRUE,
-            current_version TEXT NOT NULL,
             
             -- Onboarding and usage tracking
             first_access_date TIMESTAMPTZ,
@@ -184,8 +183,8 @@ async function createTables(db: DatabaseService) {
             completed_onboarding BOOLEAN DEFAULT FALSE,
             onboarding_completion_date TIMESTAMPTZ,
             
-            -- App-specific preferences/settings (stored as JSONB for flexibility)
-            preferences JSONB DEFAULT '{}'::JSONB,
+            desired_record_interval INTEGER DEFAULT 0 CHECK (record_interval > 0), -- in minutes
+            last_record_request_date TIMESTAMPTZ,
             
             -- Usage metrics
             session_count INTEGER DEFAULT 0,
@@ -212,6 +211,106 @@ async function createTables(db: DatabaseService) {
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
+
+        CREATE TABLE IF NOT EXISTS private.clinician_patient (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+            clinician_id UUID NOT NULL REFERENCES private.user(id) ON DELETE CASCADE,
+            patient_id UUID NOT NULL REFERENCES private.user(id) ON DELETE CASCADE,
+            relationship_status TEXT NOT NULL DEFAULT 'active', -- active, paused, terminated
+            start_date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            end_date TIMESTAMPTZ,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            
+            -- Ensure a patient can only be linked to the same clinician once
+            UNIQUE(clinician_id, patient_id)
+        );
+
+        CREATE OR REPLACE FUNCTION private.validate_clinician_patient_roles()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            clinician_role TEXT;
+            patient_role TEXT;
+        BEGIN
+            -- Get clinician's primary role
+            SELECT primary_role INTO clinician_role FROM private.user WHERE id = NEW.clinician_id;
+            
+            -- Get patient's primary role
+            SELECT primary_role INTO patient_role FROM private.user WHERE id = NEW.patient_id;
+            
+            -- Validate roles
+            IF clinician_role <> 'clinician' THEN
+                RAISE EXCEPTION 'User % is not a clinician', NEW.clinician_id;
+            END IF;
+            
+            IF patient_role <> 'patient' THEN
+                RAISE EXCEPTION 'User % is not a patient', NEW.patient_id;
+            END IF;
+            
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE TRIGGER validate_clinician_patient_roles_trigger
+        BEFORE INSERT OR UPDATE ON private.clinician_patient
+        FOR EACH ROW EXECUTE FUNCTION private.validate_clinician_patient_roles();
+
+
+        -- Table to store clinician-patient record settings used to overwrite app_profile settings
+        CREATE TABLE IF NOT EXISTS private.clinician_patient_record_settings (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+            clinician_patient_id UUID NOT NULL REFERENCES private.clinician_patient(id) ON DELETE CASCADE,
+            app_type TEXT NOT NULL, -- 'pain', 'mood', 'marriage', etc.
+            
+            -- Record interval settings that override app_profile settings
+            desired_record_interval INTEGER NOT NULL CHECK (desired_record_interval > 0), -- in hours
+            override_patient_settings BOOLEAN DEFAULT TRUE, -- If false, patient settings take precedence
+            
+            -- Notes for the clinician about this setting
+            notes TEXT,
+            
+            -- Metadata
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            created_by UUID REFERENCES private.user(id),
+            updated_by UUID REFERENCES private.user(id),
+            
+            -- Ensure one setting per clinician-patient relationship per app type
+            UNIQUE(clinician_patient_id, app_type)
+        );
+
+        CREATE OR REPLACE VIEW private.patient_record_settings AS
+        SELECT 
+            u.id AS user_id,
+            u.email,
+            u.first_name,
+            u.last_name,
+            ap.app_type,
+            COALESCE(
+                -- Use clinician settings if they exist and override is enabled
+                CASE WHEN cprs.override_patient_settings THEN cprs.desired_record_interval ELSE NULL END,
+                -- Otherwise use patient's own app_profile settings
+                ap.desired_record_interval
+            ) AS effective_record_interval,
+            ap.desired_record_interval AS patient_record_interval,
+            cprs.desired_record_interval AS clinician_record_interval,
+            cprs.override_patient_settings,
+            cp.clinician_id,
+            cu.first_name AS clinician_first_name,
+            cu.last_name AS clinician_last_name,
+            ap.last_record_request_date
+        FROM 
+            private.user u
+        JOIN 
+            private.app_profile ap ON u.id = ap.user_id
+        LEFT JOIN 
+            private.clinician_patient cp ON u.id = cp.patient_id AND cp.relationship_status = 'active'
+        LEFT JOIN 
+            private.clinician_patient_record_settings cprs ON cp.id = cprs.clinician_patient_id AND ap.app_type = cprs.app_type
+        LEFT JOIN
+            private.user cu ON cp.clinician_id = cu.id
+        WHERE
+            u.primary_role = 'patient' AND ap.is_enabled = TRUE;
     `);
 
     await db.query(`

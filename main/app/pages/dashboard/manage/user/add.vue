@@ -1,15 +1,16 @@
 <template>
-    <PageTabs :tabs="currentTabs" :loading="!ready">
+    <Page :loading="!ready">
         <template #header>
             <h1>Add new users</h1>
+            <DashboardInvitationSenderForm :inviter-roles="userRoles" />
         </template>
-    </PageTabs>
+    </Page>
 </template>
 
 <script lang="ts" setup>
-import DashboardUserClinicianInvite from '~/components/dashboard/user/clinician/invite.vue';
-import DashboardUserPatientInvite from '~/components/dashboard/user/patient/invite.vue';
-import DashboardUserAdminInvite from '~/components/dashboard/user/admin/invite.vue';
+// import DashboardUserClinicianInvite from '~/components/dashboard/user/clinician/invite.vue';
+// import DashboardUserPatientInvite from '~/components/dashboard/user/patient/invite.vue';
+// import DashboardUserAdminInvite from '~/components/dashboard/user/admin/invite.vue';
 
 const {
     ready,
@@ -28,40 +29,40 @@ watch(() => userRoles.value, (role) => {
     }
 }, { immediate: true });
 
-const userTabs = [{
-        label: 'Clinicians',
-        component: DashboardUserClinicianInvite,
-        headerWidth: 90
-    }, {
-        label: 'Admins',
-        component: DashboardUserAdminInvite,
-        headerWidth: 80
-    }, {
-        label: 'Patients',
-        component: DashboardUserPatientInvite,
-        headerWidth: 100
-    }
-]
+// const userTabs = [{
+//         label: 'Clinicians',
+//         component: DashboardUserClinicianInvite,
+//         headerWidth: 90
+//     }, {
+//         label: 'Admins',
+//         component: DashboardUserAdminInvite,
+//         headerWidth: 80
+//     }, {
+//         label: 'Patients',
+//         component: DashboardUserPatientInvite,
+//         headerWidth: 100
+//     }
+// ]
 
-const currentTabs = computed(() => {
-    const role = primaryRole.value;
+// const currentTabs = computed(() => {
+//     const role = primaryRole.value;
 
-    if (hasRole('admin')) {
-        return userTabs;
-    }
-    else {
-        return [];
-    }
+//     if (hasRole('admin')) {
+//         return userTabs;
+//     }
+//     else {
+//         return [];
+//     }
 
-    // switch(role) {
-    //     case 'admin':
-    //         return userTabs;
-    //     case 'clinician':
-    //         return []
-    //     default:
-    //         return []
-    // }
-})
+//     // switch(role) {
+//     //     case 'admin':
+//     //         return userTabs;
+//     //     case 'clinician':
+//     //         return []
+//     //     default:
+//     //         return []
+//     // }
+// })
 
 definePageMeta({
     layout: 'app',

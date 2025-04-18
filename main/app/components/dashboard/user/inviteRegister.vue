@@ -216,8 +216,7 @@
                             @update:modelValue="setRoleField('clinician', field.identifier, $event)"
                         />
                     </div>
-                </div>
-                
+                </div>         
             </div>
 
             <div class="submit-section">

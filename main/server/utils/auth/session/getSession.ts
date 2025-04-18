@@ -11,7 +11,9 @@ import type {
 } from '#auth-utils';
 import { type AllRoles } from '@@/shared/types/v1/role';
 import { hasPermission } from '../../permission/hasPermission';
-import { hasRole } from '~~/server/utils/user/role';
+// import { hasRole } from '~~/server/utils/user/role';
+
+import { checkRole } from '@@/shared/utils/auth/role';
 import { getPermissionsContext } from '../../permission/getPermissionsContext';
 
 
@@ -54,7 +56,7 @@ export async function getPainCoachSession(event: H3Event) {
          * @param role - Role or array of roles to check
          * @returns {boolean}
          */
-        hasRole: (role: AllRoles | AllRoles[]) => hasRole(secureSession as SecureSessionData, role),
+        hasRole: (role: AllRoles | AllRoles[]) => checkRole((secureSession as SecureSessionData).roles, role),
 
         permissions,
 

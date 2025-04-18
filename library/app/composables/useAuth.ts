@@ -1,7 +1,5 @@
 import type { Role, AllRoles } from "@@/shared/types/v1/role"
-import type { LimitedUserWithRoles } from "@@/shared/types/v1/user/limited"
-// import { type LimitedUser } from "@@/shared/types/v1/user/minimal"
-
+import { checkRole } from "@@/shared/utils/auth/role"
 
 
 export const useAuth = () => {
@@ -175,7 +173,7 @@ export const useAuth = () => {
     const hasRole = (role: AllRoles, useActualRoles: boolean = false) => {
         const rolesToCheck = useActualRoles ? actualUserRoles.value : userRoles.value
         if (!rolesToCheck) return false
-        return rolesToCheck.includes(role)
+        return checkRole(rolesToCheck, role)
     }
 
     const verified = computed(() => {

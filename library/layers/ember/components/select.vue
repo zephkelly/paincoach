@@ -40,10 +40,10 @@
   };
   
   type SelectProps = {
+      options: Array<string | SelectOption>;
     id: string;
     label?: string;
     modelValue?: string | null;
-    options: Array<string | SelectOption>;
     placeholder?: string;
     required?: boolean;
     tabindex?: number;
